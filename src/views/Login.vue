@@ -106,7 +106,7 @@ export default {
   data: () => ({
     visible: false,
     loading: false,
-    selectedOption: null, // Controla la opción seleccionada
+    selectedOption: 'empresa', // Controla la opción seleccionada
     valid: true,
     snackbar: false,
     sb_type: '',
