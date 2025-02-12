@@ -1,0 +1,108 @@
+// Composables
+import { createRouter, createWebHistory } from "vue-router";
+
+const routes = [  
+  {
+    path: "/", 
+    component: () =>
+      import( "@/views/Login.vue"),
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: () =>
+      import(/* webpackChunkName: "home" */ "@/views/Login.vue"),
+  },
+  {
+     path: "/dashboard",
+    name: "Dashboard",
+    component: () =>   import(/* webpackChunkName: "home" */ "@/views/DashboardView.vue"),
+    children: [
+      {
+        path: "/home",
+        name: "Home",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/Home.vue"),
+      },
+      {
+        path: "/company",
+        name: "Negocio",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/company/Company.vue"),
+      }, 
+      {
+        path: "/branch",
+        name: "Branch",
+        component: () =>
+          import(
+            /* webpackChunkName: "home" */ "@/views/branch/Branch.vue"
+          ),
+      },   
+      {
+        path: "/worker",
+        name: "Worker",
+        component: () =>
+          import(
+            /* webpackChunkName: "home" */ "@/views/worker/Worker.vue"
+          ),
+      },
+      {
+        path: "/role",
+        name: "Role",
+        component: () =>
+          import(
+            /* webpackChunkName: "home" */ "@/views/role/Role.vue"
+          ),
+      },
+      {
+        path: "/vehicle",
+        name: "Vehicle",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/vehicle/Vehicle.vue"),
+      },   
+      {
+        path: "/location",
+        name: "Location",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/location/Location.vue"),
+      },
+      {
+        path: "/device",
+        name: "Device",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/device/Device.vue"),
+      },
+      {
+        path: "/route",
+        name: "Route",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/route/Route.vue"),
+      },
+      {
+        path: "/trip",
+        name: "Trip",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/trip/Trip.vue"),
+      },
+      {
+        path: "/tick",
+        name: "Tick",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/ticket/Tickect.vue"),
+      },
+      {
+        path: "/permission",
+        name: "Permission",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/permission/Permission.vue"),
+      },
+    ],
+  },
+];
+
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
+  routes,
+});
+
+export default router;
