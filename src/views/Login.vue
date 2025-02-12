@@ -56,41 +56,46 @@
   </div>-->
 
   <div class="d-flex align-center justify-center" style="height: 100vh;">
-  <v-form ref="form" v-model="valid" enctype="multipart/form-data">
-    <v-card class="mx-4 pa-6 pb-8" elevation="8" max-width="600px" min-width="400px" rounded="lg">
-      <!-- Contenedor del texto "BusGo" -->
-      <div class="mx-auto" style="font-size: 3.5rem; font-weight: bold; color: #1976D2; text-align: center; width: 100%;">
-        <v-icon class="mb-3">mdi-bus</v-icon>
-        <div style="display: flex; align-items: center; justify-content: center; gap: 0;">
-          <span style="color: black;">Bus</span>
-          <span style="color: orange;">Go</span>
+    <v-form ref="form" v-model="valid" enctype="multipart/form-data">
+      <v-card class="mx-4 pa-6 pb-8" elevation="8" max-width="600px" min-width="400px" rounded="lg">
+        <!-- Contenedor del texto "BusGo" -->
+        <div class="mx-auto"
+          style="font-size: 3.5rem; font-weight: bold; color: #1976D2; text-align: center; width: 100%;">
+          <v-icon class="mb-3">mdi-bus</v-icon>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 0;">
+            <span style="color: black;">Bus</span>
+            <span style="color: orange;">Go</span>
+          </div>
         </div>
-      </div>
 
-      <v-text-field density="compact" placeholder="Usuario" prepend-inner-icon="mdi-account-circle-outline"
-        variant="outlined" v-model="editedItem.email"></v-text-field>
+        <v-text-field density="compact" placeholder="Usuario" prepend-inner-icon="mdi-account-circle-outline"
+          variant="outlined" v-model="editedItem.email"></v-text-field>
 
-      <v-text-field :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" :type="visible ? 'text' : 'password'"
-        density="compact" placeholder="Contraseña" prepend-inner-icon="mdi-lock-outline" variant="outlined"
-        @click:append-inner="visible = !visible" v-model="editedItem.password"></v-text-field>
+        <v-text-field :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" :type="visible ? 'text' : 'password'"
+          density="compact" placeholder="Contraseña" prepend-inner-icon="mdi-lock-outline" variant="outlined"
+          @click:append-inner="visible = !visible" v-model="editedItem.password"></v-text-field>
 
-      <v-radio-group v-model="selectedOption" inline>
-        <v-radio color="blue" label="Empresa" value="empresa"></v-radio>
-        <v-radio color="blue" class="ml-4" label="Sucursales" value="sucursales"></v-radio>
-      </v-radio-group>
+        <v-radio-group v-model="selectedOption" inline>
+          <v-radio color="blue" label="Empresa" value="empresa"></v-radio>
+          <v-radio color="blue" class="ml-4" label="Sucursales" value="sucursales"></v-radio>
+        </v-radio-group>
 
-      <v-autocomplete :no-data-text="'No hay datos disponibles'" v-if="selectedOption === 'sucursales'" clearable
-        label="Seleccione una Sucursal" variant="outlined" prepend-inner-icon="mdi-domain"
-        v-model="editedItem.branch_id" :items="branches" item-title="name" item-value="id">
-      </v-autocomplete>
+        <v-autocomplete :no-data-text="'No hay datos disponibles'" v-if="selectedOption === 'sucursales'" clearable
+          label="Seleccione una Sucursal" variant="outlined" prepend-inner-icon="mdi-domain"
+          v-model="editedItem.branch_id" :items="branches" item-title="name" item-value="id">
+          <template v-slot:item="{ props, item }">
+            <v-list-item v-bind="props" :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`"
+              :title="item.raw.name"></v-list-item>
+          </template>
+        </v-autocomplete>
 
-      <v-btn class="mb-8" color="blue" size="large" variant="tonal" block :loading="loading" @click="login()"
-        :disabled="!valid">
-        Ingresar
-      </v-btn>
-    </v-card>
-  </v-form>
-</div>
+        <v-btn class="mb-8" color="blue" size="large" variant="tonal" block :loading="loading" @click="login()"
+          :disabled="!valid">
+          Ingresar
+        </v-btn>
+      </v-card>
+    </v-form>
+  </div>
 </template>
 <script>
 import LocalStorageService from "@/LocalStorageService";
@@ -169,7 +174,6 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.branches = [];
-          this.showAlert('info', result.message || 'No hay sucursales disponibles.', 3000);
         }
       } catch (error) {
         // Captura de errores no controlados
@@ -196,7 +200,7 @@ export default {
           // Manejo en caso de éxito
           this.showAlert('success', 'Inicio de sesión exitoso', 3000);
           this.user = result.data;
-          
+
           // Guardar datos en LocalStorage
           const user = this.user;
           LocalStorageService.setItem('token', user.token);
