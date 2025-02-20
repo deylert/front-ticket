@@ -21,7 +21,7 @@
                     <v-col cols="12" md="3" class="text-right">
                         <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
                             prepend-icon="mdi-plus-circle" @click="showAdd">
-                            Agregar Nuevo Permiso
+                            Agregar Permiso
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -145,13 +145,13 @@ export default {
             (v) => (v && v.length <= 50) ||
                 "El campo debe tener menos de 51 caracteres",
             (v) => (v && v.length >= 3) ||
-                "El campo debe tener al menos de 3 caracteres",
+                "El campo debe tener al menos 3 caracteres",
         ],
         selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
     }),
     computed: {
         formTitle() {
-            return this.editedIndex === -1 ? 'Agregar Nuevo Permiso' : 'Editar Permiso';
+            return this.editedIndex === -1 ? 'Agregar Permiso' : 'Editar Permiso';
         }
     },
     mounted() {
@@ -185,12 +185,11 @@ export default {
                 } else {
                     // Si no hay datos, asignamos un array vacío
                     this.permissions = [];
-                    this.showAlert('success', result.message || 'No hay permissions disponibles.', 3000);
                 }
             } catch (error) {
                 this.loading = false;
                 // Captura de errores no controlados
-                this.showAlert('error', 'Ocurrió un error inesperado al cargar los roles.', 3000);
+                this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
             } finally {
                 this.loading = false;
             }
@@ -231,7 +230,7 @@ export default {
           }
         } else {
           this.loading = false;
-          this.showAlert("success", "Debe completar los datos del permiso.", 3000);
+          this.showAlert("success", "Debe completar los datos.", 3000);
         }
             } else {
                 const fieldsToUpdate = ['id', 'name', 'module', 'description'];

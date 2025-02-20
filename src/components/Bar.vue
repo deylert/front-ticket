@@ -1,5 +1,5 @@
 <template>
-   <v-container style="height: 300px;"> <!-- Ajusta la altura aquí -->
+   <v-container style="height: 300px;" fluid> <!-- Ajusta la altura aquí -->
     <Bar :options="chartOptions" :data="chartData" />
     </v-container>
   </template>
@@ -26,9 +26,36 @@
   
   export default {
     name: "BarChart",
-  
-    data: () => ({
-      chartData: {
+    props: {
+    dataArray: {
+      type: Array,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      chartOptions: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            grid: {
+              display: false, // Oculta la cuadrícula del eje X
+            },
+            barThickness: 30, // Ancho fijo de las barras en píxeles
+          },
+          y: {
+            grid: {
+              display: true, // Muestra la cuadrícula del eje Y
+            },
+          },
+        },
+      },
+    };
+  },
+  computed: {
+    chartData() {
+      return {
         labels: [
           "Enero",
           "Febrero",
@@ -45,16 +72,14 @@
         ],
         datasets: [
           {
-            label: "Data One",
-            backgroundColor: "#425C5A",
-            data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11],
+            label: "Ingresado",
+            backgroundColor: "#1976D2",
+            data: this.dataArray, // Usamos el array pasado como prop
           },
         ],
-      },
-      chartOptions: {
-        responsive: true,
-      },
-    }),
+      };
+    },
+  },
     components: {
       Bar,
     },

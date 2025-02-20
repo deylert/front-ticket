@@ -16,11 +16,11 @@
   <v-app-bar scroll-threshold="0">
     <v-app-bar-title>
   <div style="display: flex; align-items: center; gap: 0;">
-    <v-icon size="40">mdi-bus</v-icon> <!-- Icono sin margen inferior -->
-    <span style="font-size: 2rem; font-weight: bold; color: black;">
+    <!--<v-icon size="40">mdi-bus</v-icon>  Icono sin margen inferior -->
+    <span style="font-size: 1.5rem; font-weight: bold; color: black;">
       Bus
     </span>
-    <span style="font-size: 2rem; font-weight: bold; color: orange;">
+    <span style="font-size: 1.5rem; font-weight: bold; color: orange;">
       Go
     </span>
   </div>

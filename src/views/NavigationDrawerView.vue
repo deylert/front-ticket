@@ -2,28 +2,11 @@
   <v-card>
     <v-layout>
       <v-navigation-drawer permanent class="pt-4 my-1" color="white" theme="dark" app>
-        <!--<template v-slot:prepend>
-    <v-list-item
-      color="#1976D2"
-      lines="two"
-      variant="flat"
-      :style="{ backgroundColor: '#1976D2', display: 'flex', justifyContent: 'center', alignItems: 'center' }"
-    >
-    <template v-slot:title>
-      <v-icon class="mb-3" size="45">mdi-bus</v-icon>-->
-        <!--<div style="display: flex; align-items: center; gap: 0;">
-        <span style="font-size: 2rem; font-weight: bold; color: white;">
-          Dashboard
-        </span>
-      </div>
-    </template>
-</v-list-item>
-</template>-->
         <template v-slot:prepend>
           <v-list-item class="text-subtitle-1" lines="two" variant="flat"
             :prepend-avatar="`${this.$axios.defaults.baseURL}images/${this.imageBranch}`" :title="this.title"
             :subtitle="this.subtitle"
-            :style="{ backgroundColor: '#ECEFF1', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#000000' }">
+            :style="{ backgroundColor: '#ECEFF1', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#000000' }" cover>
           </v-list-item>
         </template>
         <!--prepend-avatar=`${this.$axios.defaults.baseURL}images/${imageBusiness}`-->
@@ -49,6 +32,7 @@
           <v-list-item prepend-icon="mdi-steering" title="Viajes" to="trip" value="trip"
             class="list-item"></v-list-item>
           <v-list-item prepend-icon="mdi-ticket" title="Tickets" to="tick" value="tick" class="list-item"></v-list-item>
+          <v-list-item prepend-icon="mdi-bus-side" title="Estructuras de asientos" to="structure" value="structure" class="list-item"></v-list-item>
 
 
           <v-list-group value="Mantenedores">
@@ -66,12 +50,11 @@
         <v-spacer></v-spacer>
         <template v-slot:append>
 
-          <!-- Opciones en la parte inferior -->
+          <!-- Opciones en la parte inferior 
           <v-list density="compact" nav>
             <v-list-item prepend-icon="mdi-cog-outline" title="Configuración" to="/settings" value="settings"
               class="list-item"></v-list-item>
-            <!--<v-list-item prepend-icon="mdi-earth" title="Idioma" to="/language" value="language" class="list-item"></v-list-item>-->
-          </v-list>
+          </v-list>-->
         </template>
       </v-navigation-drawer>
       <v-main style="height: 94vh"></v-main>

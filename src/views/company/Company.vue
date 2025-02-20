@@ -12,44 +12,44 @@
     </v-row>
   </v-snackbar>
   <v-container fluid>
-  <v-card elevation="6" class="mx-2">
-    <v-toolbar color="#1976D2">
-      <v-row align="center">
-        <v-col cols="12" md="8" class="grow ml-4">
-          <span class="text-subtitle-1"><strong>Negocio</strong></span>
-        </v-col>
-        <v-col cols="12" md="3" class="text-right">
-          <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
-            prepend-icon="mdi-plus-circle" @click="showAddBussines">
-            Agregar Nueva Compañía
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-toolbar>
+    <v-card elevation="6" class="mx-2">
+      <v-toolbar color="#1976D2">
+        <v-row align="center">
+          <v-col cols="12" md="8" class="grow ml-4">
+            <span class="text-subtitle-1"><strong>Negocios</strong></span>
+          </v-col>
+          <v-col cols="12" md="3" class="text-right">
+            <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
+              prepend-icon="mdi-plus-circle" @click="showAddBussines">
+              Agregar Negocio
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-toolbar>
 
-    <v-card-text>
-      <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
-        hide-details>
-      </v-text-field>
-      <v-data-table :headers="headers" :search="search" :items="companies" class="elevation-1"
-        style="max-height: 68vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
-        no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
-        <template v-slot:item.actions="{ item }">
-          <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2" variant="tonal"
-            elevation="1" title="Editar Negocio"></v-btn>
-          <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171" variant="tonal"
-            elevation="1" title="Eliminar Negocio"></v-btn>
-        </template>
-        <template v-slot:item.name="{ item }">
-          <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
-            <v-img :src="`${this.$axios.defaults.baseURL}images/${item.image}?t=${Date.now()}`" alt="image"></v-img>
-          </v-avatar><!--+'?$'+Date.now()-->
-          {{ item.name }}
-        </template>
-      </v-data-table>
-    </v-card-text>
-  </v-card>
-</v-container>
+      <v-card-text>
+        <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+          hide-details>
+        </v-text-field>
+        <v-data-table :headers="headers" :search="search" :items="companies" class="elevation-1"
+          style="max-height: 68vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
+          no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
+          <template v-slot:item.actions="{ item }">
+            <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2" variant="tonal"
+              elevation="1" title="Editar Negocio"></v-btn>
+            <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171" variant="tonal"
+              elevation="1" title="Eliminar Negocio"></v-btn>
+          </template>
+          <template v-slot:item.name="{ item }">
+            <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
+              <v-img :src="`${this.$axios.defaults.baseURL}images/${item.image}?t=${Date.now()}`" alt="image"></v-img>
+            </v-avatar><!--+'?$'+Date.now()-->
+            {{ item.name }}
+          </template>
+        </v-data-table>
+      </v-card-text>
+    </v-card>
+  </v-container>
 
   <v-dialog v-model="dialog" max-width="600px">
     <v-form ref="form" v-model="valid" enctype="multipart/form-data">
@@ -69,8 +69,8 @@
                   variant="underlined" :rules="rutRules"></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="editedItem.phone" clearable label="Teléfono" placeholder="+56912345678" prepend-icon="mdi-phone"
-                  variant="underlined" :rules="mobileRules"></v-text-field>
+                <v-text-field v-model="editedItem.phone" clearable label="Teléfono" placeholder="+56912345678"
+                  prepend-icon="mdi-phone" variant="underlined" :rules="mobileRules"></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field v-model="editedItem.address" clearable label="Dirección"
@@ -184,20 +184,20 @@ export default {
       (v) => (v && v.length <= 50) ||
         "El campo debe tener menos de 51 caracteres",
       (v) => (v && v.length >= 3) ||
-        "El campo debe tener al menos de 3 caracteres",
+        "El campo debe tener al menos 3 caracteres",
     ],
     selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
     mobileRules: [
       v => !!v || 'El número de móvil es requerido',
       v => /^\+569\d{8}$/.test(v) || 'Formato de número móvil inválido. Ejemplo: +56912345678'
     ],
-    rutRules: [ v => !!v || 'El RUT es requerido',
-                    v => /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/.test(v) || 'El RUT debe estar en el formato XX.XXX.XXX-Y (ejemplo: 12.345.678-9)'
-                  ]
+    rutRules: [v => !!v || 'El RUT es requerido',
+    v => /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/.test(v) || 'El RUT debe estar en el formato XX.XXX.XXX-Y (ejemplo: 12.345.678-9)'
+    ]
   }),
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'Agregar Nuevo Negocio' : 'Editar Negocio';
+      return this.editedIndex === -1 ? 'Agregar Negocio' : 'Editar Negocio';
     },
     imgedit() {
       return this.imgMiniatura;
@@ -234,17 +234,16 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.companies = [];
-          this.showAlert('info', result.message || 'No hay compañías disponibles.', 3000);
         }
       } catch (error) {
         this.loading = false;
         // Captura de errores no controlados
-        this.showAlert('error', 'Ocurrió un error inesperado al cargar las compañías.', 3000);
+        this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
       } finally {
         this.loading = false;
       }
     },
-    async save() { 
+    async save() {
       this.loading = true;
       if (this.editedIndex === -1) {
         this.valid = false;
@@ -303,27 +302,27 @@ export default {
             formData.append(key, updatedFields[key]);
           }
           try {
-          const result = await handleRequest({
-            endpoint: 'company-update',
-            method: 'POST',
-            data: formData
-          });
+            const result = await handleRequest({
+              endpoint: 'company-update',
+              method: 'POST',
+              data: formData
+            });
 
-          // Manejo de la respuesta según el resultado
-          if (result.success) {
-            this.showAlert("success", result.message, 3000);
-            this.initialize();
-            this.loading = false;
-          } else {
-            this.showAlert("warning", result.message, 3000);
+            // Manejo de la respuesta según el resultado
+            if (result.success) {
+              this.showAlert("success", result.message, 3000);
+              this.initialize();
+              this.loading = false;
+            } else {
+              this.showAlert("warning", result.message, 3000);
+              this.loading = false;
+            }
+          } catch (error) {
+            // Este bloque captura errores inesperados fuera del manejo estándar
+            this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
             this.loading = false;
           }
-        } catch (error) {
-          // Este bloque captura errores inesperados fuera del manejo estándar
-          this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
-          this.loading = false;
-        }
-        }else{
+        } else {
           this.showAlert("success", "No se realizaron cambios.", 3000);
           this.loading = false;
         }

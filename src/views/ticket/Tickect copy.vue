@@ -37,9 +37,9 @@
                     no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
                     <template v-slot:item.actions="{ item }">
                         <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2"
-                            variant="tonal" elevation="1" title="Editar Ticket"></v-btn>
+                            variant="tonal" elevation="1" title="Editar Viaje"></v-btn>
                         <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171"
-                            variant="tonal" elevation="1" title="Eliminar Ticket"></v-btn>
+                            variant="tonal" elevation="1" title="Eliminar Viaje"></v-btn>
                     </template>
                     <template v-slot:item.tripOrigin="{ item }">
                         <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
@@ -66,7 +66,6 @@
                 <v-card-text>
                     <v-container>
                         <v-row style="margin-top: 5px">
-                            <!-- Selección de viaje -->
                             <v-col cols="12" md="12">
                                 <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.trip_id"
                                     :items="trips" label="Viaje" prepend-icon="mdi-road" item-title="name"
@@ -122,11 +121,16 @@
                                                                     :src="`${this.$axios.defaults.baseURL}images/${item.raw.imageVehicle}`"
                                                                     max-width="40" />
                                                             </v-avatar>
-                                                            <div class="ml-2 text-truncate" :title="item.raw.plate"
-                                                                style="max-width: 200px;">
+                                                            <div class="ml-2 text-truncate"
+                                                                :title="item.raw.plate" style="max-width: 200px;">
                                                                 {{ item.raw.plate }}
                                                             </div>
                                                         </v-col>
+                                                        <!--<v-col cols="auto" class="d-flex align-center ml-4">
+                                                            <div class="text-truncate" style="max-width: 150px;">
+                                                                <strong>Disponibles:</strong> {{ item.raw.seats - item.raw.reservedSeats.length}}
+                                                            </div>
+                                                        </v-col>-->
                                                     </v-row>
                                                 </v-list-item-content>
                                             </v-list-item>
@@ -135,16 +139,12 @@
                                     </template>
                                 </v-autocomplete>
                             </v-col>
-
-                            <!-- Método de pago -->
                             <v-col cols="12" md="6">
                                 <v-select v-model="editedItem.method" :items="paymentMethods" label="Método de pago"
                                     item-value="value" item-title="text" variant="underlined" density="compact"
-                                    :rules="[(v) => !!v || 'Seleccione un método de pago']"
-                                    prepend-icon="mdi-cash"></v-select>
+                                    :rules="[(v) => !!v || 'Seleccione un método de pago']" prepend-icon="mdi-cash">
+                                </v-select>
                             </v-col>
-
-                            <!-- Fecha -->
                             <v-col cols="12" md="6">
                                 <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40"
                                     transition="scale-transition" offset-y min-width="190px">
@@ -159,25 +159,21 @@
                                     </v-locale-provider>
                                 </v-menu>
                             </v-col>
-
-                            <!-- Precio del pasaje -->
                             <v-col cols="12" md="4">
                                 <v-text-field v-model="editedItem.price" label="Precio del pasaje" type="number"
                                     variant="underlined" density="compact" prepend-icon="mdi-cash"
                                     :rules="[(v) => v > 0 || 'Debe ser un precio válido']"
-                                    placeholder="Ingrese el precio del pasaje" min="0" step="0.01"
-                                    readonly></v-text-field>
+                                    placeholder="Ingrese el precio del pasaje" min="0" step="0.01" readonly>
+                                </v-text-field>
                             </v-col>
-
-                            <!-- Cantidad de pasajes -->
                             <v-col cols="12" md="4">
                                 <v-text-field v-model="editedItem.quantity" label="Cantidad de pasajes" type="number"
                                     variant="underlined" density="compact" prepend-icon="mdi-ticket"
                                     placeholder="Ingrese la cantidad" min="1" @update:model-value="calculateTotal"
-                                    :rules="quantityAndPassengerRules" :disabled="!editedItem.trip_id"></v-text-field>
+                                    :rules="quantityAndPassengerRules" :disabled="!editedItem.trip_id">
+                                </v-text-field>
                             </v-col>
 
-                            <!-- Selección de asientos -->
                             <v-col cols="12" md="4" v-if="editedItem.quantity">
                                 <v-row>
                                     <v-menu v-model="showSeatsMenu" activator="parent" offset-y
@@ -188,7 +184,8 @@
                                                 color="primary" dark readonly style="text-transform: none"
                                                 :disabled="editedItem.quantity <= 0" prepend-icon="mdi-seat"
                                                 variant="underlined"
-                                                :rules="[v => selectedSeats.length > 0 || 'Debe seleccionar al menos un asiento']"></v-text-field>
+                                                :rules="[v => selectedSeats.length > 0 || 'Debe seleccionar al menos un asiento']">
+                                            </v-text-field>
                                         </template>
 
                                         <!-- Contenido del menú -->
@@ -197,29 +194,35 @@
                                             <v-card-text>
                                                 <v-row>
                                                     <!-- Mostrar asientos en filas de 2 -->
-                                                    <!-- Mostrar asientos en filas de 2 -->
-                                                    <v-col cols="12" class="d-flex align-center justify-center">
-                                                        <div class="seat-map-preview"
-                                                            style="display: flex; flex-direction: column;">
-                                                            <div v-for="(row, rowIndex) in seatMap" :key="rowIndex"
-                                                                class="seat-row"
-                                                                style="display: flex; flex-direction: row;">
-                                                                <template v-for="(seat, seatIndex) in row"
-                                                                    :key="seatIndex">
-                                                                    <v-btn v-if="seat.selected"
-                                                                        :color="getSeatColor(seat)"
-                                                                        class="seat-button-preview"
-                                                                        :disabled="!isSeatAvailable(seat)"
-                                                                        @click="toggleSeat(seat)"
-                                                                        style="min-width: 30px; min-height: 30px; font-size: 0.8rem; font-weight: bold;">
-                                                                        <!-- Ícono de asiento -->
-                                                                        <v-icon v-if="seat.label">mdi-seat</v-icon>
-                                                                        {{ Number(seat.label) ? `${Number(seat.label)}`
-                                                                        : '' }}
-                                                                    </v-btn>
-                                                                </template>
-                                                            </div>
-                                                        </div>
+                                                    <v-col v-for="seat in evenSeats" :key="seat" cols="6"
+                                                        class="d-flex align-center justify-center">
+                                                        <v-icon :color="isSeatReserved(seat)
+                                                            ? 'red'
+                                                            : selectedSeats.includes(seat)
+                                                                ? 'primary'
+                                                                : 'green'
+                                                            " class="cursor-pointer"
+                                                            @click="!isSeatReserved(seat) ? toggleSeat(seat) : ''"
+                                                            :disabled="!isSeatReserved(seat)">
+                                                            mdi-seat
+                                                        </v-icon>
+                                                        <span class="ml-2">{{ seat }}</span>
+                                                    </v-col>
+
+                                                    <!-- Si hay un asiento impar, mostrarlo centrado -->
+                                                    <v-col v-if="oddSeat" cols="12"
+                                                        class="d-flex align-center justify-center">
+                                                        <v-icon :color="isSeatReserved(oddSeat)
+                                                            ? 'red'
+                                                            : selectedSeats.includes(oddSeat)
+                                                                ? 'primary'
+                                                                : 'green'
+                                                            " class="cursor-pointer"
+                                                            @click="!isSeatReserved(oddSeat) ? toggleSeat(oddSeat) : ''"
+                                                            :disabled="!isSeatReserved(oddSeat)">
+                                                            mdi-seat
+                                                        </v-icon>
+                                                        <span class="ml-2">{{ oddSeat }}</span>
                                                     </v-col>
                                                 </v-row>
 
@@ -241,29 +244,30 @@
                                     </v-menu>
                                 </v-row>
                             </v-col>
-
-                            <!-- Pasajeros adultos y menores -->
                             <v-row>
+                                <!-- Campo para Pasajeros Adultos -->
                                 <v-col cols="12" md="4">
                                     <v-text-field v-model="editedItem.adults" label="Pasajeros adultos" type="number"
                                         variant="underlined" density="compact" prepend-icon="mdi-account"
                                         placeholder="Ingrese la cantidad de adultos" min="0"
-                                        @update:model-value="calculateTotal"
-                                        :rules="quantityAndPassengerRules"></v-text-field>
+                                        @update:model-value="calculateTotal" :rules="quantityAndPassengerRules">
+                                    </v-text-field>
                                 </v-col>
 
+                                <!-- Campo para Pasajeros Menores -->
                                 <v-col cols="12" md="4">
                                     <v-text-field v-model="editedItem.minors" label="Pasajeros menores" type="number"
                                         variant="underlined" density="compact" prepend-icon="mdi-account-child"
                                         placeholder="Ingrese la cantidad de menores" min="0"
-                                        @update:model-value="calculateTotal"
-                                        :rules="quantityAndPassengerRules"></v-text-field>
+                                        @update:model-value="calculateTotal" :rules="quantityAndPassengerRules">
+                                    </v-text-field>
                                 </v-col>
 
+                                <!-- Campo para Total -->
                                 <v-col cols="12" md="4">
                                     <v-text-field v-model="editedItem.total" label="Total a pagar" type="number"
-                                        variant="underlined" density="compact" prepend-icon="mdi-cash"
-                                        readonly></v-text-field>
+                                        variant="underlined" density="compact" prepend-icon="mdi-cash" readonly>
+                                    </v-text-field>
                                 </v-col>
                             </v-row>
                         </v-row>
@@ -273,7 +277,7 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="#DA7171" variant="flat" @click="close">Cancelar</v-btn>
-                    <v-btn color="#1976D2" variant="flat" @click="save" :disabled="!valid"
+                    <v-btn color="#1976D2" variant="flat" @click="save" :disabled="(!valid)"
                         :loading="loading">Aceptar</v-btn>
                 </v-card-actions>
             </v-card>
@@ -282,10 +286,10 @@
     <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card>
             <v-toolbar color="#DA7171">
-                <span class="text-subtitle-2 ml-4"> Eliminar un Ticket</span>
+                <span class="text-subtitle-2 ml-4"> Eliminar una viaje</span>
             </v-toolbar>
 
-            <v-card-text class="mt-2 mb-2"> ¿Desea eliminar el ticket?</v-card-text>
+            <v-card-text class="mt-2 mb-2"> ¿Desea eliminar la viaje?</v-card-text>
             <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
@@ -412,7 +416,7 @@ export default {
     }),
     computed: {
         formTitle() {
-            return this.editedIndex === -1 ? "Agregar Ticket" : "Editar Ticket";
+            return this.editedIndex === -1 ? "Agregar Nuevo Ticket" : "Editar Ticket";
         },
         dateFormatted() {
             const date = this.input ? new Date(this.input) : new Date();
@@ -424,12 +428,6 @@ export default {
         getDate() {
             return this.input ? new Date(this.input) : new Date();
         },
-        evenSeats() {
-            return this.availableSeats.filter((seat, index) => index % 2 === 0);
-        },
-        oddSeat() {
-            return this.availableSeats.length % 2 !== 0 ? this.availableSeats[this.availableSeats.length - 1] : null;
-        },
         quantityAndPassengerRules() {
             return [
                 () => {
@@ -437,18 +435,28 @@ export default {
                         return "La cantidad de pasajes debe ser mayor a cero.";
                     }
 
-                    const availableSeats = this.availableSeats.length;
+                    const availableSeats =
+                        this.seats - (this.reservedSeats ? this.reservedSeats.length : 0);
 
+                    // Si la cantidad de pasajes supera los asientos disponibles, es inválido
                     if (this.editedItem.quantity > availableSeats) {
                         return `La cantidad de pasajes no puede ser mayor a los asientos disponibles (${availableSeats}).`;
                     }
 
                     if (this.validateQuantity()) {
-                        return true;
+                        return true; // La validación pasó
                     }
                     return "La suma de adultos y menores no puede ser mayor que la cantidad de pasajes.";
                 },
             ];
+        },
+        evenSeats() {
+            // Genera los asientos hasta el penúltimo si el número es impar
+            return Array.from({ length: Math.floor(this.seats / 2) * 2 }, (_, i) => i + 1);
+        },
+        oddSeat() {
+            // Devuelve el asiento impar si existe
+            return this.seats % 2 !== 0 ? this.seats : null;
         },
     },
     watch: {
@@ -490,72 +498,47 @@ export default {
                 }
             } catch (error) {
                 // Captura de errores no controlados
-                this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
+                this.showAlert('error', 'Ocurrió un error inesperado al cargar las sucursales.', 3000);
             } finally {
                 this.loading = false;
                 this.initialize();
             }
         },
-        getSeatColor(seat) {
-            if (this.isSeatReserved(seat.label)) {
-                return 'red'; // Asiento reservado
-            } else if (this.selectedSeats.includes(Number(seat.label))) {
-                return 'primary'; // Asiento seleccionado
-            } else {
-                return 'green'; // Asiento disponible
-            }
-        },
-        isSeatAvailable(seat) {
-            return seat.label && !this.isSeatReserved(seat.label);
+        isSeatReserved(seat) {
+            const exists = this.reservedSeats.includes(seat);
+            console.log(exists + "-" + seat); // Imprime true o false en la consola
+            return exists; // Retorna true o false
         },
         updateSeats(tripId) {
+            // Busca el elemento seleccionado en el array trips
             const selectedTrip = this.trips.find((trip) => trip.id === tripId);
+
+            // Si encuentra el elemento, actualiza el valor de seats
             if (selectedTrip) {
                 this.seats = selectedTrip.seats;
                 this.editedItem.price = selectedTrip.price;
                 this.reservedSeats = selectedTrip.reservedSeats;
-                this.seatMap = selectedTrip.seatMap;
-
-                // Generar asientos disponibles y reservados
-                this.availableSeats = this.generateAvailableSeats(this.seatMap, this.reservedSeats);
             } else {
-                this.seats = 0;
-                this.availableSeats = [];
-                this.reservedSeats = [];
+                this.seats = 0; // Reinicia si no hay elemento seleccionado
             }
-        },
-        generateAvailableSeats(seatMap, reservedSeats) {
-            const availableSeats = [];
-            seatMap.forEach((row) => {
-                row.forEach((seat) => {
-                    if (seat.label && !reservedSeats.includes(seat.label)) {
-                        availableSeats.push(seat.label);
-                    }
-                });
-            });
-            return availableSeats;
-        },
-        isSeatReserved(seat) {
-            return this.reservedSeats.includes(Number(seat));
+            this.seatMap = selectedTrip.seatMap;
+            console.log('this.setaMap');
+            console.log(this.seatMap);
         },
         toggleSeat(seat) {
-            if (this.isSeatAvailable(seat)) {
-                const seatLabel = Number(seat.label);
-                const index = this.selectedSeats.indexOf(seatLabel);
-                if (index === -1) {
-                    // Si el asiento no está seleccionado, agregarlo
-                    this.selectedSeats.push(seatLabel);
-                } else {
-                    // Si el asiento ya está seleccionado, removerlo
-                    this.selectedSeats.splice(index, 1);
-                }
+            const index = this.selectedSeats.indexOf(seat);
+            if (index === -1) {
+                // Si el asiento no está seleccionado, agregarlo
+                this.selectedSeats.push(seat);
+            } else {
+                // Si el asiento ya está seleccionado, removerlo
+                this.selectedSeats.splice(index, 1);
             }
-        },
-        calculateTotal() {
-            this.editedItem.total = this.editedItem.price * this.editedItem.quantity;
-        },
-        validateQuantity() {
-            return this.editedItem.adults + this.editedItem.minors <= this.editedItem.quantity;
+            if (this.selectedSeats.length !== this.editedItem.quantity) {
+                this.hasStartedSelecting = true;
+            } else {
+                this.hasStartedSelecting = false;
+            }
         },
         updateDate(val) {
             this.input = val;
@@ -580,7 +563,7 @@ export default {
                     this.trips = [];
                 }
             } catch (error) {
-                this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
+                this.showAlert("error", "Ocurrió un error inesperado al cargar los datos.", 3000);
             } finally {
                 this.dialog = true;
             }
@@ -595,11 +578,34 @@ export default {
             this.editedIndex = -1;
             this.reservedSeats = [];
         },
+        // Función para verificar que la suma de adultos y menores no exceda la cantidad total
+        validateQuantity() {
+            const adults = Number(this.editedItem.adults) || 0;
+            const minors = Number(this.editedItem.minors) || 0;
+            const quantity = Number(this.editedItem.quantity) || 0;
+
+            return adults + minors <= quantity;
+        },
+        calculateTotal() {
+            const price = Number(this.editedItem.price) || 0;
+            const quantity = Number(this.editedItem.quantity) || 0;
+            const adults = Number(this.editedItem.adults) || 0;
+            const minors = Number(this.editedItem.minors) || 0;
+
+            if (adults === 0 && minors === 0) {
+                // Si no hay adultos ni menores, calcular el total por cantidad total
+                this.editedItem.total = price * quantity;
+            } else {
+                // Si hay adultos o menores, calcular el total considerando el 50%
+                const discountedTickets = adults + minors;
+                this.editedItem.total = price * quantity - discountedTickets * (price * 0.5);
+            }
+        },
         async initialize() {
             try {
                 this.loading = true;
                 this.data = {};
-                this.data.branch_id = Number(this.branch_id);
+                this.data.branch_id = this.branch_id;
                 const result = await handleRequest({
                     endpoint: "get-tickets-date",
                     method: "POST",
@@ -618,7 +624,7 @@ export default {
                 // Captura de errores no controlados
                 this.showAlert(
                     "error",
-                    "Ocurrió un error inesperado al procesar la solicitud.",
+                    "Ocurrió un error inesperado al cargar los viajes.",
                     3000
                 );
             } finally {
@@ -786,9 +792,10 @@ export default {
                 } else {
                     // Si no hay datos, asignamos un array vacío
                     this.trips = [];
+                    this.showAlert("info", result.message || "No hay viajes disponibles.", 3000);
                 }
             } catch (error) {
-                this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
+                this.showAlert("error", "Ocurrió un error inesperado al cargar los datos.", 3000);
             } finally {
                 this.updateSeats(item.trip_id);
                 this.dialog = true;
@@ -861,8 +868,3 @@ export default {
     },
 };
 </script>
-<style>
-.seat-map-preview {
-    margin-top: 10px;
-}
-</style>

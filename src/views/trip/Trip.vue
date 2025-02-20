@@ -16,7 +16,7 @@
       <v-toolbar color="#1976D2">
         <v-row align="center">
           <v-col cols="12" md="8" class="grow ml-4">
-            <span class="text-subtitle-1"><strong>Sucursales</strong></span>
+            <span class="text-subtitle-1"><strong>Viajes</strong></span>
           </v-col>
           <v-col cols="12" md="3" class="text-right">
             <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
@@ -227,10 +227,10 @@
   <v-dialog v-model="dialogDelete" max-width="500px">
     <v-card>
       <v-toolbar color="#DA7171">
-        <span class="text-subtitle-2 ml-4"> Eliminar una viaje</span>
+        <span class="text-subtitle-2 ml-4"> Eliminar un viaje</span>
       </v-toolbar>
 
-      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar la viaje?</v-card-text>
+      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar el viaje?</v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -279,6 +279,7 @@
 </template>
 
 <script>
+import LocalStorageService from "@/LocalStorageService";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
 import _ from 'lodash';
 export default {
@@ -294,15 +295,17 @@ export default {
     mostrar: false,
     dialog: false,
     dialogDelete: false,
-    branch_id: 3,
     estimated: null,
     trips: [],
     routes: [],
     vehicles: [],
     workers: [],
+    branches: [],
     filteredWorkers: [],
     data: {},
     selectedWorker: "",
+    route: '',
+    branch_id: '',
     dialogAssignedWorkers: false,
     headers: [
       { title: "Ruta", value: "name", width: "15%" },
@@ -326,7 +329,7 @@ export default {
     editedItem: {
       id: "",
       route_id: "",
-      branch_id: 3,
+      branch_id: "",
       vehicle_id: "",
       date: "",
       schedule: "",
@@ -339,7 +342,7 @@ export default {
     originalItem: {
       id: "",
       route_id: "",
-      branch_id: 3,
+      branch_id: "",
       vehicle_id: "",
       date: "",
       schedule: "",
@@ -352,7 +355,7 @@ export default {
     defaultItem: {
       id: "",
       route_id: "",
-      branch_id: 3,
+      branch_id: "",
       vehicle_id: "",
       date: "",
       schedule: "",
@@ -372,7 +375,7 @@ export default {
     nameRules: [
       (v) => !!v || "El campo es requerido",
       (v) => (v && v.length <= 50) || "El campo debe tener menos de 51 caracteres",
-      (v) => (v && v.length >= 3) || "El campo debe tener al menos de 3 caracteres",
+      (v) => (v && v.length >= 3) || "El campo debe tener al menos 3 caracteres",
     ],
     selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
     priceRules: [
@@ -385,7 +388,7 @@ export default {
   }),
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "Agregar Nuevo Viaje" : "Editar Viaje";
+      return this.editedIndex === -1 ? "Agregar Viaje" : "Editar Viaje";
     },
     dateFormatted() {
       const date = this.input ? new Date(this.input) : new Date();
@@ -399,11 +402,39 @@ export default {
     },
   },
   mounted() {
-    this.branch_id = 3;
+    this.role = JSON.parse(LocalStorageService.getItem('role'));
+    if (this.role === 'Administrador'){      
+    this.showBranches();
+    }else{
+      this.branch_id = LocalStorageService.getItem('branch_id');
+    }
     this.timeSlots = this.generateTimeSlots();
-    this.initialize();
   },
   methods: {
+    async showBranches() {
+      try {
+        const result = await handleRequest({
+          endpoint: 'branch',
+          method: 'GET',
+        });
+
+        if (result.success) {
+          // Si la solicitud es exitosa, asignamos las sucursales
+          this.branches = result.data?.branches || [];
+          this.editedItem.branch_id = this.branches[0].id;
+          this.branch_id = this.branches[0].id;
+        } else {
+          // Si no hay datos, asignamos un array vacío
+          this.branches = [];
+        }
+      } catch (error) {
+        // Captura de errores no controlados
+        this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
+      } finally {
+        this.loading = false;
+        this.initialize();
+      }
+    },
     // Filtramos los trabajadores según el vehículo seleccionado
     filterWorkers() {
       const selectedVehicleId = this.editedItem.vehicle_id;
@@ -417,10 +448,6 @@ export default {
       const matchedRoute = this.routes.find((route) => route.id === this.editedItem.route_id);
       // Si se encuentra el objeto, asignamos su propiedad 'estimated' a this.estimated
       this.estimated = matchedRoute ? matchedRoute.estimated : null;
-      console.log('this.routes');
-      console.log(matchedRoute);
-      console.log('this.estimated');
-      console.log(this.estimated);
     },
     updateArrival() {
       if (!this.editedItem.schedule || !this.estimated) {
@@ -485,10 +512,9 @@ export default {
           this.routes = [];
           this.vehicles = [];
           this.workers = [];
-          this.showAlert("info", result.message || "No hay datos disponibles.", 3000);
         }
       } catch (error) {
-        this.showAlert("error", "Ocurrió un error inesperado al cargar los datos.", 3000);
+        this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
       } finally {
         this.dialog = true;
       }
@@ -504,9 +530,6 @@ export default {
       this.editedIndex = -1;
     },
     async showAssiegnedWorker() {
-      console.log("Workers after vehicle filter:", this.filteredWorkers);
-      console.log("this.editedItem.workers after vehicle filter:", this.editedItem.workers);
-
       // Clonar filteredWorkers para evitar referencias compartidas
       const clonedFilteredWorkers = this.filteredWorkers.map(worker => ({ ...worker }));
 
@@ -515,9 +538,6 @@ export default {
         // Verificar si la persona no está en editedItem.workers
         return !this.editedItem.workers.some(editedWorker => editedWorker.id === worker.id);
       });
-
-      console.log("this.editedItem.workers after filter:", this.editedItem.workers);
-      console.log("Filtered workers after exclusion:", this.filteredWorkers);
       this.dialogAssignedWorkers = true;
     },
     closeAssignedWorker() {
@@ -557,10 +577,6 @@ export default {
       }
     },
     areWorkersDifferent(originalWorkers, editedWorkers) {
-      console.log('JSON.stringify(originalWorkers)');
-      console.log(JSON.stringify(originalWorkers));
-      console.log('JSON.stringify(editedWorkers)');
-      console.log(JSON.stringify(editedWorkers));
       if (originalWorkers.length !== editedWorkers.length) {
         return true; // Si tienen longitudes diferentes, son diferentes
       }
@@ -594,14 +610,13 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.trips = [];
-          this.showAlert("info", result.message || "No hay viajes disponibles.", 3000);
         }
       } catch (error) {
         this.loading = false;
         // Captura de errores no controlados
         this.showAlert(
           "error",
-          "Ocurrió un error inesperado al cargar los viajes.",
+          "Ocurrió un error inesperado al procesar la solicitud.",
           3000
         );
       } finally {
@@ -642,7 +657,7 @@ export default {
           }, {});
         if (Object.keys(updatedFields).length > 0) {
           updatedFields.date = this.editedItem.date ? this.editedItem.date : new Date();
-          updatedFields.branch_id = this.editedItem.branch_id;
+          updatedFields.branch_id = this.branch_id;
           try {
             const result = await handleRequest({
               endpoint: "trip",
@@ -761,10 +776,9 @@ export default {
           this.routes = [];
           this.vehicles = [];
           this.workers = [];
-          this.showAlert("info", result.message || "No hay datos disponibles.", 3000);
         }
       } catch (error) {
-        this.showAlert("error", "Ocurrió un error inesperado al cargar los datos.", 3000);
+        this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
       } finally {
         this.updateStimated();
         this.filterWorkers();

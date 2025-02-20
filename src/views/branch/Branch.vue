@@ -149,7 +149,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="tonal" color="primary" @click="closeDialogBranchWorker">Cerrar</v-btn>
+        <v-btn variant="flat" color="#1976D2" @click="closeDialogBranchWorker">Cerrar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -164,7 +164,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="tonal" color="primary" @click="closeDialogBranchVehicle">Cerrar</v-btn>
+        <v-btn variant="flat" color="#1976D2" @click="closeDialogBranchVehicle">Cerrar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -179,7 +179,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="tonal" color="primary" @click="closeDialogBranchRoute">Cerrar</v-btn>
+        <v-btn variant="flat" color="#1976D2" @click="closeDialogBranchRoute">Cerrar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -258,7 +258,7 @@ export default {
     nameRules: [
       (v) => !!v || "El campo es requerido",
       (v) => (v && v.length <= 50) || "El campo debe tener menos de 51 caracteres",
-      (v) => (v && v.length >= 3) || "El campo debe tener al menos de 3 caracteres",
+      (v) => (v && v.length >= 3) || "El campo debe tener al menos 3 caracteres",
     ],
     selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
     mobileRules: [
@@ -276,7 +276,7 @@ export default {
   }),
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "Agregar Nueva Sucursal" : "Editar Sucursal";
+      return this.editedIndex === -1 ? "Agregar Sucursal" : "Editar Sucursal";
     },
     imgedit() {
       return this.imgMiniatura;
@@ -299,7 +299,6 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.companies = [];
-          this.showAlert("info", result.message || "No hay compañías disponibles.", 3000);
         }
       } catch (error) {
         this.showAlert(
@@ -335,11 +334,6 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.branches = [];
-          this.showAlert(
-            "info",
-            result.message || "No hay sucursales disponibles.",
-            3000
-          );
         }
       } catch (error) {
         this.loading = false;
@@ -491,23 +485,17 @@ export default {
           } else {
             // Si no hay datos, asignamos un array vacío
             this.companies = [];
-            this.showAlert(
-              "info",
-              result.message || "No hay compañías disponibles.",
-              3000
-            );
           }
         } catch (error) {
           this.showAlert(
             "error",
-            "Ocurrió un error inesperado al cargar las compañías.",
+            "Ocurrió un error inesperado al procesar la solicitud.",
             3000
           );
         } finally {
           this.dialog = true;
         }
       };
-      this.dialog = true;
     },
     deleteItem(item) {
       this.editedIndex = 1;
@@ -585,7 +573,7 @@ export default {
       const maxSize = 500 * 1024; // 500 KB en bytes
       if (file && file.size > maxSize) {
         this.valid = false;
-        this.showAlert("warning", "El archivo de imagen debe ser de máximo 500 KB", 3000);
+        this.showAlert("warning", "El archivo de imagen debe ser de un máximo 500 KB", 3000);
         return; // Detener el proceso si el archivo es demasiado grande
       }
       this.valid = true;

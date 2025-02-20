@@ -110,10 +110,10 @@
     <v-card>
 
       <v-toolbar color="#DA7171">
-        <span class="text-subtitle-2 ml-4"> Eliminar Trabajador</span>
+        <span class="text-subtitle-2 ml-4"> Eliminar Lugar</span>
       </v-toolbar>
 
-      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar un trabajador?</v-card-text>
+      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar un lugar?</v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -192,7 +192,7 @@ export default {
       (v) => (v && v.length <= 250) ||
         "El campo debe tener menos de 51 caracteres",
       (v) => (v && v.length >= 3) ||
-        "El campo debe tener al menos de 3 caracteres",
+        "El campo debe tener al menos 3 caracteres",
     ],
     selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
     requiredRules: [(v) => !!v || "El campo es requerido"],
@@ -238,12 +238,11 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.locations = [];
-          this.showAlert('info', 'No hay Lugares disponibles.', 3000);
         }
       } catch (error) {
         this.loading = false;
         // Captura de errores no controlados
-        this.showAlert('error', 'Ocurrió un error inesperado al cargar las sucursales.', 3000);
+        this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
       } finally {
         this.loading = false;
       }
@@ -292,7 +291,7 @@ export default {
           }
         } else {
           this.loading = false;
-          this.showAlert("success", "Debe completar los datos de producto.", 3000);
+          this.showAlert("success", "Debe completar los datos.", 3000);
         }
       } else {
         this.valid = false;

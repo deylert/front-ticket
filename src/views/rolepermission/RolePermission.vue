@@ -17,10 +17,10 @@
     <v-container style="min-width: 100%; min-height: 100%">
         <v-card elevation="6" class="mx-2">
             <v-toolbar color="#1976D2">
-                <span class="text-subtitle-2 ml-4"> Permisos por roles</span>
+                <span class="text-subtitle-2 ml-4"> Permisos por rol: {{ this.roleName }}</span>
                 <v-spacer></v-spacer>
                 <v-btn class="text-subtitle-1 ml-12" color="#E7E9E9" variant="flat" @click="showAdd()">
-                    Agregar Permiso
+                    Asignar Permiso
                 </v-btn>
             </v-toolbar>
 
@@ -128,6 +128,7 @@ export default {
         rolepermissions: [],
         permissions: [],
         role_id: "",
+        roleName: '',
         data: {},
         headers: [
             { title: "Nombre", value: "name", width: "40%" },
@@ -162,6 +163,7 @@ export default {
     },
     mounted() {
         this.role_id = this.role.id;
+        this.roleName = this.role.name;
         this.initialize();
     },
     methods: {
@@ -178,7 +180,6 @@ export default {
                     ) || [];
                 } else {
                     this.permissions = [];
-                    this.showAlert('info', result.message || 'No hay datos disponibles.', 3000);
                 }
             } catch (error) {
                 this.showAlert('error', 'Ocurrió un error inesperado al cargar los datos.', 3000);
@@ -212,11 +213,6 @@ export default {
                 } else {
                     // Si no hay datos, asignamos un array vacío
                     this.rolepermissions = [];
-                    this.showAlert(
-                        "info",
-                        result.message || "No hay datos disponibles.",
-                        3000
-                    );
                     this.loading = false;
                 }
             } catch (error) {
@@ -224,7 +220,7 @@ export default {
                 // Captura de errores no controlados
                 this.showAlert(
                     "error",
-                    "Ocurrió un error inesperado al cargar los permissos.",
+                    "Ocurrió un error inesperado al procesar la solicitud.",
                     3000
                 );
             } finally {
@@ -325,11 +321,9 @@ export default {
                     this.permissions = result.data?.permissions.filter((permission) =>
                         !this.rolepermissions.some((rolepermission) => rolepermission.permission_id === permission.id)
                     ) || [];
-                } else {
-                    this.showAlert('info', result.message || 'No hay datos disponibles.', 3000);
                 }
             } catch (error) {
-                this.showAlert('error', 'Ocurrió un error inesperado al cargar los datos.', 3000);
+                this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
             } finally {
                 this.dialog = true;
             }

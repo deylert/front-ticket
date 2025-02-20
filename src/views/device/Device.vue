@@ -190,6 +190,7 @@
 </template>
 
 <script>
+import LocalStorageService from "@/LocalStorageService";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
 export default {
   data: () => ({
@@ -212,6 +213,8 @@ export default {
     dialogDelete: false,
     devices: [],
     branches: [],
+    role: '',
+    branch_id: '',
     data: {},
     headers: [
       //{ title: 'Sucursal', value: 'branchName', width: '20%' },
@@ -274,7 +277,7 @@ export default {
       (v) => (v && v.length <= 50) ||
         "El campo debe tener menos de 51 caracteres",
       (v) => (v && v.length >= 3) ||
-        "El campo debe tener al menos de 3 caracteres",
+        "El campo debe tener al menos 3 caracteres",
     ],
     selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
     mobileRules: [
@@ -298,7 +301,7 @@ export default {
   }),
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'Agregar Nuevo Dispositivo' : 'Editar Dispositivo';
+      return this.editedIndex === -1 ? 'Agregar Dispositivo' : 'Editar Dispositivo';
     },
     imgedit() {
       return this.imgMiniatura;
@@ -325,7 +328,12 @@ export default {
     },
   },
   mounted() {
+    this.role = JSON.parse(LocalStorageService.getItem('role'));
+    if (this.role === 'Administrador'){      
     this.showBranches();
+    }else{
+      this.branch_id = LocalStorageService.getItem('branch_id');
+    }
   },
   methods: {
     updateDate(val) {
@@ -349,14 +357,14 @@ export default {
           // Si la solicitud es exitosa, asignamos las sucursales
           this.branches = result.data?.branches || [];
           this.editedItem.branch_id = this.branches[0].id;
+          this.branch_id = this.branches[0].id;
         } else {
           // Si no hay datos, asignamos un array vacío
           this.branches = [];
-          this.showAlert('info', result.message || 'No hay sucursales disponibles.', 3000);
         }
       } catch (error) {
         // Captura de errores no controlados
-        this.showAlert('error', 'Ocurrió un error inesperado al cargar las sucursales.', 3000);
+        this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
       } finally {
         this.loading = false;
         this.initialize();
@@ -378,7 +386,7 @@ export default {
     async initialize() {
       try {
         this.data = {};
-        this.data.branch_id = this.editedItem.branch_id;
+        this.data.branch_id = this.branch_id;
         this.loading = true;
         const result = await handleRequest({
           endpoint: 'device-branch',
@@ -392,12 +400,11 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.devices = [];
-          this.showAlert('info', 'No hay dispositivos disponibles.', 3000);
         }
       } catch (error) {
         this.loading = false;
         // Captura de errores no controlados
-        this.showAlert('error', 'Ocurrió un error inesperado al cargar las sucursales.', 3000);
+        this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
       } finally {
         this.loading = false;
       }
@@ -415,7 +422,7 @@ export default {
             return obj;
           }, {});
         if (Object.keys(updatedFields).length > 0) {
-          updatedFields.branch_id = this.editedItem.branch_id;
+          updatedFields.branch_id = this.branch_id;
           updatedFields.acquisition = this.editedItem.acquisition ? this.editedItem.acquisition : new Date();
           updatedFields.maintenance = this.editedItem.maintenance ? this.editedItem.maintenance : new Date();
           if (this.file) {

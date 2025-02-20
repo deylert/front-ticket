@@ -224,7 +224,7 @@ export default {
       (v) => (v && v.length <= 50) ||
         "El campo debe tener menos de 51 caracteres",
       (v) => (v && v.length >= 3) ||
-        "El campo debe tener al menos de 3 caracteres",
+        "El campo debe tener al menos 3 caracteres",
     ],
     selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
     requiredRules: [(v) => !!v || "El campo es requerido"],
@@ -266,11 +266,10 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.branches = [];
-          this.showAlert('info', result.message || 'No hay sucursales disponibles.', 3000);
         }
       } catch (error) {
         // Captura de errores no controlados
-        this.showAlert('error', 'Ocurrió un error inesperado al cargar las sucursales.', 3000);
+        this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
       } finally {
         this.loading = false;
         this.initialize();
@@ -293,10 +292,9 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.roles = [];
-          this.showAlert('info', result.message || 'No hay roles disponibles.', 3000);
         }
       } catch (error) {
-        this.showAlert('error', 'Ocurrió un error inesperado al cargar las compañías.', 3000);
+        this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
       } finally {
         this.dialog = true;
       }
@@ -327,12 +325,11 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.workers = [];
-          this.showAlert('info', 'No hay trabajadores disponibles.', 3000);
         }
       } catch (error) {
         this.loading = false;
         // Captura de errores no controlados
-        this.showAlert('error', 'Ocurrió un error inesperado al cargar las sucursales.', 3000);
+        this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
       } finally {
         this.loading = false;
       }
@@ -387,7 +384,6 @@ export default {
         } else {
           this.loading = false;
           this.showAlert("success", "Debe completar los datos de producto.", 3000);
-          this.loading = false;
         }
       } else {
         this.valid = false;
@@ -435,7 +431,6 @@ export default {
         } else {
           this.loading = false;
           this.showAlert("success", "No se realizaron cambios.", 3000);
-          this.loading = false;
         }
       }
       this.close();
@@ -475,10 +470,9 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.roles = [];
-          this.showAlert('info', result.message || 'No hay roles disponibles.', 3000);
         }
       } catch (error) {
-        this.showAlert('error', 'Ocurrió un error inesperado al cargar las compañías.', 3000);
+        this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
       } finally {
         this.dialog = true;
       }

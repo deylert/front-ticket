@@ -12,50 +12,50 @@
     </v-row>
   </v-snackbar>
   <v-container style="min-width: 100%; min-height: 100%;">
-  <v-card elevation="6" class="mx-2">
-    <v-toolbar color="#1976D2">
-      <v-row align="center">
-        <v-col cols="12" md="8" class="grow ml-4">
-          <span class="text-subtitle-1"><strong>Vehículos</strong></span>
-        </v-col>
-        <v-col cols="12" md="3" class="text-right">
-          <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
-            prepend-icon="mdi-plus-circle" @click="showAdd">
-            Agregar Vehículo
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-toolbar>
+    <v-card elevation="6" class="mx-2">
+      <v-toolbar color="#1976D2">
+        <v-row align="center">
+          <v-col cols="12" md="8" class="grow ml-4">
+            <span class="text-subtitle-1"><strong>Vehículos</strong></span>
+          </v-col>
+          <v-col cols="12" md="3" class="text-right">
+            <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
+              prepend-icon="mdi-plus-circle" @click="showAdd">
+              Agregar Vehículo
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-toolbar>
 
-    <v-card-text>
-      <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
-        hide-details>
-      </v-text-field>
-      <v-data-table :headers="headers" :search="search" :items="vehicles" class="elevation-1"
-        style="max-height: 68vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
-        no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
-        <template v-slot:item.actions="{ item }">
-          <v-btn density="comfortable" icon="mdi-account-tie" @click="showAddWorker(item)" color="#388E3C"
-          variant="tonal" elevation="1" title="Agregar Trabajador"></v-btn>
-          <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2" variant="tonal"
-            elevation="1" title="Editar Vehículo"></v-btn>
-          <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171" variant="tonal"
-            elevation="1" title="Eliminar Vehículo"></v-btn>
-        </template>
-        <template v-slot:item.plate="{ item }">
-          <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
-            <v-img :src="`${this.$axios.defaults.baseURL}images/${item.image}?t=${Date.now()}`" alt="image"></v-img>
-          </v-avatar><!--+'?$'+Date.now()-->
-          {{ item.plate }}
-        </template>
-        <template v-slot:item.state="{ item }">
-          <span v-if="item.state === 1" class="text-success">Activo</span>
-          <span v-else class="text-error">Inactivo</span>
-        </template>
-      </v-data-table>
-    </v-card-text>
-  </v-card>
-</v-container>
+      <v-card-text>
+        <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+          hide-details>
+        </v-text-field>
+        <v-data-table :headers="headers" :search="search" :items="vehicles" class="elevation-1"
+          style="max-height: 68vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
+          no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
+          <template v-slot:item.actions="{ item }">
+            <v-btn density="comfortable" icon="mdi-account-tie" @click="showAddWorker(item)" color="#388E3C"
+              variant="tonal" elevation="1" title="Agregar Trabajador"></v-btn>
+            <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2" variant="tonal"
+              elevation="1" title="Editar Vehículo"></v-btn>
+            <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171" variant="tonal"
+              elevation="1" title="Eliminar Vehículo"></v-btn>
+          </template>
+          <template v-slot:item.plate="{ item }">
+            <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
+              <v-img :src="`${this.$axios.defaults.baseURL}images/${item.image}?t=${Date.now()}`" alt="image"></v-img>
+            </v-avatar><!--+'?$'+Date.now()-->
+            {{ item.plate }}
+          </template>
+          <template v-slot:item.state="{ item }">
+            <span v-if="item.state === 1" class="text-success">Activo</span>
+            <span v-else class="text-error">Inactivo</span>
+          </template>
+        </v-data-table>
+      </v-card-text>
+    </v-card>
+  </v-container>
   <v-dialog v-model="dialog" max-width="700px">
     <v-form ref="form" v-model="valid" enctype="multipart/form-data">
       <v-card>
@@ -65,6 +65,31 @@
         <v-card-text>
           <v-container>
             <v-row>
+              <v-col cols="12" md="12">
+                <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.structure_id"
+                  :items="structures" label="Estructura de asientos" prepend-icon="mdi-seat" item-title="name"
+                  item-value="id" variant="underlined" :rules="selectRules" @update:model-value="updateSeats">
+                  <!-- Personalizar el ítem del autocomplete -->
+                  <template v-slot:item="{ props, item }">
+                    <v-list-item v-bind="props">
+                      <template v-slot:prepend>
+                        <!-- Vista previa de la matriz de asientos -->
+                        <div class="seat-map-preview">
+                          <div v-for="(row, rowIndex) in item.raw.seatMap" :key="rowIndex" class="seat-row">
+                            <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex"
+                              :color="seat.selected ? 'primary' : '#00000'" class="seat-button-preview" size="x-small"
+                              height="25" width="25" disabled>
+                                {{ Number(seat.label) ? `A${Number(seat.label)}` : '' }}
+                            </v-btn>
+                          </div>
+                        </div>
+                      </template>
+                      <v-list-item-subtitle>{{ item.raw.description }}</v-list-item-subtitle>
+                    </v-list-item>
+                  </template>
+
+                </v-autocomplete>
+              </v-col>
               <v-col cols="12" md="6">
                 <v-text-field v-model="editedItem.brand" clearable label="Marca" prepend-icon="mdi-car"
                   variant="underlined"></v-text-field>
@@ -79,16 +104,16 @@
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field v-model="editedItem.rut" clearable label="RUT" prepend-icon="mdi-card-account-details"
-                  variant="underlined" :rules="[ v => !!v || 'El RUT es requerido',
-                    v => /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/.test(v) || 'El RUT debe estar en el formato XX.XXX.XXX-Y (ejemplo: 12.345.678-9)'
+                  variant="underlined" :rules="[v => !!v || 'El RUT es requerido',
+                  v => /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/.test(v) || 'El RUT debe estar en el formato XX.XXX.XXX-Y (ejemplo: 12.345.678-9)'
                   ]">
                 </v-text-field>
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field v-model="editedItem.seats" clearable label="Asientos" prepend-icon="mdi-seat"
-                  variant="underlined" :rules="[ v => !!v || 'El número de asientos es requerido',
-                      v => !isNaN(v) || 'Debe ser un número'
-                    ]"></v-text-field>
+                  variant="underlined" :rules="[v => !!v || 'El número de asientos es requerido',
+                  v => !isNaN(v) || 'Debe ser un número'
+                  ]" disabled="true"></v-text-field>
               </v-col>
               <v-col cols="12" md="4">
                 <v-select v-model="editedItem.state" :items="statusOptions" item-value="value" item-title="text"
@@ -97,9 +122,8 @@
             </v-row>
             <v-row>
               <v-col cols="12" md="6">
-                <v-file-input clearable v-model="file" ref="fileInput" label="Imagen del Dispositivo"
-                  variant="underlined" density="compact" name="file" accept=".png, .jpg, .jpeg"
-                  @change="onFileSelected">
+                <v-file-input clearable v-model="file" ref="fileInput" label="Imagen del Vehículo" variant="underlined"
+                  density="compact" name="file" accept=".png, .jpg, .jpeg" @change="onFileSelected">
                 </v-file-input>
               </v-col>
               <v-col cols="12" md="6">
@@ -153,7 +177,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="tonal" color="primary" @click="closeDialogVehicleWorker">Cerrar</v-btn>
+        <v-btn variant="flat" color="#1976D2" @click="closeDialogVehicleWorker">Cerrar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -181,6 +205,7 @@ export default {
     dialog: false,
     dialogDelete: false,
     vehicles: [],
+    structures: [],
     data: {},
     selectedVehicle: null,
     dialogVehicleWorker: null,
@@ -200,6 +225,7 @@ export default {
     ],
     editedItem: {
       id: '',
+      structure_id: '',
       plate: '',
       model: '',
       brand: '',
@@ -210,6 +236,7 @@ export default {
     },
     originalItem: {
       id: '',
+      structure_id: '',
       plate: '',
       model: '',
       brand: '',
@@ -220,6 +247,7 @@ export default {
     },
     defaultItem: {
       id: '',
+      structure_id: '',
       plate: '',
       model: '',
       brand: '',
@@ -241,7 +269,7 @@ export default {
   }),
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'Agregar Nuevo Vehículo' : 'Editar Vehículo';
+      return this.editedIndex === -1 ? 'Agregar Vehículo' : 'Editar Vehículo';
     },
     imgedit() {
       return this.imgMiniatura;
@@ -251,8 +279,41 @@ export default {
     this.initialize();
   },
   methods: {
+    updateSeats(structureId) {
+      // Busca el elemento seleccionado en el array trips
+      const selectedStructure = this.structures.find((structure) => structure.id === structureId);
+
+      // Si encuentra el elemento, actualiza el valor de seats
+      if (selectedStructure) {
+        this.editedItem.seats = selectedStructure.seatCount;
+      } else {
+        this.editedItem.seats = ''; // Reinicia si no hay elemento seleccionado
+      }
+      console.log();
+    },
     async showAdd() {
-      this.dialog = true;
+      try {
+        const result = await handleRequest({
+          endpoint: "structure",
+          method: "GET",
+        });
+
+        if (result.success) {
+          // Si la solicitud es exitosa, asignamos las sucursales
+          this.structures = result.data?.structures || [];
+        } else {
+          // Si no hay datos, asignamos un array vacío
+          this.companies = [];
+        }
+      } catch (error) {
+        this.showAlert(
+          "error",
+          "Ocurrió un error inesperado al procesar la solicitud.",
+          3000
+        );
+      } finally {
+        this.dialog = true;
+      }
     },
     close() {
       this.dialog = false;
@@ -280,12 +341,11 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.vehicles = [];
-          this.showAlert('info', 'No hay vehículos disponibles.', 3000);
         }
       } catch (error) {
         this.loading = false;
         // Captura de errores no controlados
-        this.showAlert('error', 'Ocurrió un error inesperado al cargar las sucursales.', 3000);
+        this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
       } finally {
         this.loading = false;
       }
@@ -294,7 +354,7 @@ export default {
       this.loading = true;
       if (this.editedIndex === -1) {
         this.valid = false;
-        const fieldsToUpdate = ['brand', 'model', 'plate', 'rut', 'seats', 'state', 'image'];
+        const fieldsToUpdate = ['brand', 'model', 'plate', 'rut', 'seats', 'state', 'image', 'structure_id'];
 
         let updatedFields = Object.keys(this.editedItem)
           .filter((key) => fieldsToUpdate.includes(key) && this.editedItem[key] !== this.originalItem[key])
@@ -334,11 +394,11 @@ export default {
           }
         } else {
           this.loading = false;
-          this.showAlert("success", "Debe completar los datos de producto.", 3000);
+          this.showAlert("success", "Debe completar los datos.", 3000);
         }
       } else {
         this.valid = false;
-        const fieldsToUpdate = ['brand', 'model', 'plate', 'rut', 'seats', 'state', 'image'];
+        const fieldsToUpdate = ['brand', 'model', 'plate', 'rut', 'seats', 'state', 'image', 'structure_id'];
         let updatedFields = Object.keys(this.editedItem)
           .filter((key) => fieldsToUpdate.includes(key) && this.editedItem[key] !== this.originalItem[key])
           .reduce((obj, key) => {
@@ -401,7 +461,35 @@ export default {
           this.showAlert('error', 'Error al cargar la imagen.', 3000);
         }
       };
-      this.dialog = true;
+      try {
+        // Asignar la imagen cargada a imgMiniatura
+        this.imgMiniatura = `${this.$axios.defaults.baseURL}images/${item.image}`;
+      } catch (error) {
+        console.error("Error al cargar la imagen", error);
+        this.showAlert("error", "Error al cargar la imagen.", 3000);
+      }
+      try {
+        const result = await handleRequest({
+          endpoint: "structure",
+          method: "GET",
+        });
+
+        if (result.success) {
+          // Si la solicitud es exitosa, asignamos las sucursales
+          this.structures = result.data?.structures || [];
+        } else {
+          // Si no hay datos, asignamos un array vacío
+          this.structures = [];
+        }
+      } catch (error) {
+        this.showAlert(
+          "error",
+          "Ocurrió un error inesperado al procesar la solicitud.",
+          3000
+        );
+      } finally {
+        this.dialog = true;
+      }
     },
     deleteItem(item) {
       this.editedIndex = 1;
@@ -507,3 +595,24 @@ export default {
   },
 };
 </script>
+<style>
+/* Estilos para la vista previa de la matriz de asientos */
+seat-map-preview {
+  max-width: 200px; /* Ancho máximo */
+  max-height: 100px; /* Altura máxima */
+  overflow: auto; /* Agregar scroll si es necesario */
+}
+
+.seat-row {
+  display: flex;
+  gap: 2px; /* Espacio reducido entre asientos */
+  margin-bottom: 2px; /* Espacio reducido entre filas */
+}
+
+.seat-button-preview {
+  min-width: 20px !important; /* Ancho reducido */
+  height: 20px !important;    /* Altura reducida */
+  padding: 0 !important;      /* Eliminar padding */
+  margin: 1px !important;     /* Margen reducido */
+}
+</style>

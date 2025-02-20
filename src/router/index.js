@@ -96,6 +96,12 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "home" */ "@/views/permission/Permission.vue"),
       },
+      {
+        path: "/structure",
+        name: "Structure",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/structure/Structure.vue"),
+      },
     ],
   },
 ];

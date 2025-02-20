@@ -1,14 +1,6 @@
 <template>
-  <v-snackbar
-    class="mt-12"
-    location="right top"
-    :timeout="sb_timeout"
-    :color="sb_type"
-    elevation="24"
-    :multi-line="true"
-    vertical
-    v-model="snackbar"
-  >
+  <v-snackbar class="mt-12" location="right top" :timeout="sb_timeout" :color="sb_type" elevation="24"
+    :multi-line="true" vertical v-model="snackbar">
     <v-row>
       <v-col md="2">
         <v-avatar :icon="sb_icon" color="sb_type" size="40"></v-avatar>
@@ -24,17 +16,11 @@
       <v-toolbar color="#1976D2">
         <v-row align="center">
           <v-col cols="12" md="8" class="grow ml-4">
-            <span class="text-subtitle-1"><strong>Sucursales</strong></span>
+            <span class="text-subtitle-1"><strong>Rutas</strong></span>
           </v-col>
           <v-col cols="12" md="3" class="text-right">
-            <v-btn
-              class="text-subtitle-1 ml-12"
-              color="white"
-              variant="tonal"
-              elevation="2"
-              prepend-icon="mdi-plus-circle"
-              @click="showAdd"
-            >
+            <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
+              prepend-icon="mdi-plus-circle" @click="showAdd">
               Agregar Ruta
             </v-btn>
           </v-col>
@@ -42,66 +28,28 @@
       </v-toolbar>
 
       <v-card-text>
-        <v-text-field
-          class="mt-1 mb-1"
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Buscar"
-          single-line
-          hide-details
-        >
+        <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+          hide-details>
         </v-text-field>
-        <v-data-table
-          :headers="headers"
-          :search="search"
-          :items="routes"
-          class="elevation-1"
-          style="max-height: 68vh; overflow-y: auto"
-          :items-per-page-text="'Elementos por páginas'"
-          no-data-text="No hay datos disponibles"
-          :loading="loading"
-          loading-text="Cargando datos..."
-        >
+        <v-data-table :headers="headers" :search="search" :items="routes" class="elevation-1"
+          style="max-height: 68vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
+          no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
           <template v-slot:item.actions="{ item }">
-            <v-btn
-              density="comfortable"
-              icon="mdi-pencil"
-              @click="editItem(item)"
-              color="#1976D2"
-              variant="tonal"
-              elevation="1"
-              title="Editar Ruta"
-            ></v-btn>
-            <v-btn
-              density="comfortable"
-              icon="mdi-delete"
-              @click="deleteItem(item)"
-              color="#DA7171"
-              variant="tonal"
-              elevation="1"
-              title="Eliminar Ruta"
-            ></v-btn>
+            <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2" variant="tonal"
+              elevation="1" title="Editar Ruta"></v-btn>
+            <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171" variant="tonal"
+              elevation="1" title="Eliminar Ruta"></v-btn>
           </template>
           <template v-slot:item.originAddress="{ item }">
             <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
-              <v-img
-                :src="`${this.$axios.defaults.baseURL}images/${
-                  item.originImage
-                }?t=${Date.now()}`"
-                alt="image"
-              ></v-img> </v-avatar
-            ><!--+'?$'+Date.now()-->
+              <v-img :src="`${this.$axios.defaults.baseURL}images/${item.originImage
+                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
             {{ item.originAddress }}
           </template>
           <template v-slot:item.destinationAddress="{ item }">
             <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
-              <v-img
-                :src="`${this.$axios.defaults.baseURL}images/${
-                  item.destinationImage
-                }?t=${Date.now()}`"
-                alt="image"
-              ></v-img> </v-avatar
-            ><!--+'?$'+Date.now()-->
+              <v-img :src="`${this.$axios.defaults.baseURL}images/${item.destinationImage
+                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
             {{ item.destinationAddress }}
           </template>
         </v-data-table>
@@ -118,76 +66,38 @@
           <v-container>
             <v-row>
               <v-col cols="12" md="12">
-                <v-text-field
-                  v-model="editedItem.name"
-                  clearable
-                  label="Nombre"
-                  prepend-icon="mdi-store"
-                  variant="underlined"
-                  :rules="nameRules"
-                ></v-text-field>
+                <v-text-field v-model="editedItem.name" clearable label="Nombre" prepend-icon="mdi-store"
+                  variant="underlined" :rules="nameRules"></v-text-field>
               </v-col>
               <v-col cols="12" md="12">
-                <v-autocomplete
-                  :no-data-text="'No hay datos disponibles'"
-                  v-model="editedItem.origin_id"
-                  :items="locations"
-                  label="Origen"
-                  prepend-icon="mdi-arrow-up-circle"
-                  item-title="address"
-                  item-value="id"
-                  variant="underlined"
-                  :rules="selectRules"
-                >
+                <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.origin_id"
+                  :items="locations" label="Origen" prepend-icon="mdi-arrow-up-circle" item-title="address"
+                  item-value="id" variant="underlined" :rules="selectRules">
                   <template v-slot:item="{ props, item }">
-                    <v-list-item
-                      v-bind="props"
+                    <v-list-item v-bind="props"
                       :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`"
-                      :title="item.raw.address"
-                    ></v-list-item>
+                      :title="item.raw.address"></v-list-item>
                   </template>
                 </v-autocomplete>
               </v-col>
               <v-col cols="12" md="12">
-                <v-autocomplete
-                  :no-data-text="'No hay datos disponibles'"
-                  v-model="editedItem.destination_id"
-                  :items="locations"
-                  label="Destino"
-                  prepend-icon="mdi-arrow-down-circle"
-                  item-title="address"
-                  item-value="id"
-                  variant="underlined"
-                  :rules="selectRules"
-                >
+                <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.destination_id"
+                  :items="locations" label="Destino" prepend-icon="mdi-arrow-down-circle" item-title="address"
+                  item-value="id" variant="underlined" :rules="selectRules">
                   <template v-slot:item="{ props, item }">
-                    <v-list-item
-                      v-bind="props"
+                    <v-list-item v-bind="props"
                       :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`"
-                      :title="item.raw.address"
-                    ></v-list-item>
+                      :title="item.raw.address"></v-list-item>
                   </template>
                 </v-autocomplete>
               </v-col>
               <v-col cols="12" md="12">
-                <v-text-field
-                  v-model="editedItem.distance"
-                  clearable
-                  label="Distancia"
-                  prepend-icon="mdi-ruler"
-                  variant="underlined"
-                  :rules="durationRules"
-                ></v-text-field>
+                <v-text-field v-model="editedItem.distance" clearable label="Distancia" prepend-icon="mdi-ruler"
+                  variant="underlined" :rules="durationRules"></v-text-field>
               </v-col>
               <v-col cols="12" md="12">
-                <v-text-field
-                  v-model="editedItem.estimated"
-                  clearable
-                  label="Duración (Minutos)"
-                  prepend-icon="mdi-timer"
-                  variant="underlined"
-                  :rules="durationRules"
-                ></v-text-field>
+                <v-text-field v-model="editedItem.estimated" clearable label="Duración (Minutos)"
+                  prepend-icon="mdi-timer" variant="underlined" :rules="durationRules"></v-text-field>
               </v-col>
             </v-row>
           </v-container>
@@ -196,9 +106,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="#DA7171" variant="flat" @click="close">Cancelar</v-btn>
-          <v-btn color="#1976D2" variant="flat" @click="save" :disabled="!valid" :loading="loading"
-            >Aceptar</v-btn
-          >
+          <v-btn color="#1976D2" variant="flat" @click="save" :disabled="!valid" :loading="loading">Aceptar</v-btn>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -279,7 +187,7 @@ export default {
     nameRules: [
       (v) => !!v || "El campo es requerido",
       (v) => (v && v.length <= 50) || "El campo debe tener menos de 51 caracteres",
-      (v) => (v && v.length >= 3) || "El campo debe tener al menos de 3 caracteres",
+      (v) => (v && v.length >= 3) || "El campo debe tener al menos 3 caracteres",
     ],
     selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
     distanceRules: [
@@ -293,7 +201,7 @@ export default {
   }),
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "Agregar Nueva Ruta" : "Editar Ruta";
+      return this.editedIndex === -1 ? "Agregar Ruta" : "Editar Ruta";
     },
     imgedit() {
       return this.imgMiniatura;
@@ -316,12 +224,11 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.locations = [];
-          this.showAlert("info", result.message || "No hay lugares disponibles.", 3000);
         }
       } catch (error) {
         this.showAlert(
           "error",
-          "Ocurrió un error inesperado al cargar los lugares.",
+          "Ocurrió un error inesperado al procesar la solicitud.",
           3000
         );
       } finally {
@@ -350,12 +257,11 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.routes = [];
-          this.showAlert("info", result.message || "No hay rutas disponibles.", 3000);
         }
       } catch (error) {
         this.loading = false;
         // Captura de errores no controlados
-        this.showAlert("error", "Ocurrió un error inesperado al cargar las rutas.", 3000);
+        this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
       } finally {
         this.loading = false;
       }
@@ -481,12 +387,11 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.locations = [];
-          this.showAlert("info", result.message || "No hay lugares disponibles.", 3000);
         }
       } catch (error) {
         this.showAlert(
           "error",
-          "Ocurrió un error inesperado al cargar los lugares.",
+          "Ocurrió un error inesperado al procesar la solicitud.",
           3000
         );
       } finally {

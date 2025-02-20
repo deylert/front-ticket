@@ -1,309 +1,297 @@
 <template>
-    <v-snackbar
-      class="mt-12"
-      location="right top"
-      :timeout="sb_timeout"
-      :color="sb_type"
-      elevation="24"
-      :multi-line="true"
-      vertical
-      v-model="snackbar"
-    >
-      <v-row>
-        <v-col md="2">
-          <v-avatar :icon="sb_icon" color="sb_type" size="40"></v-avatar>
-        </v-col>
-        <v-col md="10">
-          <h4>{{ sb_title }}</h4>
-          {{ sb_message }}
-          <div v-if="branch">
-            <!-- Aquí puedes agregar más información sobre la sucursal -->
-          </div>
-        </v-col>
-      </v-row>
-    </v-snackbar>
-    <v-container style="min-width: 100%; min-height: 100%">
-      <v-card elevation="6" class="mx-2">
-        <v-toolbar color="#1976D2">
-          <span class="text-subtitle-2 ml-4"> Vehículos de la Sucursal</span>
-          <v-spacer></v-spacer>
-          <v-btn
-            class="text-subtitle-1 ml-12"
-            color="#E7E9E9"
-            variant="flat"
-            @click="showAdd()"
-          >
-            Agregar Vehículo
-          </v-btn>
-        </v-toolbar>
-  
-        <v-card-text>
-          <v-text-field
-            class="mt-1 mb-1"
-            v-model="search"
-            append-icon="mdi-magnify"
-            label="Buscar"
-            single-line
-            hide-details
-          >
-          </v-text-field>
-          <v-data-table
-            :headers="headers"
-            :search="search"
-            :items="branchvehicles"
-            class="elevation-1"
-            style="max-height: 68vh; overflow-y: auto"
-            :items-per-page-text="'Elementos por páginas'"
-            no-data-text="No hay datos disponibles"
-            :loading="loading"
-            loading-text="Cargando datos..."
-          >
-            <template v-slot:item.actions="{ item }">
-              <v-btn
-                density="comfortable"
-                icon="mdi-pencil"
-                @click="editItem(item)"
-                color="#1976D2"
-                variant="tonal"
-                elevation="1"
-                title="Editar Vehículo"
-              ></v-btn
-              >
-              <v-btn
-                density="comfortable"
-                icon="mdi-delete"
-                @click="deleteItem(item)"
-                color="#DA7171"
-                variant="tonal"
-                elevation="1"
-                title="Eliminar Vehículo"
-              ></v-btn>
-            </template>
-            <template v-slot:item.plate="{ item }">
-              <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
-                <v-img
-                  :src="`${this.$axios.defaults.baseURL}images/${
-                    item.image
-                  }?t=${Date.now()}`"
-                  alt="image"
-                ></v-img> </v-avatar
-              ><!--+'?$'+Date.now()-->
-              {{ item.plate }}
-            </template>
-          </v-data-table>
-        </v-card-text>
-      </v-card>
-    </v-container>
-  
-    <v-dialog v-model="dialog" max-width="400px">
-      <v-form ref="form" v-model="valid" enctype="multipart/form-data">
-        <v-card>
-          <v-toolbar color="#1976D2">
-            <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
-          </v-toolbar>
-          <v-card-text>
-            <v-container>
-              <v-row>
-                <v-col cols="12" md="12">
-                  <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.vehicle_id"
-                    :items="vehicles" label="Vehículos" prepend-icon="mdi-car" item-title="plate"
-                    item-value="id" variant="underlined" :rules="selectRules">
-                    <template v-slot:item="{ props, item }">
-                      <v-list-item v-bind="props"
-                        :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`"
-                        :title="item.raw.name">
-                        <v-list-item-subtitle class="d-flex flex-column">
-                          <div>Chapa: {{ item.raw.plate }}</div>
-                          <div>Marca: {{ item.raw.brand }}</div>
-                          <div>Modelo: {{ item.raw.model }}</div>
-                        </v-list-item-subtitle>
-                      </v-list-item>
-                    </template>
-                  </v-autocomplete>
-                  </v-col>
-              </v-row>
-            </v-container>
-          </v-card-text>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="#DA7171" variant="flat" @click="close">Cancelar</v-btn>
-            <v-btn
-              color="#1976D2"
-              variant="flat"
-              @click="save"
-              :disabled="!valid"
-              :loading="loading"
-              >Aceptar</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </v-form>
-    </v-dialog>
-    <v-dialog v-model="dialogDelete" max-width="500px">
+  <v-snackbar class="mt-12" location="right top" :timeout="sb_timeout" :color="sb_type" elevation="24"
+    :multi-line="true" vertical v-model="snackbar">
+    <v-row>
+      <v-col md="2">
+        <v-avatar :icon="sb_icon" color="sb_type" size="40"></v-avatar>
+      </v-col>
+      <v-col md="10">
+        <h4>{{ sb_title }}</h4>
+        {{ sb_message }}
+        <div v-if="branch">
+          <!-- Aquí puedes agregar más información sobre la sucursal -->
+        </div>
+      </v-col>
+    </v-row>
+  </v-snackbar>
+  <v-container style="min-width: 100%; min-height: 100%">
+    <v-card elevation="6" class="mx-2">
+      <v-toolbar color="#1976D2">
+        <span class="text-subtitle-2 ml-4"> Vehículos de la Sucursal: </span>
+        <span class="text-subtitle-2 ml-4">
+                    <!-- Avatar del vehículo -->
+                    <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
+                        <v-img :src="`${this.$axios.defaults.baseURL}images/${this.branch.image}?t=${Date.now()}`"
+                            alt="image"></v-img>
+                    </v-avatar>
+                     {{ this.branch.name }}
+                </span>
+        <v-spacer></v-spacer>
+        <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2" @click="showAdd()">
+          Agregar Vehículo
+        </v-btn>
+      </v-toolbar>
+
+      <v-card-text>
+        <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+          hide-details>
+        </v-text-field>
+        <v-data-table :headers="headers" :search="search" :items="branchvehicles" class="elevation-1"
+          style="max-height: 68vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
+          no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
+          <template v-slot:item.actions="{ item }">
+            <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2" variant="tonal"
+              elevation="1" title="Editar Vehículo"></v-btn>
+            <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171" variant="tonal"
+              elevation="1" title="Eliminar Vehículo"></v-btn>
+          </template>
+          <template v-slot:item.plate="{ item }">
+            <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
+              <v-img :src="`${this.$axios.defaults.baseURL}images/${item.image
+                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
+            {{ item.plate }}
+          </template>
+        </v-data-table>
+      </v-card-text>
+    </v-card>
+  </v-container>
+
+  <v-dialog v-model="dialog" max-width="400px">
+    <v-form ref="form" v-model="valid" enctype="multipart/form-data">
       <v-card>
-        <v-toolbar color="#DA7171">
-          <span class="text-subtitle-2 ml-4"> Eliminar Vehículo</span>
+        <v-toolbar color="#1976D2">
+          <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
         </v-toolbar>
-  
-        <v-card-text class="mt-2 mb-2"> ¿Desea eliminar el Vehículo?</v-card-text>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12" md="12">
+                <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.vehicle_id"
+                  :items="vehicles" label="Vehículos" prepend-icon="mdi-car" item-title="plate" item-value="id"
+                  variant="underlined" :rules="selectRules">
+                  <template v-slot:item="{ props, item }">
+                    <v-list-item v-bind="props"
+                      :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`"
+                      :title="item.raw.name">
+                      <v-list-item-subtitle class="d-flex flex-column">
+                        <div>Chapa: {{ item.raw.plate }}</div>
+                        <div>Marca: {{ item.raw.brand }}</div>
+                        <div>Modelo: {{ item.raw.model }}</div>
+                      </v-list-item-subtitle>
+                    </v-list-item>
+                  </template>
+                </v-autocomplete>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="#DA7171" variant="flat" @click="closeDelete"> Cancelar </v-btn>
-          <v-btn color="#1976D2" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
+          <v-btn color="#DA7171" variant="flat" @click="close">Cancelar</v-btn>
+          <v-btn color="#1976D2" variant="flat" @click="save" :disabled="!valid" :loading="loading">Aceptar</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
-  </template>
-  
-  <script>
-  import { handleRequest } from "@/utils/api"; // Ruta al archivo
-  export default {
-    props: {
-      branch: {
-        type: Object,
-        required: true,
-        default: () => ({}), // Objeto vacío por defecto
-      },
+    </v-form>
+  </v-dialog>
+  <v-dialog v-model="dialogDelete" max-width="500px">
+    <v-card>
+      <v-toolbar color="#DA7171">
+        <span class="text-subtitle-2 ml-4"> Eliminar Vehículo</span>
+      </v-toolbar>
+
+      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar el Vehículo?</v-card-text>
+      <v-divider></v-divider>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="#DA7171" variant="flat" @click="closeDelete"> Cancelar </v-btn>
+        <v-btn color="#1976D2" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+
+<script>
+import { handleRequest } from "@/utils/api"; // Ruta al archivo
+export default {
+  props: {
+    branch: {
+      type: Object,
+      required: true,
+      default: () => ({}), // Objeto vacío por defecto
     },
-    data: () => ({
-      snackbar: false,
-      sb_type: "",
-      sb_message: "",
-      sb_timeout: 2000,
-      sb_title: "",
-      sb_icon: "",
-      valid: true,
-      loading: false,
-      mostrar: false,
-  
-      dialog: false,
-      dialogDelete: false,
-      branchvehicles: [],
-      vehicles: [],
+  },
+  data: () => ({
+    snackbar: false,
+    sb_type: "",
+    sb_message: "",
+    sb_timeout: 2000,
+    sb_title: "",
+    sb_icon: "",
+    valid: true,
+    loading: false,
+    mostrar: false,
+
+    dialog: false,
+    dialogDelete: false,
+    branchvehicles: [],
+    vehicles: [],
+    branch_id: "",
+    data: {},
+    headers: [
+      { title: "Chapa", value: "plate", width: "30%" },
+      { title: "Marca", value: "brand", width: "20%" },
+      { title: "Modelo", value: "model", width: "20%" },
+      { title: "Asientos", value: "seats", width: "10%" },
+      { title: "Acciones", value: "actions", sortable: false, width: "20%" },
+    ],
+
+    editedItem: {
+      id: "",
       branch_id: "",
-      data: {},
-      headers: [
-        { title: "Chapa", value: "plate", width: "30%" },
-        { title: "Marca", value: "brand", width: "20%" },
-        { title: "Modelo", value: "model", width: "20%" },
-        { title: "Asientos", value: "seats", width: "10%" },
-        { title: "Acciones", value: "actions", sortable: false, width: "20%" },
-      ],
-  
-      editedItem: {
-        id: "",
-        branch_id: "",
-        vehicle_id: "",
-      },
-      originalItem: {
-        id: "",
-        branch_id: "",
-        role_id: "",
-      },
-      defaultItem: {
-        id: "",
-        branch_id: "",
-        role_id: "",
-      },
-      editedIndex: -1,
-      search: "",
-      selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
-    }),
-    computed: {
-      formTitle() {
-        return this.editedIndex === -1 ? "Agregar Vehículo" : "Editar Vehículo";
-      },
+      vehicle_id: "",
     },
-    mounted() {
-      this.branch_id = this.branch.id;
-      this.initialize();
+    originalItem: {
+      id: "",
+      branch_id: "",
+      role_id: "",
     },
-    methods: {
-      async showAdd() {
-        this.data = {};
-        try {
-          const result = await handleRequest({
-            endpoint: 'vehicle',
-            method: 'GET'
-          });
-  
-          if (result.success) {
-            this.vehicles = result.data?.vehicles.filter((vehicle) =>
-        !this.branchvehicles.some((branchvehicle) => branchvehicle.vehicle_id === vehicle.id)
-      ) || [];
-          } else {
-            // Si no hay datos, asignamos un array vacío
-            this.vehicles = [];
-            this.showAlert('info', result.message || 'No hay datos disponibles.', 3000);
-          }
-        } catch (error) {
-          this.showAlert('error', 'Ocurrió un error inesperado al cargar los datos.', 3000);
-        } finally {
-          this.dialog = true;
-        }
-      },
-      close() {
-        this.dialog = false;
-        this.$nextTick(() => {
-          this.editedItem = Object.assign({}, this.defaultItem);
-          this.originalItem = Object.assign({}, this.defaultItem);
+    defaultItem: {
+      id: "",
+      branch_id: "",
+      role_id: "",
+    },
+    editedIndex: -1,
+    search: "",
+    selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
+  }),
+  computed: {
+    formTitle() {
+      return this.editedIndex === -1 ? "Agregar Vehículo" : "Editar Vehículo";
+    },
+  },
+  mounted() {
+    this.branch_id = this.branch.id;
+    this.initialize();
+  },
+  methods: {
+    async showAdd() {
+      this.data = {};
+      try {
+        const result = await handleRequest({
+          endpoint: 'vehicle',
+          method: 'GET'
         });
-        this.editedIndex = -1;
-      },
-      async initialize() {
+
+        if (result.success) {
+          this.vehicles = result.data?.vehicles.filter((vehicle) =>
+            !this.branchvehicles.some((branchvehicle) => branchvehicle.vehicle_id === vehicle.id)
+          ) || [];
+        } else {
+          // Si no hay datos, asignamos un array vacío
+          this.vehicles = [];
+        }
+      } catch (error) {
+        this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
+      } finally {
+        this.dialog = true;
+      }
+    },
+    close() {
+      this.dialog = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.originalItem = Object.assign({}, this.defaultItem);
+      });
+      this.editedIndex = -1;
+    },
+    async initialize() {
+      try {
+        this.loading = true;
+        this.data = {};
+        this.data.branch_id = this.branch_id;
+        const result = await handleRequest({
+          endpoint: "branch-vehicles",
+          method: "POST",
+          data: this.data,
+        });
+
+        if (result.success) {
+          // Si la solicitud es exitosa, asignamos las sucursales
+          this.branchvehicles = result.data?.branchVehicles || [];
+          this.loading = false;
+        } else {
+          // Si no hay datos, asignamos un array vacío
+          this.branchVehicles = [];
+          this.loading = false;
+        }
+      } catch (error) {
+        this.loading = false;
+        // Captura de errores no controlados
+        this.showAlert(
+          "error",
+          "Ocurrió un error inesperado al procesar la solicitud.",
+          3000
+        );
+      } finally {
+        this.loading = false;
+      }
+    },
+    async save() {
+      this.loading = true;
+      if (this.editedIndex === -1) {
+        this.valid = false;
+        this.data = {};
+        this.data.branch_id = this.branch_id;
+        this.data.vehicle_id = this.editedItem.vehicle_id;
+
         try {
-          this.loading = true;
-          this.data = {};
-          this.data.branch_id = this.branch_id;
           const result = await handleRequest({
-            endpoint: "branch-vehicles",
+            endpoint: "branch-vehicle",
             method: "POST",
             data: this.data,
           });
-  
+
+          // Manejo de la respuesta según el resultado
           if (result.success) {
-            // Si la solicitud es exitosa, asignamos las sucursales
-            this.branchvehicles = result.data?.branchVehicles || [];
+            this.showAlert("success", result.message, 3000);
+            this.initialize();
             this.loading = false;
           } else {
-            // Si no hay datos, asignamos un array vacío
-            this.branchVehicles = [];
-            this.showAlert(
-              "info",
-              result.message || "No hay Vehículos disponibles.",
-              3000
-            );
+            this.showAlert("warning", result.message, 3000);
             this.loading = false;
           }
         } catch (error) {
-          this.loading = false;
-          // Captura de errores no controlados
+          // Este bloque captura errores inesperados fuera del manejo estándar
           this.showAlert(
             "error",
-            "Ocurrió un error inesperado al cargar los trabajadores.",
+            "Ocurrió un error inesperado al procesar la solicitud.",
             3000
           );
-        } finally {
           this.loading = false;
         }
-      },
-      async save() {
-        this.loading = true;
-        if (this.editedIndex === -1) {
-          this.valid = false;
-          this.data = {};
-          this.data.branch_id = this.branch_id;
-          this.data.vehicle_id = this.editedItem.vehicle_id;
-  
+      } else {
+        this.valid = false;
+        const fieldsToUpdate = ["id", "branch_id", "vehicle_id"];
+        let updatedFields = Object.keys(this.editedItem)
+          .filter(
+            (key) =>
+              fieldsToUpdate.includes(key) &&
+              this.editedItem[key] !== this.originalItem[key]
+          )
+          .reduce((obj, key) => {
+            obj[key] = this.editedItem[key];
+            return obj;
+          }, {});
+        if (Object.keys(updatedFields).length > 0) {
+          updatedFields.id = this.editedItem.id;
           try {
             const result = await handleRequest({
               endpoint: "branch-vehicle",
-              method: "POST",
-              data: this.data,
+              method: "PUT",
+              data: updatedFields,
             });
-  
+
             // Manejo de la respuesta según el resultado
             if (result.success) {
               this.showAlert("success", result.message, 3000);
@@ -323,143 +311,101 @@
             this.loading = false;
           }
         } else {
-          this.valid = false;
-          const fieldsToUpdate = ["id", "branch_id", "vehicle_id"];
-          let updatedFields = Object.keys(this.editedItem)
-            .filter(
-              (key) =>
-                fieldsToUpdate.includes(key) &&
-                this.editedItem[key] !== this.originalItem[key]
-            )
-            .reduce((obj, key) => {
-              obj[key] = this.editedItem[key];
-              return obj;
-            }, {});
-          if (Object.keys(updatedFields).length > 0) {
-            updatedFields.id = this.editedItem.id;
-            try {
-              const result = await handleRequest({
-                endpoint: "branch-vehicle",
-                method: "PUT",
-                data: updatedFields,
-              });
-  
-              // Manejo de la respuesta según el resultado
-              if (result.success) {
-                this.showAlert("success", result.message, 3000);
-                this.initialize();
-                this.loading = false;
-              } else {
-                this.showAlert("warning", result.message, 3000);
-                this.loading = false;
-              }
-            } catch (error) {
-              // Este bloque captura errores inesperados fuera del manejo estándar
-              this.showAlert(
-                "error",
-                "Ocurrió un error inesperado al procesar la solicitud.",
-                3000
-              );
-              this.loading = false;
-            }
-          } else {
-            this.showAlert("success", "No se realizaron cambios.", 3000);
-            this.loading = false;
-          }
+          this.showAlert("success", "No se realizaron cambios.", 3000);
+          this.loading = false;
         }
-        this.close();
-      },
-      async editItem(item) {
-        this.editedIndex = 1;
-        this.originalItem = Object.assign({}, item);
-        this.editedItem = Object.assign({}, item);
-        this.data = {};
-        this.data.branch_id = this.branch_id;
-        this.data.type = 'Sucursal';
-        try {
-          const result = await handleRequest({
-            endpoint: 'vehicle',
-            method: 'GET'
-          });
-  
-          if (result.success) {
-      this.vehicles = result.data?.vehicles.filter((vehicle) =>
-    !this.branchvehicles.some((branchvehicle) => branchvehicle.vehicle_id === vehicle.id) || 
-    vehicle.id === this.editedItem.vehicle_id
-) || [];
-          } else {
-            // Si no hay datos, asignamos un array vacío
-            this.vehicles = [];
-            this.showAlert('info', result.message || 'No hay datos disponibles.', 3000);
-          }
-        } catch (error) {
-          this.showAlert('error', 'Ocurrió un error inesperado al cargar los datos.', 3000);
-        } finally {
-          this.dialog = true;
-        }
-      },
-      deleteItem(item) {
-        this.editedIndex = 1;
-        this.editedItem.id = item.id;
-        this.dialogDelete = true;
-      },
-      closeDelete() {
-        this.dialogDelete = false;
-        this.$nextTick(() => {
-          this.editedItem = Object.assign({}, this.defaultItem);
-        });
-      },
-      async deleteItemConfirm() {
-        try {
-          let request = {
-            id: this.editedItem.id,
-          };
-          const result = await handleRequest({
-            endpoint: "branch-vehicle-destroy",
-            method: "POST",
-            data: request,
-          });
-  
-          // Manejo de la respuesta según el resultado
-          if (result.success) {
-            this.showAlert("success", result.message, 3000);
-            this.initialize();
-          } else {
-            this.showAlert("warning", result.message, 3000);
-          }
-        } catch (error) {
-          // Este bloque captura errores inesperados fuera del manejo estándar
-          this.showAlert(
-            "error",
-            "Ocurrió un error inesperado al procesar la solicitud.",
-            3000
-          );
-        } finally {
-          this.closeDelete();
-        }
-      },
-      showAlert(sb_type, sb_message, sb_timeout) {
-        this.sb_type = sb_type;
-  
-        if (sb_type == "success") {
-          this.sb_title = "Éxito";
-          this.sb_icon = "mdi-check-circle";
-        }
-  
-        if (sb_type == "error") {
-          this.sb_title = "Error";
-          this.sb_icon = "mdi-check-circle";
-        }
-  
-        if (sb_type == "warning") {
-          this.sb_title = "Advertencia";
-          this.sb_icon = "mdi-alert-circle";
-        }
-        this.sb_message = sb_message;
-        this.sb_timeout = sb_timeout;
-        this.snackbar = true;
-      },
+      }
+      this.close();
     },
-  };
-  </script>
-  
+    async editItem(item) {
+      this.editedIndex = 1;
+      this.originalItem = Object.assign({}, item);
+      this.editedItem = Object.assign({}, item);
+      this.data = {};
+      this.data.branch_id = this.branch_id;
+      this.data.type = 'Sucursal';
+      try {
+        const result = await handleRequest({
+          endpoint: 'vehicle',
+          method: 'GET'
+        });
+
+        if (result.success) {
+          this.vehicles = result.data?.vehicles.filter((vehicle) =>
+            !this.branchvehicles.some((branchvehicle) => branchvehicle.vehicle_id === vehicle.id) ||
+            vehicle.id === this.editedItem.vehicle_id
+          ) || [];
+        } else {
+          // Si no hay datos, asignamos un array vacío
+          this.vehicles = [];
+        }
+      } catch (error) {
+        this.showAlert('error', 'Ocurrió un error inesperado al cargar los datos.', 3000);
+      } finally {
+        this.dialog = true;
+      }
+    },
+    deleteItem(item) {
+      this.editedIndex = 1;
+      this.editedItem.id = item.id;
+      this.dialogDelete = true;
+    },
+    closeDelete() {
+      this.dialogDelete = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+      });
+    },
+    async deleteItemConfirm() {
+      try {
+        let request = {
+          id: this.editedItem.id,
+        };
+        const result = await handleRequest({
+          endpoint: "branch-vehicle-destroy",
+          method: "POST",
+          data: request,
+        });
+
+        // Manejo de la respuesta según el resultado
+        if (result.success) {
+          this.showAlert("success", result.message, 3000);
+          this.initialize();
+        } else {
+          this.showAlert("warning", result.message, 3000);
+        }
+      } catch (error) {
+        // Este bloque captura errores inesperados fuera del manejo estándar
+        this.showAlert(
+          "error",
+          "Ocurrió un error inesperado al procesar la solicitud.",
+          3000
+        );
+      } finally {
+        this.closeDelete();
+      }
+    },
+    showAlert(sb_type, sb_message, sb_timeout) {
+      this.sb_type = sb_type;
+
+      if (sb_type == "success") {
+        this.sb_title = "Éxito";
+        this.sb_icon = "mdi-check-circle";
+      }
+
+      if (sb_type == "error") {
+        this.sb_title = "Error";
+        this.sb_icon = "mdi-check-circle";
+      }
+
+      if (sb_type == "warning") {
+        this.sb_title = "Advertencia";
+        this.sb_icon = "mdi-alert-circle";
+      }
+      this.sb_message = sb_message;
+      this.sb_timeout = sb_timeout;
+      this.snackbar = true;
+    },
+  },
+};
+</script>

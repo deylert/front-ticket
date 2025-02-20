@@ -17,9 +17,17 @@
     <v-container style="min-width: 100%; min-height: 100%">
         <v-card elevation="6" class="mx-2">
             <v-toolbar color="#1976D2">
-                <span class="text-subtitle-2 ml-4"> Rutas de la Sucursal</span>
+                <span class="text-subtitle-2 ml-4"> Rutas de la Sucursal: </span>
+                <span class="text-subtitle-2 ml-4">
+                    <!-- Avatar del vehículo -->
+                    <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
+                        <v-img :src="`${this.$axios.defaults.baseURL}images/${this.branch.image}?t=${Date.now()}`"
+                            alt="image"></v-img>
+                    </v-avatar>
+                     {{ this.branch.name }}
+                </span>
                 <v-spacer></v-spacer>
-                <v-btn class="text-subtitle-1 ml-12" color="#E7E9E9" variant="flat" @click="showAdd()">
+                <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2" @click="showAdd()">
                     Agregar Ruta
                 </v-btn>
             </v-toolbar>
@@ -232,7 +240,6 @@ export default {
                 } else {
                     // Si no hay datos, asignamos un array vacío
                     this.routes = [];
-                    this.showAlert('info', result.message || 'No hay datos disponibles.', 3000);
                 }
             } catch (error) {
                 this.showAlert('error', 'Ocurrió un error inesperado al cargar los datos.', 3000);
@@ -266,11 +273,6 @@ export default {
                 } else {
                     // Si no hay datos, asignamos un array vacío
                     this.branchroutes = [];
-                    this.showAlert(
-                        "info",
-                        result.message || "No hay Rutas disponibles.",
-                        3000
-                    );
                     this.loading = false;
                 }
             } catch (error) {
@@ -278,7 +280,7 @@ export default {
                 // Captura de errores no controlados
                 this.showAlert(
                     "error",
-                    "Ocurrió un error inesperado al cargar los trabajadores.",
+                    "Ocurrió un error inesperado al procesar la solicitud.",
                     3000
                 );
             } finally {
@@ -384,10 +386,9 @@ export default {
                 } else {
                     // Si no hay datos, asignamos un array vacío
                     this.routes = [];
-                    this.showAlert('info', result.message || 'No hay datos disponibles.', 3000);
                 }
             } catch (error) {
-                this.showAlert('error', 'Ocurrió un error inesperado al cargar los datos.', 3000);
+                this.showAlert('error', "Ocurrió un error inesperado al procesar la solicitud.", 3000);
             } finally {
                 this.dialog = true;
             }

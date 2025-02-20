@@ -21,7 +21,7 @@
           <v-col cols="12" md="3" class="text-right">
             <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
               prepend-icon="mdi-plus-circle" @click="showAddRole">
-              Agregar Nuevo Rol
+              Agregar Rol
             </v-btn>
           </v-col>
         </v-row>
@@ -121,7 +121,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="tonal" color="primary" @click="closeDialogRolePermission">Cerrar</v-btn>
+        <v-btn variant="flat" color="#1976D2" @click="closeDialogRolePermission">Cerrar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -192,13 +192,13 @@ export default {
       (v) => (v && v.length <= 50) ||
         "El campo debe tener menos de 51 caracteres",
       (v) => (v && v.length >= 3) ||
-        "El campo debe tener al menos de 3 caracteres",
+        "El campo debe tener al menos 3 caracteres",
     ],
     selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
   }),
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'Agregar Nuevo Rol' : 'Editar Rol';
+      return this.editedIndex === -1 ? 'Agregar Rol' : 'Editar Rol';
     }
   },
   mounted() {
@@ -233,12 +233,11 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.roles = [];
-          this.showAlert('success', result.message || 'No hay roles disponibles.', 3000);
         }
       } catch (error) {
         this.loading = false;
         // Captura de errores no controlados
-        this.showAlert('error', 'Ocurrió un error inesperado al cargar los roles.', 3000);
+        this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
       } finally {
         this.loading = false;
       }
@@ -329,33 +328,6 @@ export default {
           this.loading = false;
           this.showAlert("success", "No se realizaron cambios.", 3000);
         }
-        /*this.valid = false;
-        this.data.id = this.editedItem.id;
-        this.data.name = this.editedItem.name;
-        this.data.description = this.editedItem.description;
-        this.data.type = this.editedItem.type;
-
-        try {
-          const result = await handleRequest({
-            endpoint: 'role',
-            method: 'PUT',
-            data: this.data
-          });
-
-          // Manejo de la respuesta según el resultado
-          if (result.success) {
-            this.showAlert("success", result.message, 3000);
-            this.initialize();
-          } else {
-            this.showAlert("warning", result.message, 3000);
-          }
-        } catch (error) {
-          // Este bloque captura errores inesperados fuera del manejo estándar
-          this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
-        } finally {
-          this.loading = false;
-          this.editedIndex = -1;
-        }*/
       }
       this.close();
     },

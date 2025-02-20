@@ -82,7 +82,7 @@
 
         <v-autocomplete :no-data-text="'No hay datos disponibles'" v-if="selectedOption === 'sucursales'" clearable
           label="Seleccione una Sucursal" variant="outlined" prepend-inner-icon="mdi-domain"
-          v-model="editedItem.branch_id" :items="branches" item-title="name" item-value="id">
+          v-model="editedItem.branch_id" :items="branches" item-title="name" item-value="id" :rules="requiredRules">
           <template v-slot:item="{ props, item }">
             <v-list-item v-bind="props" :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`"
               :title="item.raw.name"></v-list-item>
