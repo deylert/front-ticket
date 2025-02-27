@@ -102,6 +102,24 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "home" */ "@/views/structure/Structure.vue"),
       },
+      {
+        path: "/ticketdate",
+        name: "TicketsDate",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/reportes/TicketDate.vue"),
+      },
+      {
+        path: "/tickettripdate",
+        name: "TicketsTripsDate",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/reportes/TripPeriodo.vue"),
+      },
+      {
+        path: "/tripsworker",
+        name: "TripsWorker",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/reportes/TripsWorkers.vue"),
+      }
     ],
   },
 ];

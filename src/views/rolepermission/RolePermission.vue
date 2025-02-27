@@ -19,7 +19,7 @@
             <v-toolbar color="#1976D2">
                 <span class="text-subtitle-2 ml-4"> Permisos por rol: {{ this.roleName }}</span>
                 <v-spacer></v-spacer>
-                <v-btn class="text-subtitle-1 ml-12" color="#E7E9E9" variant="flat" @click="showAdd()">
+                <v-btn class="text-subtitle-1 ml-12" prepend-icon="mdi-plus-circle" color="white" variant="tonal" @click="showAdd()">
                     Asignar Permiso
                 </v-btn>
             </v-toolbar>
@@ -29,7 +29,7 @@
                     hide-details>
                 </v-text-field>
                 <v-data-table :headers="headers" :search="search" :items="rolepermissions" class="elevation-1"
-                    style="max-height: 68vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
+                    style="max-height: 65vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
                     no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
                     <template v-slot:item.actions="{ item }">
                         <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171"
@@ -131,10 +131,10 @@ export default {
         roleName: '',
         data: {},
         headers: [
-            { title: "Nombre", value: "name", width: "40%" },
-            { title: "Módulo", value: "module", width: "40%" },
-            { title: "Descripción", value: "description", width: "40%" },
-            { title: "Acciones", value: "actions", sortable: false, width: "20%" },
+            { title: "Nombre", value: "name", },
+            { title: "Módulo", value: "module", },
+            { title: "Descripción", value: "description", },
+            { title: "Acciones", value: "actions", sortable: false, },
         ],
 
         editedItem: {

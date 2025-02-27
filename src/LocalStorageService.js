@@ -20,8 +20,8 @@ const LocalStorageService = {
     LocalStorageService.removeItem("nameBusiness");
     LocalStorageService.removeItem("imageBusiness");
     LocalStorageService.removeItem("image");
-    LocalStorageService.removeItem("business_id");
-    LocalStorageService.removeItem("permissionsUser");*/
+    LocalStorageService.removeItem("business_id");*/
+    LocalStorageService.removeItem("permissions");
     LocalStorageService.removeItem("authenticateUser");
     LocalStorageService.removeItem("usre_id");
     LocalStorageService.removeItem("user");

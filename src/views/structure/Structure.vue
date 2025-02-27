@@ -11,73 +11,112 @@
       </v-col>
     </v-row>
   </v-snackbar>
-  <v-toolbar color="#1976D2">
+  <!--<v-toolbar color="#1976D2">
     <v-row align="left">
       <v-col cols="12" md="8" class="grow ml-4">
         <span class="text-subtitle-1"><strong>Estructuras de asientos</strong></span>
       </v-col>
     </v-row>
   </v-toolbar>
-  <v-container>
-    <!-- Botón para abrir el diálogo (alineado a la derecha) -->
+ <v-container>
+     Botón para abrir el diálogo (alineado a la derecha)
     <div class="button-container">
       <v-btn @click="dialog = true" color="primary">Agregar Estructura</v-btn>
-    </div>
+    </div>-->
 
-    <!-- Diálogo para crear una nueva estructura -->
-    <v-dialog v-model="dialog" max-width="600">
-      <v-form ref="form" v-model="valid">
-        <v-card>
-          <v-toolbar color="#1976D2">
-            <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
-          </v-toolbar>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-text-field v-model="editedItem.name" clearable label="Nombre" prepend-icon="mdi-tag-outline"
-                  variant="underlined" :rules="nameRules"></v-text-field>
-              </v-col>
-              <v-col cols="12" md="6">
-                <!-- Campo para la cantidad de asientos -->
-                <v-text-field v-model="editedItem.seatCount" label="Cantidad de Asientos" type="number"
-                  @input="generateSeatMap" prepend-icon="mdi-seat" :rules="seatCountRules"
-                  variant="underlined"></v-text-field>
-              </v-col>
-              <v-col cols="12" md="12">
-                <v-textarea v-model="editedItem.description" clearable label="Descripción" prepend-icon="mdi-note"
-                  variant="underlined"></v-textarea>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-card v-if="this.editedItem.seatMap.length > 0">
-                  <v-card-text>
-                    <div v-for="(row, rowIndex) in this.editedItem.seatMap" :key="rowIndex" class="seat-row">
-                      <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex"
-                        :color="seat.selected ? 'primary' : 'grey'"
-                        :disabled="selectedCount >= editedItem.seatCount && !seat.selected"
-                        @click="toggleSeat(rowIndex, seatIndex)" class="seat-button">
-                        {{ seat.label }}
-                      </v-btn>
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn @click="close" color="#DA7171" variant="flat">Cancelar</v-btn>
-            <v-btn @click="save" color="#1976D2" variant="flat" :loading="this.loading"
-              :disabled="!valid">Aceptar</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-form>
-    </v-dialog>
+  <!-- Diálogo para crear una nueva estructura -->
+  <v-dialog v-model="dialog" max-width="600">
+    <v-form ref="form" v-model="valid">
+      <v-card>
+        <v-toolbar color="#1976D2">
+          <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
+        </v-toolbar>
+        <v-card-text>
+          <v-row>
+            <v-col cols="12" md="6">
+              <v-text-field v-model="editedItem.name" clearable label="Nombre" prepend-icon="mdi-tag-outline"
+                variant="underlined" :rules="nameRules"></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <!-- Campo para la cantidad de asientos -->
+              <v-text-field v-model="editedItem.seatCount" label="Cantidad de Asientos" type="number"
+                @input="generateSeatMap" prepend-icon="mdi-seat" :rules="seatCountRules"
+                variant="underlined"></v-text-field>
+            </v-col>
+            <v-col cols="12" md="12">
+              <v-textarea v-model="editedItem.description" clearable label="Descripción" prepend-icon="mdi-note"
+                variant="underlined"></v-textarea>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-card v-if="this.editedItem.seatMap.length > 0">
+                <v-card-text>
+                  <div v-for="(row, rowIndex) in this.editedItem.seatMap" :key="rowIndex" class="seat-row">
+                    <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex" :color="seat.selected ? 'primary' : 'grey'"
+                      :disabled="selectedCount >= editedItem.seatCount && !seat.selected"
+                      @click="toggleSeat(rowIndex, seatIndex)" class="seat-button">
+                      {{ seat.label }}
+                    </v-btn>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="close" color="#DA7171" variant="flat">Cancelar</v-btn>
+          <v-btn @click="save" color="#1976D2" variant="flat" :loading="this.loading" :disabled="!valid">Aceptar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-form>
+  </v-dialog>
 
-    <!-- Lista de estructuras guardadas -->
-    <v-container fluid>
-      <v-row>
+  <!-- Lista de estructuras guardadas -->
+  <v-container style="min-width: 100%; min-height: 100%;">
+    <v-card elevation="6" class="mx-2">
+      <v-toolbar color="#1976D2">
+        <v-row align="center">
+          <v-col cols="12" md="8" class="grow ml-4">
+            <span class="text-subtitle-1"><strong>Estructuras de asientos</strong></span>
+          </v-col>
+          <v-col cols="12" md="3" class="text-right">
+            <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
+              prepend-icon="mdi-plus-circle" @click="dialog">
+              Agregar Estructura
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-toolbar>
+      <v-card-text>
+        <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+          hide-details>
+        </v-text-field>
+        <v-data-table :headers="headers" :search="search" :items="structures" class="elevation-1"
+          style="max-height: 68vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
+          no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
+          <!-- Columna personalizada para el gráfico de asientos -->
+          <template v-slot:item.seatMap="{ item }">
+            <div class="seat-map-container">
+              <div v-for="(row, rowIndex) in item.seatMap" :key="rowIndex" class="seat-row" >
+                <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex" :color="seat.selected ? 'primary' : ''"
+                  class="seat-button-preview" disabled small>
+                  <v-icon v-if="seat.label">mdi-seat</v-icon>
+                  {{ seat.label ? seat.label : '' }}
+                </v-btn>
+              </div>
+            </div>
+          </template>
+          <template v-slot:item.actions="{ item }">
+            <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2" variant="tonal"
+              elevation="1" title="Editar Estructura"></v-btn>
+            <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171" variant="tonal"
+              elevation="1" title="Eliminar Estructura"></v-btn>
+          </template>
+        </v-data-table>
+      </v-card-text>
+      <!--<v-row>
         <v-col v-for="(structure, index) in structures" :key="index" cols="12" sm="6" md="4" lg="3">
           <v-card class="structure-card">
             <v-card-text class="card-content">
@@ -88,7 +127,7 @@
               </div>
 
               <div v-for="(row, rowIndex) in structure.seatMap" :key="rowIndex" class="seat-row">
-                <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex" :color="seat.selected ? 'primary' : '#00000'"
+                <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex" :color="seat.selected ? 'primary' : ''"
                   class="seat-button-preview" disabled>
                   <v-icon v-if="seat.label">mdi-seat</v-icon>
                   {{ seat.label ? `${seat.label}` : '' }}
@@ -106,29 +145,58 @@
         </v-col>
       </v-row>
 
-      <!-- Botón para cargar más estructuras -->
       <div class="text-center mt-4">
         <v-btn v-if="hasMore" @click="initialize" :loading="loading" color="primary">
           Cargar más
         </v-btn>
         <p v-else>No hay más estructuras para mostrar.</p>
-      </div>
-    </v-container>
-    <v-dialog v-model="dialogDelete" max-width="500px">
-      <v-card>
-        <v-toolbar color="#DA7171">
-          <span class="text-subtitle-2 ml-4"> Eliminar una estructura</span>
-        </v-toolbar>
-        <v-card-text class="mt-2 mb-2"> ¿Desea eliminar la estructura?</v-card-text>
-        <v-divider></v-divider>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="#DA7171" variant="flat" @click="closeDelete">Cancelar</v-btn>
-          <v-btn color="#1976D2" variant="flat" :loading="loading" @click="deleteItemConfirm">Aceptar</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+      </div>-->
+    </v-card>
   </v-container>
+  <!-- Diálogo para mostrar el gráfico de asientos -->
+  <v-dialog v-model="dialogSeats" max-width="600">
+    <v-card>
+      <v-card-title class="text-h6">
+        Gráfico de Asientos
+      </v-card-title>
+      <v-card-text>
+        <div v-if="selectedStructure" class="seat-map-container">
+          <div class="text-h6">{{ selectedStructure.name }}</div>
+          <div class="text-body-1">{{ selectedStructure.description }}</div>
+          <div class="text-caption">Asientos: {{ selectedStructure.seatCount }}</div>
+
+          <!-- Gráfico de asientos -->
+          <div v-for="(row, rowIndex) in selectedStructure.seatMap" :key="rowIndex" class="seat-row">
+            <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex" :color="seat.selected ? 'primary' : ''"
+              class="seat-button-preview" disabled>
+              <v-icon v-if="seat.label">mdi-seat</v-icon>
+              {{ seat.label ? `${seat.label}` : '' }}
+            </v-btn>
+          </div>
+        </div>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="dialog = false" color="primary">
+          Cerrar
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="dialogDelete" max-width="500px">
+    <v-card>
+      <v-toolbar color="#DA7171">
+        <span class="text-subtitle-2 ml-4"> Eliminar una estructura</span>
+      </v-toolbar>
+      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar la estructura?</v-card-text>
+      <v-divider></v-divider>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="#DA7171" variant="flat" @click="closeDelete">Cancelar</v-btn>
+        <v-btn color="#1976D2" variant="flat" :loading="loading" @click="deleteItemConfirm">Aceptar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+  <!--</v-container>-->
 </template>
 
 <script>
@@ -136,16 +204,33 @@ import { handleRequest } from "@/utils/api"; // Ruta al archivo
 export default {
   data() {
     return {
+      /*
+      */
+      itemsPerPage: 2,
+      totalItems: 0,
+      name: '',
+      description: '',
+      page: 1,
+      /* */
       snackbar: false,
       sb_type: '',
       sb_message: '',
       sb_timeout: 2000,
       sb_title: '',
       sb_icon: '',
+      search: '',
       valid: true,
       loading: false,
       dialogDelete: false,
+      dialogSeats: false,
       dialog: false, // Controla la visibilidad del diálogo
+      headers: [
+        //{ title: 'Sucursal', value: 'branchName', width: '20%' },
+        { title: 'Nomre', value: 'name' },
+        { title: 'Asientos', value: 'seatMap' },
+        { title: 'Descripción', value: 'description' },
+        { title: 'Acciones', value: 'actions', sortable: false },
+      ],
       editedItem: {
         id: '',
         name: '',
@@ -196,36 +281,85 @@ export default {
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? 'Agregar Estructura' : 'Editar Estructura';
-    }
+    },
+    filteredSeatMap() {
+      return this.item.seatMap.filter((row, rowIndex) => {
+        // Si no es la última fila, siempre se incluye
+        if (rowIndex !== this.item.seatMap.length - 1) return true;
+
+        // Si es la última fila, se incluye solo si tiene asientos seleccionados
+        return row.some(seat => seat.selected);
+      });
+    },
   },
-  mounted() {
+   mounted() {
     this.initialize();
   },
   methods: {
-    async loadStructures() {
-      if (this.isLoading) return; // Evitar múltiples solicitudes
+    /*async loadItems({ page, itemsPerPage, isSearch = false }) {
+      this.loading = true;
+      // Verifica si los datos de la página solicitada ya están cargados
+      // Solo verifica si los datos ya están cargados si no es una búsqueda
+      if (!isSearch) {
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const isPageLoaded = this.structures.slice(startIndex, endIndex).length === itemsPerPage;
 
-      this.isLoading = true;
+        if (isPageLoaded) {
+          this.loading = false;
+          this.structures = [];
+          return;
+        }
+      }
+
 
       try {
-        const response = await this.$axios.post('/api/structures', {
-          limit: 10, // Número de estructuras por página
-          cursor: this.cursor, // Cursor para la paginación
-        });
+        // Realiza la solicitud al servidor
+        const result = await this.fetchData({ page, itemsPerPage, search: this.search });
 
-        const { structures, hasMore, nextCursor } = response.data;
-
-        // Agregar las nuevas estructuras a la lista
-        this.structures = [...this.structures, ...structures];
-        this.hasMore = hasMore;
-        this.cursor = nextCursor; // Actualizar el cursor para la próxima página
+        if (result.success) {
+          const { structures, total, nextCursor } = result.data;
+          this.structures.push(...structures);
+          this.totalItems = total;
+          this.cursor = nextCursor; // Actualiza el cursor para la próxima página
+        } else {
+          this.structures = [];
+          this.totalItems = 0;
+        }
       } catch (error) {
-        console.error('Error al cargar las estructuras:', error);
+        this.showAlert('error', 'Ocurrió un error inesperado al cargar los datos.', 3000);
       } finally {
-        this.isLoading = false;
+        this.loading = false;
       }
     },
+    async fetchData({ page, itemsPerPage, search }) {
+      const data = {
+        cursor: this.cursor,
+        limit: itemsPerPage,
+        page,
+        search, // Envía el término de búsqueda al servidor
+      };
+
+      return await handleRequest({
+        endpoint: 'structure-cursor',
+        method: 'POST',
+        data: data,
+      });
+    },
+    handleSearch() {
+      console.log("Búsqueda realizada:", this.search); // Verifica que el método se ejecuta
+      // Reinicia la paginación y carga los datos con el término de búsqueda
+      this.cursor = null; // Reinicia el cursor
+      this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, isSearch: true });
+    },*/
     // Genera la matriz de asientos con 4 columnas y el número mínimo de filas
+    shouldDisplayRow(row, rowIndex) {
+      // Si no es la última fila, siempre se muestra
+      if (rowIndex !== this.item.seatMap.length - 1) return true;
+
+      // Si es la última fila, verifica si tiene asientos seleccionados
+      return row.some(seat => seat.selected);
+    },
     generateSeatMap() {
       const totalSeats = this.editedItem.seatCount;
       const columns = 4; // Número fijo de columnas
@@ -249,7 +383,7 @@ export default {
     /*toggleSeat(rowIndex, seatIndex) {
       const seat = this.editedItem.seatMap[rowIndex][seatIndex];
 
-      // Verificar si se puede seleccionar más asientos
+      // Verificar si se puede seleccionar más asientos|
       if (!seat.selected && this.selectedCount >= this.editedItem.seatCount) {
         return; // No se pueden seleccionar más asientos
       }
@@ -357,24 +491,27 @@ export default {
     },
     async initialize() {
       try {
-        this.data = {};
-        this.data.cursor = this.cursor;
+        /*this.data = {};
+        this.data.limit = this.limit || this.itemsPerPage;
+        this.data.search = this.search;
+        this.data.cursor = this.cursor;*/
         this.loading = true;
         const result = await handleRequest({
-          endpoint: 'structure-cursor',
-          method: 'POST',
-          data: this.data
+          endpoint: 'structure',
+          method: 'GET',
+          //data: this.data
         });
 
         if (result.success) {
           // Si la solicitud es exitosa, asignamos las sucursales
           // Agregar las nuevas estructuras a la lista
-          const { structures, hasMore, nextCursor } = result.data;
+          
 
           // Agregar solo las estructuras nuevas a la lista
-          this.structures.push(...structures);
-          this.hasMore = hasMore;
-          this.cursor = nextCursor; // Actualizar el cursor para la próxima página
+          this.structures = result.data?.structures;
+          //this.totalItems = this.structures.length;
+          //this.hasMore = hasMore;
+          //this.cursor = nextCursor; // Actualizar el cursor para la próxima página
         } else {
           // Si no hay datos, asignamos un array vacío
           this.structures = [];
@@ -472,7 +609,7 @@ export default {
       this.close();
     },
     // Método para abrir el formulario de edición con los datos de la estructura seleccionada
-    editStructure(structure) {
+    editItem(structure) {
       //this.close();
 
       // Clonar la estructura sin referencia
@@ -535,7 +672,21 @@ export default {
         // Manejo de la respuesta según el resultado
         if (result.success) {
           this.showAlert("success", result.message, 3000);
-          this.initialize();
+          // 🔍 Verificar estructura actual antes de eliminar
+          console.log("Estructura actual:", this.structure);
+
+          // Buscar el índice del elemento a eliminar
+          const index = this.structures.findIndex(item => item.id == this.editedItem.id);
+          console.log("Índice encontrado:", index);
+          console.log("Elemento encontrado:", this.structures[index]);
+
+          // Si el elemento existe, eliminarlo
+          if (index !== -1) {
+            this.structures.splice(index, 1);
+            console.log("Estructura después de eliminar:", this.structures);
+            this.structures = [...this.structures]; // 🔄 Forzar actualización en Vue
+            this.totalItems--;
+          }
         } else {
           this.showAlert("warning", result.message, 3000);
         }
@@ -699,5 +850,26 @@ export default {
   justify-content: flex-end;
   margin-top: auto;
   /* Alinear los botones al final */
+}
+
+/*data table*/
+.seat-map-container {
+  display: inline-block;
+  border: 1px solid #ddd;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.seat-row {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.seat-button-preview {
+  min-width: 30px !important;
+  height: 30px !important;
+  padding: 0 !important;
 }
 </style>

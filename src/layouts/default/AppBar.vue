@@ -98,7 +98,7 @@
       <template v-slot:activator="{ props }">
 
         <v-list-item v-bind="props" variant="tonal" class="mr-4" lines="two" :title="this.name" :subtitle="this.role"
-          :style="{ color: '#00000' }">
+          :style="{ color: '#000000' }">
           <template v-slot:prepend>
             <v-avatar class="mr-2">
                     <v-img :src="`${this.$axios.defaults.baseURL}images/${imageUrl}`" alt="Avatar de la persona"></v-img>

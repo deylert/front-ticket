@@ -226,7 +226,7 @@ export default {
           // LocalStorageService.setItem('nameBusiness', user.nameBusiness);
           // LocalStorageService.setItem('imageBusiness', user.imageBusiness);
           // LocalStorageService.setItem('business_id', user.business_id);
-          // LocalStorageService.setItem('permissionsUser', user.permissions);
+          LocalStorageService.setItem('permissions', user.permissions);
 
           // Reiniciar el formulario
           this.editedItem = Object.assign({}, this.defaultItem);
@@ -236,7 +236,7 @@ export default {
             router.push({ name: 'Dashboard' });
           }, 1000);
         } else {
-          console.log(result.message);
+          //console.log(result.message);
           // Manejo de errores definidos por la API
           this.showAlert('warning', result.message || 'Error inesperado', 3000);
           //this.showAlert('warning', result.details || 'Error inesperado', 3000);
@@ -244,7 +244,7 @@ export default {
       } catch (error) {
         // Manejo de errores no controlados
         this.showAlert('error', 'Ocurrió un error inesperado al iniciar sesión.', 3000);
-        console.error(error);
+        //console.error(error);
       } finally {
         this.loading = false; // Detener el loader
       }

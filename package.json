@@ -14,8 +14,14 @@
     "chart.js": "^4.4.7",
     "core-js": "^3.29.0",
     "date-fns": "^4.1.0",
+    "docxtemplater": "^3.60.1",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.0",
+    "jszip-utils": "^0.1.0",
     "lodash": "^4.17.21",
     "pinia": "^2.0.0",
+    "pizzip": "^3.1.8",
     "roboto-fontface": "*",
     "vee-validate": "^4.11.0",
     "vue": "^3.2.0",
@@ -26,6 +32,7 @@
     "vue3-snotify": "^0.0.6",
     "vuetify": "^3.4.7",
     "webfontloader": "^1.0.0",
+    "xlsx": "^0.18.5",
     "yup": "^1.2.0"
   },
   "devDependencies": {

@@ -12,37 +12,37 @@
         <!--prepend-avatar=`${this.$axios.defaults.baseURL}images/${imageBusiness}`-->
         <v-divider></v-divider>
 
-        <v-list density="compact" nav>
+        <v-list density="compact" nav v-model:opened="open">
           <v-list-item prepend-icon="mdi-view-dashboard-outline" title="Dashboard" to="home" value="home"
             class="list-item"></v-list-item>
-          <v-list-item prepend-icon="mdi-store" title="Negocio" to="company" value="company"
-            class="list-item"></v-list-item>
-          <v-list-item prepend-icon="mdi-store" title="Sucursales" to="branch" value="branch"
-            class="list-item"></v-list-item>
-          <v-list-item prepend-icon="mdi-devices" title="Dsipositivos" to="device" value="device"
-            class="list-item"></v-list-item>
-          <v-list-item prepend-icon="mdi-bus" title="Vehículos" to="vehicle" value="vehicle"
-            class="list-item"></v-list-item>
-          <v-list-item prepend-icon="mdi-account" title="Trabajadores" to="worker" value="worker"
-            class="list-item"></v-list-item>
-          <v-list-item prepend-icon="mdi-map-marker" title="Lugares" to="location" value="location"
-            class="list-item"></v-list-item>
-          <v-list-item prepend-icon="mdi-road-variant" title="Rutas" to="route" value="route"
-            class="list-item"></v-list-item>
-          <v-list-item prepend-icon="mdi-steering" title="Viajes" to="trip" value="trip"
-            class="list-item"></v-list-item>
-          <v-list-item prepend-icon="mdi-ticket" title="Tickets" to="tick" value="tick" class="list-item"></v-list-item>
-          <v-list-item prepend-icon="mdi-bus-side" title="Estructuras de asientos" to="structure" value="structure" class="list-item"></v-list-item>
+            <v-list-group value="Admin" v-if="filteredMenuAdministracion.length !== 0">
+            <template v-slot:activator="{ props }">
+              <v-list-item v-bind="props" prepend-icon="mdi-cog-outline" title="Administración"></v-list-item>
+            </template>
 
+            <v-list-item v-for="item in filteredMenuAdministracion" style="padding-left: 20px !important;" :key="item.title" :prepend-icon="item.icon" :title="item.title"
+            :to="item.to" :value="item.value"> <!-- Filtrado directo usando v-if -->
+  
+            </v-list-item>
 
-          <v-list-group value="Mantenedores">
+          </v-list-group>
+          
+          <v-list-group value="Reportes" v-if="filteredMenuReports.length !== 0">
+            <template v-slot:activator="{ props }">
+              <v-list-item v-bind="props" prepend-icon="mdi-file-chart" title="Reportes"></v-list-item>
+            </template>
+
+            <v-list-item v-for="item in filteredMenuReports" style="padding-left: 20px !important" :key="item.title" :prepend-icon="item.icon" :title="item.title"
+            :to="item.to" :value="item.value"></v-list-item> <!-- Filtrado directo usando v-if -->
+          </v-list-group>
+
+          <v-list-group value="Mantenedores" >
             <template v-slot:activator="{ props }">
               <v-list-item v-bind="props" prepend-icon="mdi-progress-wrench" title="Mantenedores"></v-list-item>
             </template>
 
-
-            <v-list-item v-for="([title, icon, to], i) in mainteiners" :key="i" :title="title" :prepend-icon="icon"
-              :value="title" :to="to" style="padding-left: 20px !important"></v-list-item>
+            <v-list-item v-for="item in filteredMenuMainteiners" style="padding-left: 20px !important" :key="item.title" :prepend-icon="item.icon" :title="item.title"
+            :to="item.to" :value="item.value"></v-list-item> <!-- Filtrado directo usando v-if -->
           </v-list-group>
         </v-list>
 
@@ -66,27 +66,65 @@
 import LocalStorageService from "@/LocalStorageService";
 export default {
   data: () => ({
-    open: ['Users'],
-    mainteiners: [
+    open: ['Admin'],
+    permissions: '',
+    /*mainteiners: [
       //['Categorías', 'mdi-text-box-outline', '/category'],
       //['Prioridades', 'mdi-star-circle-outline', '/priority'],
       ['Roles', 'mdi-account-cog-outline', '/role'],
       ['Permisos', 'mdi-shield-check', '/permission'],
+    ],*/
+    mainteiners: [
+      { title: "Roles", icon: "mdi-account-cog-outline", to: "role", permission: "view_roles" },
+      { title: "Permisos", icon: "mdi-shield-check", to: "permission", permission: "view_permissions" },
+      { title: "Estructuras de asientos", icon: "mdi-bus-side", to: "structure", permission: "view_structures" },
+    ],
+    administracion: [
+      { icon: "mdi-store", title: "Negocio", to: "company", value: "company", permission: "view_business" },
+      { icon: "mdi-store", title: "Sucursales", to: "branch", value: "branch", permission: "view_branches" },
+      { icon: "mdi-account", title: "Trabajadores", to: "worker", value: "worker", permission: "view_workers" },  
+      { icon: "mdi-devices", title: "Dispositivos", to: "device", value: "devices", permission: "view_devices" },  
+      { icon: "mdi-bus", title: "Vehìculos", to: "vehicle", value: "vehicle", permission: "view_vehicles" },  
+      { icon: "mdi-map-marker", title: "Lugares", to: "location", value: "location", permission: "view_locations" },  
+      { icon: "mdi-road-variant", title: "Rutas", to: "route", value: "route", permission: "view_routes" },  
+      { icon: "mdi-steering", title: "Viajes", to: "trip", value: "trip", permission: "view_trips" },  
+      { icon: "mdi-ticket", title: "Tickets", to: "ticket", value: "ticket", permission: "view_tickets" },  
+    ],
+    reports: [
+      { title: "Monto generado", icon: "mdi-finance", to: "ticketdate", permission: "view_ticketsdate" },
+      { title: "Monto por viajes", icon: "mdi-map-marker-path", to: "tickettripdate", permission: "view_tickettripsdate" },
+      { title: "Viajes por trabajador", icon: "mdi-bus-marker", to: "tripsworker", permission: "view_tripsworker" },
     ],
     title: '',
     imageBranch: '',
     subtitle: 'Negocio',
     role: '',
   }),
+  computed: {
+    filteredMenuAdministracion() {
+      return this.administracion.filter(item => this.permissions.includes(item.permission));
+    },
+    filteredMenuMainteiners() {
+      return this.mainteiners.filter(item => this.permissions.includes(item.permission));
+    },
+    filteredMenuReports() {
+      return this.reports.filter(item => this.permissions.includes(item.permission));
+    },
+  },
   mounted() {
     /*this.name = JSON.parse(LocalStorageService.getItem('name'));
     this.user = JSON.parse(LocalStorageService.getItem('user'));
     this.user_id = JSON.parse(LocalStorageService.getItem('user_id'));
     this.rol_id = LocalStorageService.getItem('role_id');*/
     this.role = JSON.parse(LocalStorageService.getItem('role'));
+    this.permissions = LocalStorageService.getItem("permissions");
+    console.log('this.permissions');
+    console.log(this.permissions);
+    console.log(this.role);
     if (this.role === 'Administrador') {
       this.title = JSON.parse(LocalStorageService.getItem('nameBusiness'));
       this.imageBranch = LocalStorageService.getItem('imageBusiness').replace(/['"]+/g, '');
+      this.subtitle = 'Negocio'
     } else {
       this.title = JSON.parse(LocalStorageService.getItem('nameBranch'));
       this.imageBranch = LocalStorageService.getItem('imageBranch').replace(/['"]+/g, '');

@@ -27,7 +27,7 @@
                      {{ this.branch.name }}
                 </span>
         <v-spacer></v-spacer>
-        <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2" @click="showAdd()">
+        <v-btn class="text-subtitle-1 ml-12" prepend-icon="mdi-plus-circle" color="white" variant="tonal" elevation="2" @click="showAdd()">
           Agregar Trabajador
         </v-btn>
       </v-toolbar>
@@ -37,7 +37,7 @@
           hide-details>
         </v-text-field>
         <v-data-table :headers="headers" :search="search" :items="branchworkers" class="elevation-1"
-          style="max-height: 68vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
+          style="max-height: 65vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
           no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
           <template v-slot:item.actions="{ item }">
             <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2" variant="tonal"

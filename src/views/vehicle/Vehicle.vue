@@ -77,7 +77,7 @@
                         <div class="seat-map-preview">
                           <div v-for="(row, rowIndex) in item.raw.seatMap" :key="rowIndex" class="seat-row">
                             <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex"
-                              :color="seat.selected ? 'primary' : '#00000'" class="seat-button-preview" size="x-small"
+                              :color="seat.selected ? 'primary' : ''" class="seat-button-preview" size="x-small"
                               height="25" width="25" disabled>
                                 {{ Number(seat.label) ? `A${Number(seat.label)}` : '' }}
                             </v-btn>

@@ -174,16 +174,17 @@
                                 <v-text-field v-model="editedItem.quantity" label="Cantidad de pasajes" type="number"
                                     variant="underlined" density="compact" prepend-icon="mdi-ticket"
                                     placeholder="Ingrese la cantidad" min="1" @update:model-value="calculateTotal"
-                                    :rules="quantityAndPassengerRules" :disabled="!editedItem.trip_id"></v-text-field>
+                                    :rules="quantityAndPassengerRules" :disabled="!editedItem.trip_id  || !aviable"
+                                    :hint="!editedItem.quantity ? `Asientos disponibles: ${aviable}` : ''" persistent-hint></v-text-field>
                             </v-col>
 
                             <!-- Selección de asientos -->
                             <v-col cols="12" md="4" v-if="editedItem.quantity">
                                 <v-row>
-                                    <v-menu v-model="showSeatsMenu" activator="parent" offset-y
-                                        @click:outside="handleOutsideClick" :close-on-content-click="false">
+                                    <v-menu v-model="showSeatsMenu" activator="parent" offset-y :close-on-content-click="false"
+                                        :close-on-click-outside="false" :close-on-back="false">
                                         <template v-slot:activator="{ props }">
-                                            <v-text-field v-bind="props"
+                                            <v-text-field v-bind="props" ref="seatsField"
                                                 :value="selectedSeats.length > 0 ? selectedSeats.join(', ') : 'Seleccionar Asientos'"
                                                 color="primary" dark readonly style="text-transform: none"
                                                 :disabled="editedItem.quantity <= 0" prepend-icon="mdi-seat"
@@ -215,7 +216,7 @@
                                                                         <!-- Ícono de asiento -->
                                                                         <v-icon v-if="seat.label">mdi-seat</v-icon>
                                                                         {{ Number(seat.label) ? `${Number(seat.label)}`
-                                                                        : '' }}
+                                                                            : '' }}
                                                                     </v-btn>
                                                                 </template>
                                                             </div>
@@ -233,7 +234,7 @@
                                                 <v-spacer></v-spacer>
                                                 <!-- Botón para cerrar el menú -->
                                                 <v-btn variant="text" @click="showSeatsMenu = false"
-                                                    :disabled="selectedSeats.length > editedItem.quantity">
+                                                    :disabled="Number(selectedSeats.length) !== Number(editedItem.quantity)">
                                                     Cerrar
                                                 </v-btn>
                                             </v-card-actions>
@@ -273,7 +274,7 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="#DA7171" variant="flat" @click="close">Cancelar</v-btn>
-                    <v-btn color="#1976D2" variant="flat" @click="save" :disabled="!valid"
+                    <v-btn color="#1976D2" variant="flat" @click="save" :disabled="!valid || Number(selectedSeats.length) !== Number(editedItem.quantity)"
                         :loading="loading">Aceptar</v-btn>
                 </v-card-actions>
             </v-card>
@@ -324,6 +325,8 @@ export default {
         seats: 0, // Ejemplo de asientos disponibles
         selectedSeats: [], // Aquí se almacenan los asientos seleccionados
         reservedSeats: [],
+        availableSeats: [],
+        aviable: '',
         branches: [],
         showSeatsMenu: false,
         headers: [
@@ -389,7 +392,8 @@ export default {
         },
         paymentMethods: [
             { text: "Efectivo", value: "Efectivo" },
-            { text: "Tarjeta", value: "Tarjeta" },
+            { text: "Débito", value: "Debito" },
+            { text: "Crédito", value: "Credito" },
         ],
         editedIndex: -1,
         search: "",
@@ -409,6 +413,7 @@ export default {
         //prueba borrar  
         currentPage: 1, // Página actual
         itemsPerPage: 6, // Elementos por página
+
     }),
     computed: {
         formTitle() {
@@ -436,7 +441,7 @@ export default {
                     if (!this.editedItem.quantity || this.editedItem.quantity <= 0) {
                         return "La cantidad de pasajes debe ser mayor a cero.";
                     }
-
+                    //alert(this.availableSeats.length);
                     const availableSeats = this.availableSeats.length;
 
                     if (this.editedItem.quantity > availableSeats) {
@@ -510,6 +515,7 @@ export default {
         },
         updateSeats(tripId) {
             const selectedTrip = this.trips.find((trip) => trip.id === tripId);
+
             if (selectedTrip) {
                 this.seats = selectedTrip.seats;
                 this.editedItem.price = selectedTrip.price;
@@ -518,21 +524,28 @@ export default {
 
                 // Generar asientos disponibles y reservados
                 this.availableSeats = this.generateAvailableSeats(this.seatMap, this.reservedSeats);
+                this.aviable = this.availableSeats.length;
+                console.log('this.aviable');
+                console.log(this.aviable);
+
             } else {
                 this.seats = 0;
                 this.availableSeats = [];
                 this.reservedSeats = [];
+                this.aviable = 0;
             }
         },
         generateAvailableSeats(seatMap, reservedSeats) {
+
             const availableSeats = [];
             seatMap.forEach((row) => {
                 row.forEach((seat) => {
-                    if (seat.label && !reservedSeats.includes(seat.label)) {
-                        availableSeats.push(seat.label);
+                    if (seat.label && !reservedSeats.includes(Number(seat.label))) {
+                        availableSeats.push(Number(seat.label));
                     }
                 });
             });
+
             return availableSeats;
         },
         isSeatReserved(seat) {
@@ -549,10 +562,25 @@ export default {
                     // Si el asiento ya está seleccionado, removerlo
                     this.selectedSeats.splice(index, 1);
                 }
+                 // Forzar la validación del campo después de cambiar selectedSeats
+                this.$refs.seatsField.validate();
             }
         },
         calculateTotal() {
-            this.editedItem.total = this.editedItem.price * this.editedItem.quantity;
+            //this.editedItem.total = this.editedItem.price * this.editedItem.quantity;
+            const price = Number(this.editedItem.price) || 0;
+            const quantity = Number(this.editedItem.quantity) || 0;
+            const adults = Number(this.editedItem.adults) || 0;
+            const minors = Number(this.editedItem.minors) || 0;
+
+            if (adults === 0 && minors === 0) {
+                // Si no hay adultos ni menores, calcular el total por cantidad total
+                this.editedItem.total = price * quantity;
+            } else {
+                // Si hay adultos o menores, calcular el total considerando el 50%
+                const discountedTickets = adults + minors;
+                this.editedItem.total = price * quantity - discountedTickets * (price * 0.5);
+            }
         },
         validateQuantity() {
             return this.editedItem.adults + this.editedItem.minors <= this.editedItem.quantity;
@@ -563,6 +591,7 @@ export default {
             this.menu = false;
         },
         async showAdd() {
+            this.aviable = '';
             this.data = {};
             this.data.branch_id = this.branch_id;
             try {
@@ -668,7 +697,7 @@ export default {
                     updatedFields.branch_id = this.branch_id;
                     try {
                         const result = await handleRequest({
-                            endpoint: "ticket",
+                            endpoint: "ticket-web",
                             method: "POST",
                             data: updatedFields,
                         });
@@ -765,6 +794,7 @@ export default {
         },
         async editItem(item) {
             this.editedIndex = 1;
+            this.aviable = '';
             //this.originalItem = Object.assign({}, item);
             //this.editedItem = Object.assign({}, item);
             this.originalItem = _.cloneDeep(item);

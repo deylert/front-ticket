@@ -30,7 +30,13 @@
                 <v-col cols="12">
                   <v-row no-gutters>
                     <v-col cols="12" class="text-left">
-                      <span class="text-h4 font-weight-black">{{ this.formatNumber(stat.value) }}</span>
+                      <span v-if="stat.title !== 'Boletos Vendidos' && stat.title !== 'Incidentes'"
+                        class="text-h4 font-weight-black">
+                        {{ this.formatNumber(stat.value) }}
+                      </span>
+                      <span v-else class="text-h4 font-weight-black">
+                        {{ stat.value }}
+                      </span>
                     </v-col>
                     <v-col cols="12" class="text-left">
                       <span class="font-weight-black">Ver más</span>
