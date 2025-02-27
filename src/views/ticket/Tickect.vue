@@ -174,15 +174,17 @@
                                 <v-text-field v-model="editedItem.quantity" label="Cantidad de pasajes" type="number"
                                     variant="underlined" density="compact" prepend-icon="mdi-ticket"
                                     placeholder="Ingrese la cantidad" min="1" @update:model-value="calculateTotal"
-                                    :rules="quantityAndPassengerRules" :disabled="!editedItem.trip_id  || !aviable"
-                                    :hint="!editedItem.quantity ? `Asientos disponibles: ${aviable}` : ''" persistent-hint></v-text-field>
+                                    :rules="quantityAndPassengerRules" :disabled="!editedItem.trip_id || !aviable"
+                                    :hint="!editedItem.quantity ? `Asientos disponibles: ${aviable}` : ''"
+                                    persistent-hint></v-text-field>
                             </v-col>
 
                             <!-- Selección de asientos -->
                             <v-col cols="12" md="4" v-if="editedItem.quantity">
                                 <v-row>
-                                    <v-menu v-model="showSeatsMenu" activator="parent" offset-y :close-on-content-click="false"
-                                        :close-on-click-outside="false" :close-on-back="false">
+                                    <v-menu v-model="showSeatsMenu" activator="parent" offset-y
+                                        :close-on-content-click="false" :close-on-click-outside="false"
+                                        :close-on-back="false">
                                         <template v-slot:activator="{ props }">
                                             <v-text-field v-bind="props" ref="seatsField"
                                                 :value="selectedSeats.length > 0 ? selectedSeats.join(', ') : 'Seleccionar Asientos'"
@@ -274,7 +276,8 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="#DA7171" variant="flat" @click="close">Cancelar</v-btn>
-                    <v-btn color="#1976D2" variant="flat" @click="save" :disabled="!valid || Number(selectedSeats.length) !== Number(editedItem.quantity)"
+                    <v-btn color="#1976D2" variant="flat" @click="save"
+                        :disabled="!valid || Number(selectedSeats.length) !== Number(editedItem.quantity)"
                         :loading="loading">Aceptar</v-btn>
                 </v-card-actions>
             </v-card>
@@ -563,7 +566,7 @@ export default {
                     // Si el asiento ya está seleccionado, removerlo
                     this.selectedSeats.splice(index, 1);
                 }
-                 // Forzar la validación del campo después de cambiar selectedSeats
+                // Forzar la validación del campo después de cambiar selectedSeats
                 this.$refs.seatsField.validate();
             }
         },
@@ -584,7 +587,10 @@ export default {
             }
         },
         validateQuantity() {
-            return this.editedItem.adults + this.editedItem.minors <= this.editedItem.quantity;
+            const adults = Number(this.editedItem.adults);
+            const minors = Number(this.editedItem.minors);
+            const quantity = Number(this.editedItem.quantity);
+            return adults + minors <= quantity;
         },
         updateDate(val) {
             this.input = val;
@@ -594,7 +600,7 @@ export default {
         async showAdd() {
             this.aviable = '';
             this.data = {};
-            this.data.branch_id = this.branch_id;
+            this.data.branch_id = Number(this.branch_id);
             try {
                 const result = await handleRequest({
                     endpoint: "get-trip-date",
