@@ -1,6 +1,6 @@
 <template>
     <v-container style="min-width: 100%; min-height: 100%;">
-        <v-row>
+        <v-card elevation="6" class="mx-2">
             <v-toolbar color="#1976D2">
                 <v-row align="center">
                     <v-col cols="12" md="8" class="grow ml-4">
@@ -14,112 +14,119 @@
                     </v-col>
                 </v-row>
             </v-toolbar>
-        </v-row>
-        <v-row>
-            <v-col cols="12" md="3">
-                <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40" transition="scale-transition"
-                    offset-y min-width="290px">
-                    <template v-slot:activator="{ props }">
-                        <v-text-field v-bind="props" :modelValue="dateFormatted" variant="underlined"
-                            prepend-icon="mdi-calendar" label="Fecha de inicio" density="compact"></v-text-field>
-                    </template>
-                    <v-locale-provider locale="es">
-                        <v-date-picker header="Calendario" title="Seleccione la fecha" color="#1976D2"
-                            :modelValue="input" @update:model-value="updateDate" format="yyyy-MM-dd"></v-date-picker>
-                    </v-locale-provider>
-                </v-menu>
-            </v-col>
-            <v-col cols="12" md="3">
-                <v-menu v-model="menu2" :close-on-content-click="false" :nudge-right="40" transition="scale-transition"
-                    offset-y min-width="290px">
-                    <template v-slot:activator="{ props }">
-                        <v-text-field v-bind="props" :modelValue="dateFormatted1" variant="underlined"
-                            prepend-icon="mdi-calendar" label="Fecha Terminación" density="compact"></v-text-field>
-                    </template>
-                    <v-locale-provider locale="es">
-                        <v-date-picker header="Calendario" title="Seleccione la fecha" color="#1976D2"
-                            :modelValue="input2" format="yyyy-MM-dd" :min="dateFormatted"
-                            @update:model-value="updateDate1"></v-date-picker><!--@update:model-value="updateDate2"-->
-                    </v-locale-provider>
-                </v-menu>
-            </v-col>
-            <v-col cols="12" md="3">
-                <v-btn icon @click="initialize" color="#1976D2">
-                    <v-icon>mdi-magnify</v-icon></v-btn>
-            </v-col>
-        </v-row>
-        <v-row class="mx-auto" max-width="400">
-            <!-- Contenido del reporte -->
-            <v-card ref="reportContent" class="mx-auto" max-width="500" style="max-height: 68vh; overflow-y: auto;">
-                <v-card-text>
-                    <v-col cols="12" class="pa-0"> <!-- Elimina el padding en la columna principal -->
-                        <v-row class="ma-0"> <!-- Elimina el margin en la fila -->
-                            <v-col cols="12" class="text-h6 text-center pa-1"> <!-- Ajusta el padding -->
-                                {{ response.nombre }}
-                            </v-col>
-                            <v-col cols="12" class="text-center pa-1">
-                                FECHA: {{ this.response.fecha }}
-                            </v-col>
-                            <v-col cols="12" class="pa-1">
-                                <strong>RESUMEN:</strong>
-                            </v-col>
-                            <v-col cols="12" class="pa-1">
-                                <strong>EMISIÓN DE PASAJES:</strong>
-                            </v-col>
-                            <v-col cols="12" class="pa-1">
-                                <strong>Pasajes emitidos:</strong> {{ this.response.pasajesEmitidos }}
-                            </v-col>
-                            <v-col cols="12" class="pa-1">
-                                <strong>Reimpresiones:</strong> {{ this.response.reimpresiones }}
-                            </v-col>
-                            <v-col cols="12" v-for="(total, index) in this.response.totalesPorMetodo" :key="index"
-                                class="pa-1">
-                                {{ total.metodo }}: {{ (Number(total.cantidad)) }}
-                            </v-col>
-                            <v-col cols="12" class="pa-1">
-                                <strong>TOTALES:</strong>
-                            </v-col>
-                            <v-col cols="12" v-for="(total, index) in this.response.totalesPorMetodo" :key="index"
-                                class="pa-1">
-                                <strong>{{ total.metodo }}:</strong> ${{ total.total }}
-                            </v-col>
-                            <v-col cols="12" class="font-weight-bold pa-1">
-                                TOTAL: ${{ (Number(this.response.totales)) }}
-                            </v-col>
-                            <v-col cols="12" class="font-weight-bold pa-1">
-                                ---------------------------------------------
-                                <br>
-                                TRAMOS:
-                                <br>
-                                ---------------------------------------------
-                            </v-col>
-                            <v-col cols="12" v-for="(tramo, index) in this.response.tramos" :key="index" class="pa-1">
-                                <v-col cols="12" class="font-weight-bold pa-1">
-                                    {{ tramo.nombre }}
-                                </v-col>
-                                <v-col cols="12" class="pa-1">
-                                    Total Pasajes: {{ tramo.totalPasajes }}
-                                </v-col>
-                                <v-col cols="12" v-for="(total, index) in tramo.totalesPorMetodo" :key="index"
-                                    class="pa-1">
-                                    {{ total.metodo }}: {{ (Number(total.cantidad)) }}
-                                </v-col>
-                                <v-col cols="12" class="pa-1">
-                                    Total Tramo: {{ tramo.totalTramo }}
-                                </v-col>
-                                <v-col cols="12" v-for="(total, index) in tramo.totalesPorMetodo" :key="index"
-                                    class="pa-1">
-                                    {{ total.metodo }}: ${{ (Number(total.total)) }}
-                                </v-col>
-                                <v-col cols="12" class="font-weight-bold pa-1">
-                                    ---------------------------------------------
-                                </v-col>
-                            </v-col>
-                        </v-row>
+            <v-card-text>
+                <v-row>
+                    <v-col cols="12" md="3">
+                        <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40"
+                            transition="scale-transition" offset-y min-width="290px">
+                            <template v-slot:activator="{ props }">
+                                <v-text-field v-bind="props" :modelValue="dateFormatted" variant="underlined"
+                                    prepend-icon="mdi-calendar" label="Fecha de inicio"
+                                    density="compact"></v-text-field>
+                            </template>
+                            <v-locale-provider locale="es">
+                                <v-date-picker header="Calendario" title="Seleccione la fecha" color="#1976D2"
+                                    :modelValue="input" @update:model-value="updateDate"
+                                    format="yyyy-MM-dd"></v-date-picker>
+                            </v-locale-provider>
+                        </v-menu>
                     </v-col>
-                </v-card-text>
-            </v-card>
-        </v-row>
+                    <v-col cols="12" md="3">
+                        <v-menu v-model="menu2" :close-on-content-click="false" :nudge-right="40"
+                            transition="scale-transition" offset-y min-width="290px">
+                            <template v-slot:activator="{ props }">
+                                <v-text-field v-bind="props" :modelValue="dateFormatted1" variant="underlined"
+                                    prepend-icon="mdi-calendar" label="Fecha Terminación"
+                                    density="compact"></v-text-field>
+                            </template>
+                            <v-locale-provider locale="es">
+                                <v-date-picker header="Calendario" title="Seleccione la fecha" color="#1976D2"
+                                    :modelValue="input2" format="yyyy-MM-dd" :min="dateFormatted"
+                                    @update:model-value="updateDate1"></v-date-picker><!--@update:model-value="updateDate2"-->
+                            </v-locale-provider>
+                        </v-menu>
+                    </v-col>
+                    <v-col cols="12" md="3">
+                        <v-btn icon @click="initialize" color="#1976D2">
+                            <v-icon>mdi-magnify</v-icon></v-btn>
+                    </v-col>
+                </v-row>
+                <v-row class="mx-auto" max-width="400">
+                    <!-- Contenido del reporte -->
+                    <v-card ref="reportContent" class="mx-auto" max-width="500"
+                        style="max-height: 68vh; overflow-y: auto;">
+                        <v-card-text>
+                            <v-col cols="12" class="pa-0"> <!-- Elimina el padding en la columna principal -->
+                                <v-row class="ma-0"> <!-- Elimina el margin en la fila -->
+                                    <v-col cols="12" class="text-h6 text-center pa-1"> <!-- Ajusta el padding -->
+                                        {{ response.nombre }}
+                                    </v-col>
+                                    <v-col cols="12" class="text-center pa-1">
+                                        FECHA: {{ this.response.fecha }}
+                                    </v-col>
+                                    <v-col cols="12" class="pa-1">
+                                        <strong>RESUMEN:</strong>
+                                    </v-col>
+                                    <v-col cols="12" class="pa-1">
+                                        <strong>EMISIÓN DE PASAJES:</strong>
+                                    </v-col>
+                                    <v-col cols="12" class="pa-1">
+                                        <strong>Pasajes emitidos:</strong> {{ this.response.pasajesEmitidos }}
+                                    </v-col>
+                                    <v-col cols="12" class="pa-1">
+                                        <strong>Reimpresiones:</strong> {{ this.response.reimpresiones }}
+                                    </v-col>
+                                    <v-col cols="12" v-for="(total, index) in this.response.totalesPorMetodo"
+                                        :key="index" class="pa-1">
+                                        {{ total.metodo }}: {{ (Number(total.cantidad)) }}
+                                    </v-col>
+                                    <v-col cols="12" class="pa-1">
+                                        <strong>TOTALES:</strong>
+                                    </v-col>
+                                    <v-col cols="12" v-for="(total, index) in this.response.totalesPorMetodo"
+                                        :key="index" class="pa-1">
+                                        <strong>{{ total.metodo }}:</strong> ${{ this.formatNumber(Number(total.total)) }}
+                                    </v-col>
+                                    <v-col cols="12" class="font-weight-bold pa-1">
+                                        TOTAL: ${{ this.formatNumber(Number(this.response.totales)) }}
+                                    </v-col>
+                                    <v-col cols="12" class="font-weight-bold pa-1">
+                                        ---------------------------------------------
+                                        <br>
+                                        TRAMOS:
+                                        <br>
+                                        ---------------------------------------------
+                                    </v-col>
+                                    <v-col cols="12" v-for="(tramo, index) in this.response.tramos" :key="index"
+                                        class="pa-1">
+                                        <v-col cols="12" class="font-weight-bold pa-1">
+                                            {{ tramo.nombre }}
+                                        </v-col>
+                                        <v-col cols="12" class="pa-1">
+                                            Total Pasajes: {{ tramo.totalPasajes }}
+                                        </v-col>
+                                        <v-col cols="12" v-for="(total, index) in tramo.totalesPorMetodo" :key="index"
+                                            class="pa-1">
+                                            {{ total.metodo }}: {{ (Number(total.cantidad)) }}
+                                        </v-col>
+                                        <v-col cols="12" class="pa-1">
+                                            Total Tramo: {{ this.formatNumber(Number(tramo.totalTramo)) }}
+                                        </v-col>
+                                        <v-col cols="12" v-for="(total, index) in tramo.totalesPorMetodo" :key="index"
+                                            class="pa-1">
+                                            {{ total.metodo }}: ${{ this.formatNumber(Number(total.total)) }}
+                                        </v-col>
+                                        <v-col cols="12" class="font-weight-bold pa-1">
+                                            ---------------------------------------------
+                                        </v-col>
+                                    </v-col>
+                                </v-row>
+                            </v-col>
+                        </v-card-text>
+                    </v-card>
+                </v-row>
+            </v-card-text>
+        </v-card>
     </v-container>
 </template>
 
@@ -384,44 +391,44 @@ export default {
             this.snackbar = true;
         },
         exportToExcel1() {
-        // Primero, prepara una matriz que contendrá todas las filas de datos, incluidos los encabezados
-        let rows = [];
-  
-        // Construye un objeto para los encabezados basado en la estructura de 'headers'
-        let headerRow = {};
-        this.headers1.forEach(header => {
-          headerRow[header.key] = header.title; // Usa 'key' para el mapeo y 'title' para el texto del encabezado
-        });
-        rows.push(headerRow);
-  
-        // Ahora, mapea los datos de los items para que coincidan con los encabezados
-        this.results1.forEach(item => {
-          let rowData = {};
-          this.headers1.forEach(header1 => {
-            rowData[header1.key] = item[header1.key] || ''; // Asegura que cada celda se mapee correctamente; usa '' para datos faltantes
-          });
-          rows.push(rowData);
-        });
-  
-        let nameReport = {
-          // eslint-disable-next-line vue/no-use-computed-property-like-method
-          name: this.formTitle1, // Asume que 'name' es una de tus claves; ajusta según sea necesario
-          charge: '',
-          cantidad: '', // Deja vacíos los demás campos para esta fila especial
-        };
-        rows.push(nameReport);
-  
-        // Convierte la matriz de filas en una hoja de trabajo Excel
-        const ws = XLSX.utils.json_to_sheet(rows, { skipHeader: true }); // 'skipHeader: true' porque ya agregamos manualmente los encabezados
-  
-        // Crea un nuevo libro de trabajo y añade la hoja de trabajo con los datos
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Report" + this.fecha);
-  
-        // Escribe el libro de trabajo a un archivo y desencadena la descarga
-        //XLSX.writeFile(wb, "report.xlsx");
-        XLSX.writeFile(wb, `report_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`);
-      },
+            // Primero, prepara una matriz que contendrá todas las filas de datos, incluidos los encabezados
+            let rows = [];
+
+            // Construye un objeto para los encabezados basado en la estructura de 'headers'
+            let headerRow = {};
+            this.headers1.forEach(header => {
+                headerRow[header.key] = header.title; // Usa 'key' para el mapeo y 'title' para el texto del encabezado
+            });
+            rows.push(headerRow);
+
+            // Ahora, mapea los datos de los items para que coincidan con los encabezados
+            this.results1.forEach(item => {
+                let rowData = {};
+                this.headers1.forEach(header1 => {
+                    rowData[header1.key] = item[header1.key] || ''; // Asegura que cada celda se mapee correctamente; usa '' para datos faltantes
+                });
+                rows.push(rowData);
+            });
+
+            let nameReport = {
+                // eslint-disable-next-line vue/no-use-computed-property-like-method
+                name: this.formTitle1, // Asume que 'name' es una de tus claves; ajusta según sea necesario
+                charge: '',
+                cantidad: '', // Deja vacíos los demás campos para esta fila especial
+            };
+            rows.push(nameReport);
+
+            // Convierte la matriz de filas en una hoja de trabajo Excel
+            const ws = XLSX.utils.json_to_sheet(rows, { skipHeader: true }); // 'skipHeader: true' porque ya agregamos manualmente los encabezados
+
+            // Crea un nuevo libro de trabajo y añade la hoja de trabajo con los datos
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Report" + this.fecha);
+
+            // Escribe el libro de trabajo a un archivo y desencadena la descarga
+            //XLSX.writeFile(wb, "report.xlsx");
+            XLSX.writeFile(wb, `report_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`);
+        },
     },
 };
 </script>
@@ -429,9 +436,6 @@ export default {
 
 <style scoped>
 /* Estilos personalizados */
-.v-card {
-    border-radius: 10px;
-}
 
 .v-card-title {
     padding: 16px;

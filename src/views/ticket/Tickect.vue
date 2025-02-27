@@ -33,7 +33,7 @@
                 </v-text-field>
 
                 <v-data-table :headers="headers" :search="search" :items="tickets" class="elevation-1"
-                    style="max-height: 68vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
+                    style="max-height: 65vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
                     no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
                     <template v-slot:item.actions="{ item }">
                         <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2"
@@ -301,6 +301,7 @@
 import LocalStorageService from "@/LocalStorageService";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
 import _ from 'lodash';
+import { format } from 'date-fns';
 export default {
     data: () => ({
         snackbar: false,
@@ -330,18 +331,18 @@ export default {
         branches: [],
         showSeatsMenu: false,
         headers: [
-            { title: "Ruta", value: "tripName", width: "10%" },
-            { title: "Origen", value: "tripOrigin", width: "10%" },
-            { title: "Destino", value: "tripDestination", width: "10%" },
-            { title: "Fecha", value: "date", width: "5%" },
-            { title: "Horario", value: "schedule", width: "5%" },
-            { title: "Metodo", value: "method", width: "5%" },
-            { title: "Pasajes", value: "quantity", width: "5%" },
-            { title: "Adultos", value: "adults", width: "5%" },
-            { title: "Menores", value: "minors", width: "5%" },
-            { title: "Asientos", value: "seats", width: "5%" },
-            { title: "Precio", value: "price", width: "5%" },
-            { title: "Total", value: "total", width: "5%" },
+            { title: "Ruta", value: "tripName", },
+            { title: "Origen", value: "tripOrigin", },
+            { title: "Destino", value: "tripDestination", },
+            { title: "Fecha", value: "date", },
+            { title: "Horario", value: "schedule", },
+            { title: "Metodo", value: "method", },
+            { title: "Pasajes", value: "quantity", },
+            { title: "Adultos", value: "adults", },
+            { title: "Menores", value: "minors", },
+            { title: "Asientos", value: "seats", },
+            { title: "Precio", value: "price", },
+            { title: "Total", value: "total", },
             { title: "Acciones", value: "actions", sortable: false, width: "10%" },
         ],
 
@@ -628,6 +629,7 @@ export default {
             try {
                 this.loading = true;
                 this.data = {};
+                this.data.date = format(new Date(), 'yyyy-MM-dd');
                 this.data.branch_id = Number(this.branch_id);
                 const result = await handleRequest({
                     endpoint: "get-tickets-date",

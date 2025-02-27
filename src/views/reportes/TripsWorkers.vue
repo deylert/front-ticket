@@ -14,91 +14,92 @@
     <v-container style="min-width: 100%; min-height: 100%;">
 
         <v-card elevation="6" class="mx-2">
-            <v-row>
-                <v-toolbar color="#1976D2">
-                    <v-row align="center">
-                        <v-col cols="12" md="8" class="grow ml-4">
-                            <span class="text-subtitle-1"><strong>Viajes Realizados</strong></span>
-                        </v-col>
-                        <v-col cols="12" md="3" class="text-right">
-                            <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
-                                prepend-icon="mdi-file-excel-box" @click="exportToExcel">
-                                Exportar a Excel
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-                </v-toolbar>
-            </v-row>
-
-            <v-row class="mx-2">
-                <v-col cols="12" md="3">
-                    <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40"
-                        transition="scale-transition" offset-y min-width="290px">
-                        <template v-slot:activator="{ props }">
-                            <v-text-field v-bind="props" :modelValue="dateFormatted" variant="underlined"
-                                prepend-icon="mdi-calendar" label="Fecha de inicio" density="compact"></v-text-field>
-                        </template>
-                        <v-locale-provider locale="es">
-                            <v-date-picker header="Calendario" title="Seleccione la fecha" color="#1976D2"
-                                :modelValue="input" @update:model-value="updateDate"
-                                format="yyyy-MM-dd"></v-date-picker>
-                        </v-locale-provider>
-                    </v-menu>
-                </v-col>
-                <v-col cols="12" md="3">
-                    <v-menu v-model="menu2" :close-on-content-click="false" :nudge-right="40"
-                        transition="scale-transition" offset-y min-width="290px">
-                        <template v-slot:activator="{ props }">
-                            <v-text-field v-bind="props" :modelValue="dateFormatted1" variant="underlined"
-                                prepend-icon="mdi-calendar" label="Fecha Terminación" density="compact"></v-text-field>
-                        </template>
-                        <v-locale-provider locale="es">
-                            <v-date-picker header="Calendario" title="Seleccione la fecha" color="#1976D2"
-                                :modelValue="input2" format="yyyy-MM-dd" :min="dateFormatted"
-                                @update:model-value="updateDate1"></v-date-picker><!--@update:model-value="updateDate2"-->
-                        </v-locale-provider>
-                    </v-menu>
-                </v-col>
-                <v-col cols="12" md="3">
-                    <v-btn icon @click="initialize" color="#1976D2">
-                        <v-icon>mdi-magnify</v-icon></v-btn>
-                </v-col>
-            </v-row>
-            <v-row class="mx-2">
-                <v-card-text>
-                    <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar"
-                        single-line hide-details>
-                    </v-text-field>
-                    <v-data-table :headers="headers" :search="search" :items="response" class="elevation-1"
-                        style="max-height: 68vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
-                        no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
-                        <template v-slot:item.vehicleName="{ item }">
-                            <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
-                                <v-img
-                                    :src="`${this.$axios.defaults.baseURL}images/${item.vehicleImage}?t=${Date.now()}`"
-                                    alt="image"></v-img>
-                            </v-avatar><!--+'?$'+Date.now()-->
-                            {{ item.vehicleName }}
-                        </template>
-                        <template v-slot:item.origin="{ item }">
-                            <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
-                                <v-img
-                                    :src="`${this.$axios.defaults.baseURL}images/${item.originImage}?t=${Date.now()}`"
-                                    alt="image"></v-img>
-                            </v-avatar><!--+'?$'+Date.now()-->
-                            {{ item.origin }}
-                        </template>
-                        <template v-slot:item.destination="{ item }">
-                            <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
-                                <v-img
-                                    :src="`${this.$axios.defaults.baseURL}images/${item.destinationImage}?t=${Date.now()}`"
-                                    alt="image"></v-img>
-                            </v-avatar><!--+'?$'+Date.now()-->
-                            {{ item.destination }}
-                        </template>
-                    </v-data-table>
-                </v-card-text>
-            </v-row>
+            <v-toolbar color="#1976D2">
+                <v-row align="center">
+                    <v-col cols="12" md="8" class="grow ml-4">
+                        <span class="text-subtitle-1"><strong>Viajes Realizados</strong></span>
+                    </v-col>
+                    <v-col cols="12" md="3" class="text-right">
+                        <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
+                            prepend-icon="mdi-file-excel-box" @click="exportToExcel">
+                            Exportar a Excel
+                        </v-btn>
+                    </v-col>
+                </v-row>
+            </v-toolbar>
+            <v-card-text>
+                <v-row>
+                    <v-col cols="12" md="3">
+                        <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40"
+                            transition="scale-transition" offset-y min-width="290px">
+                            <template v-slot:activator="{ props }">
+                                <v-text-field v-bind="props" :modelValue="dateFormatted" variant="underlined"
+                                    prepend-icon="mdi-calendar" label="Fecha de inicio"
+                                    density="compact"></v-text-field>
+                            </template>
+                            <v-locale-provider locale="es">
+                                <v-date-picker header="Calendario" title="Seleccione la fecha" color="#1976D2"
+                                    :modelValue="input" @update:model-value="updateDate"
+                                    format="yyyy-MM-dd"></v-date-picker>
+                            </v-locale-provider>
+                        </v-menu>
+                    </v-col>
+                    <v-col cols="12" md="3">
+                        <v-menu v-model="menu2" :close-on-content-click="false" :nudge-right="40"
+                            transition="scale-transition" offset-y min-width="290px">
+                            <template v-slot:activator="{ props }">
+                                <v-text-field v-bind="props" :modelValue="dateFormatted1" variant="underlined"
+                                    prepend-icon="mdi-calendar" label="Fecha Terminación"
+                                    density="compact"></v-text-field>
+                            </template>
+                            <v-locale-provider locale="es">
+                                <v-date-picker header="Calendario" title="Seleccione la fecha" color="#1976D2"
+                                    :modelValue="input2" format="yyyy-MM-dd" :min="dateFormatted"
+                                    @update:model-value="updateDate1"></v-date-picker><!--@update:model-value="updateDate2"-->
+                            </v-locale-provider>
+                        </v-menu>
+                    </v-col>
+                    <v-col cols="12" md="3">
+                        <v-btn icon @click="initialize" color="#1976D2">
+                            <v-icon>mdi-magnify</v-icon></v-btn>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-card-text>
+                        <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar"
+                            single-line hide-details>
+                        </v-text-field>
+                        <v-data-table :headers="headers" :search="search" :items="response" class="elevation-1"
+                            style="max-height: 68vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
+                            no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
+                            <template v-slot:item.vehicleName="{ item }">
+                                <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
+                                    <v-img
+                                        :src="`${this.$axios.defaults.baseURL}images/${item.vehicleImage}?t=${Date.now()}`"
+                                        alt="image"></v-img>
+                                </v-avatar><!--+'?$'+Date.now()-->
+                                {{ item.vehicleName }}
+                            </template>
+                            <template v-slot:item.origin="{ item }">
+                                <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
+                                    <v-img
+                                        :src="`${this.$axios.defaults.baseURL}images/${item.originImage}?t=${Date.now()}`"
+                                        alt="image"></v-img>
+                                </v-avatar><!--+'?$'+Date.now()-->
+                                {{ item.origin }}
+                            </template>
+                            <template v-slot:item.destination="{ item }">
+                                <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
+                                    <v-img
+                                        :src="`${this.$axios.defaults.baseURL}images/${item.destinationImage}?t=${Date.now()}`"
+                                        alt="image"></v-img>
+                                </v-avatar><!--+'?$'+Date.now()-->
+                                {{ item.destination }}
+                            </template>
+                        </v-data-table>
+                    </v-card-text>
+                </v-row>
+            </v-card-text>
         </v-card>
     </v-container>
 </template>

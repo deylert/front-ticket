@@ -12,7 +12,7 @@
         <!--prepend-avatar=`${this.$axios.defaults.baseURL}images/${imageBusiness}`-->
         <v-divider></v-divider>
 
-        <v-list density="compact" nav v-model:opened="open">
+        <v-list density="compact" nav :opened="open" open-strategy="single">
           <v-list-item prepend-icon="mdi-view-dashboard-outline" title="Dashboard" to="home" value="home"
             class="list-item"></v-list-item>
             <v-list-group value="Admin" v-if="filteredMenuAdministracion.length !== 0">
@@ -66,7 +66,7 @@
 import LocalStorageService from "@/LocalStorageService";
 export default {
   data: () => ({
-    open: ['Admin'],
+    open: ["Admin"],
     permissions: '',
     /*mainteiners: [
       //['Categorías', 'mdi-text-box-outline', '/category'],
