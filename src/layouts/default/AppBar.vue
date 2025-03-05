@@ -205,7 +205,7 @@ export default {
       { title: 'Cerrar Sesión', icon: "mdi-exit-to-app" },
 
     ],
-    passwordRule: (value) => value && value.length >= 8 || 'La contraseña debe tener al menos 8 caracteres',
+    passwordRule: (value) => value && value.length >= 5 || 'La contraseña debe tener al menos 5 caracteres',
   }),
   mounted() {
     this.name = JSON.parse(LocalStorageService.getItem('name'));

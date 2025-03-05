@@ -55,44 +55,63 @@
     </v-form>
   </div>-->
 
-  <div class="d-flex align-center justify-center" style="height: 100vh;">
+  <div class="d-flex align-center justify-center" style="height: 100vh; background-color: #B0BEC5;">
     <v-form ref="form" v-model="valid" enctype="multipart/form-data">
-      <v-card class="mx-4 pa-6 pb-8" elevation="8" max-width="600px" min-width="400px" rounded="lg">
-        <!-- Contenedor del texto "BusGo" -->
-        <div class="mx-auto"
-          style="font-size: 3.5rem; font-weight: bold; color: #1976D2; text-align: center; width: 100%;">
-          <v-icon class="mb-3">mdi-bus</v-icon>
-          <div style="display: flex; align-items: center; justify-content: center; gap: 0;">
-            <span style="color: black;">Bus</span>
-            <span style="color: orange;">Go</span>
+      <v-card class="mx-auto" elevation="8" max-width="600px" :min-width="$vuetify.display.smAndDown ? '90%' : '400px'"
+        rounded="lg">
+        <!-- Toolbar superior -->
+        <v-toolbar :class="$vuetify.display.smAndDown ? 'pt-8 pb-8' : 'pt-16 pb-12'" dark>
+          <div class="mx-auto" :style="{
+            fontSize: $vuetify.display.smAndDown ? '2.5rem' : '3.5rem',
+            fontWeight: 'bold',
+            color: '#1976D2',
+            textAlign: 'center',
+            width: '100%'
+          }">
+            <v-icon :class="$vuetify.display.smAndDown ? 'mb-2' : 'mb-3'" style="margin-top: 16px;">mdi-bus</v-icon>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0;">
+              <span style="color: black;">Bus</span>
+              <span style="color: orange;">Go</span>
+            </div>
           </div>
-        </div>
+        </v-toolbar>
 
-        <v-text-field density="compact" placeholder="Usuario" prepend-inner-icon="mdi-account-circle-outline"
-          variant="outlined" v-model="editedItem.email"></v-text-field>
+        <v-progress-linear v-if="loading" color="#1976D2" indeterminate></v-progress-linear>
 
-        <v-text-field :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" :type="visible ? 'text' : 'password'"
-          density="compact" placeholder="Contraseña" prepend-inner-icon="mdi-lock-outline" variant="outlined"
-          @click:append-inner="visible = !visible" v-model="editedItem.password"></v-text-field>
+        <v-container>
+          <v-text-field :density="$vuetify.display.smAndDown ? 'comfortable' : 'compact'" placeholder="Usuario"
+            prepend-inner-icon="mdi-account-circle-outline" variant="outlined" v-model="editedItem.email">
+          </v-text-field>
 
-        <v-radio-group v-model="selectedOption" inline>
-          <v-radio color="blue" label="Empresa" value="empresa"></v-radio>
-          <v-radio color="blue" class="ml-4" label="Sucursales" value="sucursales"></v-radio>
-        </v-radio-group>
+          <v-text-field :density="$vuetify.display.smAndDown ? 'comfortable' : 'compact'"
+            :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" :type="visible ? 'text' : 'password'"
+            placeholder="Contraseña" prepend-inner-icon="mdi-lock-outline" variant="outlined"
+            @click:append-inner="visible = !visible" v-model="editedItem.password">
+          </v-text-field>
 
-        <v-autocomplete :no-data-text="'No hay datos disponibles'" v-if="selectedOption === 'sucursales'" clearable
-          label="Seleccione una Sucursal" variant="outlined" prepend-inner-icon="mdi-domain"
-          v-model="editedItem.branch_id" :items="branches" item-title="name" item-value="id" :rules="requiredRules">
-          <template v-slot:item="{ props, item }">
-            <v-list-item v-bind="props" :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`"
-              :title="item.raw.name"></v-list-item>
-          </template>
-        </v-autocomplete>
+          <v-radio-group v-model="selectedOption" inline>
+            <v-radio color="#1976D2" label="Empresa" value="empresa"></v-radio>
+            <v-radio color="#1976D2" class="ml-4" label="Sucursales" value="sucursales"></v-radio>
+          </v-radio-group>
 
-        <v-btn class="mb-8" color="blue" size="large" variant="tonal" block :loading="loading" @click="login()"
-          :disabled="!valid">
-          Ingresar
-        </v-btn>
+          <v-autocomplete :no-data-text="'No hay datos disponibles'" v-if="selectedOption === 'sucursales'" clearable
+            label="Seleccione una Sucursal" variant="outlined" prepend-inner-icon="mdi-domain"
+            v-model="editedItem.branch_id" :items="branches" item-title="name" item-value="id" :rules="requiredRules">
+            <template v-slot:item="{ props, item }">
+              <v-list-item v-bind="props" :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`"
+                :title="item.raw.name"></v-list-item>
+            </template>
+          </v-autocomplete>
+
+          <v-btn class="mb-8" color="#1976D2" size="large" variant="tonal" block :loading="loading" @click="login()"
+            :disabled="!valid">
+            Ingresar
+          </v-btn>
+          <v-divider></v-divider>
+          <v-row class="mt-2" justify="center">
+          BusGo v1.0
+        </v-row>
+        </v-container>
       </v-card>
     </v-form>
   </div>
@@ -198,7 +217,7 @@ export default {
 
         if (result.success) {
           // Manejo en caso de éxito
-          this.showAlert('success', 'Inicio de sesión exitoso', 3000);
+          this.showAlert('success', 'Inicio de sesión exitoso', 2000);
           this.user = result.data;
 
           // Guardar datos en LocalStorage
@@ -236,12 +255,13 @@ export default {
             router.push({ name: 'Dashboard' });
           }, 1000);
         } else {
-          //console.log(result.message);
+          this.loading = false; // Detener el loader
           // Manejo de errores definidos por la API
-          this.showAlert('warning', result.message || 'Error inesperado', 3000);
+          this.showAlert('warning', result.message || 'Error inesperado', 2000);
           //this.showAlert('warning', result.details || 'Error inesperado', 3000);
         }
       } catch (error) {
+        this.loading = false; // Detener el loader
         // Manejo de errores no controlados
         this.showAlert('error', 'Ocurrió un error inesperado al iniciar sesión.', 3000);
         //console.error(error);

@@ -83,7 +83,7 @@
           </v-col>
           <v-col cols="12" md="3" class="text-right">
             <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
-              prepend-icon="mdi-plus-circle" @click="dialog">
+              prepend-icon="mdi-plus-circle" @click="showAdd()">
               Agregar Estructura
             </v-btn>
           </v-col>
@@ -99,7 +99,7 @@
           <!-- Columna personalizada para el gráfico de asientos -->
           <template v-slot:item.seatMap="{ item }">
             <div class="seat-map-container">
-              <div v-for="(row, rowIndex) in item.seatMap" :key="rowIndex" class="seat-row" >
+              <div v-for="(row, rowIndex) in item.seatMap" :key="rowIndex" class="seat-row">
                 <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex" :color="seat.selected ? 'primary' : ''"
                   class="seat-button-preview" disabled small>
                   <v-icon v-if="seat.label">mdi-seat</v-icon>
@@ -292,7 +292,7 @@ export default {
       });
     },
   },
-   mounted() {
+  mounted() {
     this.initialize();
   },
   methods: {
@@ -362,8 +362,11 @@ export default {
     },
     generateSeatMap() {
       const totalSeats = this.editedItem.seatCount;
-      const columns = 4; // Número fijo de columnas
-      const rows = Math.ceil(totalSeats / columns) + 1; // Número de filas
+      const columns = totalSeats <= 5 ? 4 : 5; // Número fijo de columnas
+      const fileMas = totalSeats <= columns ? 2 : 1;
+      console.log('fileMas');
+      console.log(fileMas);
+      const rows = Math.ceil(totalSeats / columns) + fileMas; // Número de filas
       this.seatMap = [];
       this.editedItem.seatMap = [];
 
@@ -472,6 +475,9 @@ export default {
         });
       });
     },
+    showAdd() {
+      this.dialog = true;
+    },
     // Guarda la estructura en el array estático
     saveStructure() {
       const selectedSeats = this.seatMap
@@ -505,7 +511,7 @@ export default {
         if (result.success) {
           // Si la solicitud es exitosa, asignamos las sucursales
           // Agregar las nuevas estructuras a la lista
-          
+
 
           // Agregar solo las estructuras nuevas a la lista
           this.structures = result.data?.structures;
