@@ -209,16 +209,20 @@
                                                                 style="display: flex; flex-direction: row;">
                                                                 <template v-for="(seat, seatIndex) in row"
                                                                     :key="seatIndex">
-                                                                    <v-btn v-if="seat.selected"
-                                                                        :color="getSeatColor(seat)"
+                                                                    <v-btn v-if="seat.type" :color="getSeatColor(seat)"
                                                                         class="seat-button-preview"
                                                                         :disabled="!isSeatAvailable(seat)"
                                                                         @click="toggleSeat(seat)"
                                                                         style="min-width: 30px; min-height: 30px; font-size: 0.8rem; font-weight: bold;">
-                                                                        <!-- Ícono de asiento -->
-                                                                        <v-icon v-if="seat.label">mdi-seat</v-icon>
-                                                                        {{ Number(seat.label) ? `${Number(seat.label)}`
-                                                                            : '' }}
+                                                                        <!-- Mostrar ícono de asiento si es un asiento -->
+                                                                        <v-icon
+                                                                            v-if="seat.type === 'seat'">mdi-seat</v-icon>
+                                                                        <!-- Mostrar ícono de pasillo y una "P" si es un pasillo -->
+                                                                        <span v-if="seat.type === 'aisle'">
+                                                                            <v-icon>mdi-arrow-down</v-icon> P
+                                                                        </span>
+                                                                        <!-- Mostrar el número del asiento si es un asiento -->
+                                                                        {{ seat.type === 'seat' ? seat.label : '' }}
                                                                     </v-btn>
                                                                 </template>
                                                             </div>
@@ -244,31 +248,123 @@
                                     </v-menu>
                                 </v-row>
                             </v-col>
+                        </v-row>
+                        <!-- Pasajeros adultos y menores -->
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field v-model="normal" label="Pasajeros" type="number" variant="underlined"
+                                    density="compact" prepend-icon="mdi-account"
+                                    placeholder="Ingrese la cantidad de adultos" min="0"
+                                    @update:model-value="onNormalsChange"
+                                    :rules="quantityAndPassengerRules"></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6" v-if="showPromotionField">
+                                <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="selectedPromotion"
+                                    :items="promotions" label="Seleccionar promoción" item-title="name" item-value="id"
+                                    variant="underlined" density="compact" prepend-icon="mdi-tag"
+                                    @update:model-value="applyPromotionNormal">
+                                    <!-- Slot para personalizar cómo se muestran los ítems -->
+                                    <template v-slot:item="{ props, item }">
+                                        <v-list-item v-bind="props">
+                                            <v-list-item-subtitle>
+                                                <strong>Descuento:</strong> {{ item.raw.percentage }}%
+                                            </v-list-item-subtitle>
 
-                            <!-- Pasajeros adultos y menores -->
-                            <v-row>
-                                <v-col cols="12" md="4">
-                                    <v-text-field v-model="editedItem.adults" label="Pasajeros adultos" type="number"
-                                        variant="underlined" density="compact" prepend-icon="mdi-account"
-                                        placeholder="Ingrese la cantidad de adultos" min="0"
-                                        @update:model-value="calculateTotal"
-                                        :rules="quantityAndPassengerRules"></v-text-field>
-                                </v-col>
+                                            <v-list-item-subtitle>
+                                                <v-tooltip bottom>
+                                                    <template v-slot:activator="{ props }">
+                                                        <div class="truncate" v-bind="props"
+                                                            style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                            <strong>Descripción:</strong> {{ item.raw.description }}
+                                                        </div>
+                                                    </template>
+                                                    <span>{{ item.raw.description }}</span>
+                                                </v-tooltip>
+                                            </v-list-item-subtitle>
+                                        </v-list-item>
+                                    </template>
+                                </v-autocomplete>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field v-model="editedItem.adults" label="Pasajeros adultos" type="number"
+                                    variant="underlined" density="compact" prepend-icon="mdi-account"
+                                    placeholder="Ingrese la cantidad de adultos" min="0"
+                                    @update:model-value="onAdultsChange"
+                                    :rules="quantityAndPassengerRules"></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6" v-if="showPromotionFieldAdults">
+                                <v-autocomplete :no-data-text="'No hay datos disponibles'"
+                                    v-model="selectedPromotionAdults" :items="promotions" label="Seleccionar promoción"
+                                    item-title="name" item-value="id" variant="underlined" density="compact"
+                                    prepend-icon="mdi-tag" @update:model-value="applyPromotionAdults">
+                                    <!-- Slot para personalizar cómo se muestran los ítems -->
+                                    <template v-slot:item="{ props, item }">
+                                        <v-list-item v-bind="props">
+                                            <v-list-item-subtitle>
+                                                <strong>Descuento:</strong> {{ item.raw.percentage }}%
+                                            </v-list-item-subtitle>
 
-                                <v-col cols="12" md="4">
-                                    <v-text-field v-model="editedItem.minors" label="Pasajeros menores" type="number"
-                                        variant="underlined" density="compact" prepend-icon="mdi-account-child"
-                                        placeholder="Ingrese la cantidad de menores" min="0"
-                                        @update:model-value="calculateTotal"
-                                        :rules="quantityAndPassengerRules"></v-text-field>
-                                </v-col>
+                                            <v-list-item-subtitle>
+                                                <v-tooltip bottom>
+                                                    <template v-slot:activator="{ props }">
+                                                        <div class="truncate" v-bind="props"
+                                                            style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                            <strong>Descripción:</strong> {{ item.raw.description }}
+                                                        </div>
+                                                    </template>
+                                                    <span>{{ item.raw.description }}</span>
+                                                </v-tooltip>
+                                            </v-list-item-subtitle>
+                                        </v-list-item>
+                                    </template>
+                                </v-autocomplete>
+                            </v-col>
+                        </v-row>
+                        <v-row>
 
-                                <v-col cols="12" md="4">
-                                    <v-text-field v-model="editedItem.total" label="Total a pagar" type="number"
-                                        variant="underlined" density="compact" prepend-icon="mdi-cash"
-                                        readonly></v-text-field>
-                                </v-col>
-                            </v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field v-model="editedItem.minors" label="Pasajeros menores" type="number"
+                                    variant="underlined" density="compact" prepend-icon="mdi-account-child"
+                                    placeholder="Ingrese la cantidad de menores" min="0"
+                                    @update:model-value="onMinorsChange"
+                                    :rules="quantityAndPassengerRules"></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6" v-if="showPromotionFieldMinors">
+                                <v-autocomplete :no-data-text="'No hay datos disponibles'"
+                                    v-model="selectedPromotionMinors" :items="promotions" label="Seleccionar promoción"
+                                    item-title="name" item-value="id" variant="underlined" density="compact"
+                                    prepend-icon="mdi-tag" @update:model-value="applyPromotionMinors">
+                                    <!-- Slot para personalizar cómo se muestran los ítems -->
+                                    <template v-slot:item="{ props, item }">
+                                        <v-list-item v-bind="props">
+                                            <v-list-item-subtitle>
+                                                <strong>Descuento:</strong> {{ item.raw.percentage }}%
+                                            </v-list-item-subtitle>
+
+                                            <v-list-item-subtitle>
+                                                <v-tooltip bottom>
+                                                    <template v-slot:activator="{ props }">
+                                                        <div class="truncate" v-bind="props"
+                                                            style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                            <strong>Descripción:</strong> {{ item.raw.description }}
+                                                        </div>
+                                                    </template>
+                                                    <span>{{ item.raw.description }}</span>
+                                                </v-tooltip>
+                                            </v-list-item-subtitle>
+                                        </v-list-item>
+                                    </template>
+                                </v-autocomplete>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field v-model="editedItem.total" label="Total a pagar" type="number"
+                                    variant="underlined" density="compact" prepend-icon="mdi-cash"
+                                    readonly></v-text-field>
+                            </v-col>
                         </v-row>
                     </v-container>
                 </v-card-text>
@@ -324,6 +420,7 @@ export default {
         vehicles: [],
         workers: [],
         tickets: [],
+        promotions: [],
         data: {},
         hasStartedSelecting: false,
         seats: 0, // Ejemplo de asientos disponibles
@@ -363,6 +460,7 @@ export default {
             adults: "",
             minors: "",
             seats: [],
+            promotions: [],
         },
         originalItem: {
             id: "",
@@ -378,6 +476,7 @@ export default {
             seats: [],
             adults: "",
             minors: "",
+            promotions: [],
         },
         defaultItem: {
             id: "",
@@ -393,6 +492,7 @@ export default {
             seats: [],
             adults: "",
             minors: "",
+            promotions: [],
         },
         paymentMethods: [
             { text: "Efectivo", value: "Efectivo" },
@@ -408,6 +508,11 @@ export default {
         tab: null,
         route: '',
         seatMap: [],
+        appliedPromotions: [],
+        selectedPromotionAdults: null,
+        selectedPromotionMinors: null,
+        selectedPromotion: null,
+        normal: '',
         nameRules: [
             (v) => !!v || "El campo es requerido",
             (v) => (v && v.length <= 50) || "El campo debe tener menos de 51 caracteres",
@@ -455,9 +560,18 @@ export default {
                     if (this.validateQuantity()) {
                         return true;
                     }
-                    return "La suma de adultos y menores no puede ser mayor que la cantidad de pasajes.";
+                    return "La suma de pasajeros, adultos y menores no puede ser mayor que la cantidad de pasajes.";
                 },
             ];
+        },
+        showPromotionFieldAdults() {
+            return this.editedItem.adults > 0 && this.promotions.length > 0;
+        },
+        showPromotionFieldMinors() {
+            return this.editedItem.minors > 0 && this.promotions.length > 0;
+        },
+        showPromotionField() {
+            return this.normal > 0 && this.promotions.length > 0;
         },
     },
     watch: {
@@ -469,7 +583,7 @@ export default {
         'editedItem.quantity'(newValue) {
             this.editedItem.adults = Math.min(this.editedItem.adults, newValue);
             this.editedItem.minors = Math.min(this.editedItem.minors, newValue);
-            this.$refs.form.validate();
+            this.normal = Math.min(this.normal, newValue);
         },
     },
     mounted() {
@@ -481,6 +595,263 @@ export default {
         }
     },
     methods: {
+        applyPromotionAdults(promotionId) {
+            // Buscar la promoción seleccionada
+            const selectedPromotion = this.promotions.find((promo) => promo.id === promotionId);
+
+            if (selectedPromotion) {
+                // Calcular el nuevo descuento
+                const newDiscountAmount = this.editedItem.adults * [(this.editedItem.price * selectedPromotion.percentage) / 100];
+
+                // Buscar si ya existe un registro de tipo "adults"
+                const existingPromotionIndex = this.editedItem.promotions.findIndex(
+                    (promo) => promo.type === "adults"
+                );
+
+                if (existingPromotionIndex !== -1) {
+                    // Obtener la promoción existente
+                    const existingPromotion = this.editedItem.promotions[existingPromotionIndex];
+
+                    // Calcular la diferencia entre el descuento anterior y el nuevo
+                    const discountDifference = newDiscountAmount - existingPromotion.discountedPrice;
+
+                    // Actualizar TODOS los campos del registro existente
+                    this.editedItem.promotions[existingPromotionIndex] = {
+                        id: selectedPromotion.id, // Actualizar el ID de la promoción
+                        percentage: selectedPromotion.percentage, // Actualizar el porcentaje
+                        originalPrice: this.editedItem.price, // Actualizar el precio original
+                        discountedPrice: newDiscountAmount, // Actualizar el descuento calculado
+                        type: "adults", // Mantener el tipo
+                    };
+
+                    // Actualizar el total sumando o restando la diferencia
+                    this.editedItem.total -= discountDifference;
+
+                    // Mostrar un mensaje de éxito (opcional)
+                    console.log("Promoción actualizada adults:", selectedPromotion);
+                    console.log("Diferencia de descuento adults:", discountDifference);
+                    console.log("Total actualizado adults:", this.editedItem.total);
+                } else {
+                    // Si no existe un registro, agregar uno nuevo
+                    this.editedItem.promotions.push({
+                        id: selectedPromotion.id,
+                        percentage: selectedPromotion.percentage,
+                        originalPrice: this.editedItem.price,
+                        discountedPrice: newDiscountAmount,
+                        type: "adults",
+                    });
+
+                    // Actualizar el total restando el nuevo descuento
+                    this.editedItem.total -= newDiscountAmount;
+
+                    // Mostrar un mensaje de éxito (opcional)
+                    console.log("Promoción aplicada adults:", selectedPromotion);
+                    console.log("Total después del descuento adults:", this.editedItem.total);
+                }
+
+                console.log("Promociones aplicadas adults:", this.editedItem.promotions);
+            }
+        },
+        onAdultsChange(newValue) {
+            if (newValue == 0) {
+                // Buscar y eliminar la promoción de tipo "adults"
+                const adultPromotionIndex = this.editedItem.promotions.findIndex(
+                    (promo) => promo.type === "adults"
+                );
+
+                if (adultPromotionIndex !== -1) {
+                    // Obtener la promoción eliminada
+                    const removedPromotion = this.editedItem.promotions[adultPromotionIndex];
+
+                    // Eliminar la promoción del array
+                    this.editedItem.promotions.splice(adultPromotionIndex, 1);
+
+                    // Actualizar el total sumando el descuento que se había aplicado
+                    this.editedItem.total += removedPromotion.discountedPrice;
+                    this.selectedPromotionAdults = null;
+
+                    // Mostrar un mensaje de éxito (opcional)
+                    console.log("Promoción eliminada adults:", removedPromotion);
+                    console.log("Total actualizado adults:", this.total);
+                    console.log("Promociones aplicadas adults:", this.editedItem.promotions);
+                }
+            } else {
+                if (this.selectedPromotionAdults) {
+                    this.applyPromotionAdults(this.selectedPromotionAdults);
+                }
+            }
+        },
+        applyPromotionMinors(promotionId) {
+            // Buscar la promoción seleccionada
+            const selectedPromotion = this.promotions.find((promo) => promo.id === promotionId);
+
+            if (selectedPromotion) {
+                // Calcular el nuevo descuento
+                const newDiscountAmount = this.editedItem.minors * [(this.editedItem.price * selectedPromotion.percentage) / 100];
+
+                // Buscar si ya existe un registro de tipo "adults"
+                const existingPromotionIndex = this.editedItem.promotions.findIndex(
+                    (promo) => promo.type === "minors"
+                );
+
+                if (existingPromotionIndex !== -1) {
+                    // Obtener la promoción existente
+                    const existingPromotion = this.editedItem.promotions[existingPromotionIndex];
+
+                    // Calcular la diferencia entre el descuento anterior y el nuevo
+                    const discountDifference = newDiscountAmount - existingPromotion.discountedPrice;
+
+                    // Actualizar TODOS los campos del registro existente
+                    this.editedItem.promotions[existingPromotionIndex] = {
+                        id: selectedPromotion.id, // Actualizar el ID de la promoción
+                        percentage: selectedPromotion.percentage, // Actualizar el porcentaje
+                        originalPrice: this.editedItem.price, // Actualizar el precio original
+                        discountedPrice: newDiscountAmount, // Actualizar el descuento calculado
+                        type: "minors", // Mantener el tipo
+                    };
+
+                    // Actualizar el total sumando o restando la diferencia
+                    this.editedItem.total -= discountDifference;
+
+                    // Mostrar un mensaje de éxito (opcional)
+                    console.log("Promoción actualizada minors:", selectedPromotion);
+                    console.log("Diferencia de descuento minors:", discountDifference);
+                    console.log("Total actualizado minors:", this.editedItem.total);
+                } else {
+                    // Si no existe un registro, agregar uno nuevo
+                    this.editedItem.promotions.push({
+                        id: selectedPromotion.id,
+                        percentage: selectedPromotion.percentage,
+                        originalPrice: this.editedItem.price,
+                        discountedPrice: newDiscountAmount,
+                        type: "minors",
+                    });
+
+                    // Actualizar el total restando el nuevo descuento
+                    this.editedItem.total -= newDiscountAmount;
+
+                    // Mostrar un mensaje de éxito (opcional)
+                    console.log("Promoción aplicada minors:", selectedPromotion);
+                    console.log("Total después del descuento minors:", this.editedItem.total);
+                }
+
+                console.log("Promociones aplicadas minors:", this.editedItem.promotions);
+            }
+        },
+        onMinorsChange(newValue) {
+            if (newValue == 0) {
+                // Buscar y eliminar la promoción de tipo "adults"
+                const minorPromotionIndex = this.editedItem.promotions.findIndex(
+                    (promo) => promo.type === "minors"
+                );
+
+                if (minorPromotionIndex !== -1) {
+                    // Obtener la promoción eliminada
+                    const removedPromotion = this.editedItem.promotions[minorPromotionIndex];
+
+                    // Eliminar la promoción del array
+                    this.editedItem.promotions.splice(minorPromotionIndex, 1);
+
+                    // Actualizar el total sumando el descuento que se había aplicado
+                    this.editedItem.total += removedPromotion.discountedPrice;
+                    this.selectedPromotionMinors = null;
+
+                    // Mostrar un mensaje de éxito (opcional)
+                    console.log("Promoción eliminada minors:", removedPromotion);
+                    console.log("Total actualizado minors:", this.total);
+                    console.log("Promociones aplicadas minors:", this.editedItem.promotions);
+                }
+            } else {
+                if (this.selectedPromotionMinors) {
+                    this.applyPromotionMinors(this.selectedPromotionMinors);
+                }
+            }
+        },
+        applyPromotionNormal(promotionId) {
+            // Buscar la promoción seleccionada
+            const selectedPromotion = this.promotions.find((promo) => promo.id === promotionId);
+
+            if (selectedPromotion) {
+                // Calcular el nuevo descuento
+                const newDiscountAmount = this.normal * [(this.editedItem.price * selectedPromotion.percentage) / 100];
+
+                // Buscar si ya existe un registro de tipo "adults"
+                const existingPromotionIndex = this.editedItem.promotions.findIndex(
+                    (promo) => promo.type === "normal"
+                );
+
+                if (existingPromotionIndex !== -1) {
+                    // Obtener la promoción existente
+                    const existingPromotion = this.editedItem.promotions[existingPromotionIndex];
+
+                    // Calcular la diferencia entre el descuento anterior y el nuevo
+                    const discountDifference = newDiscountAmount - existingPromotion.discountedPrice;
+
+                    // Actualizar TODOS los campos del registro existente
+                    this.editedItem.promotions[existingPromotionIndex] = {
+                        id: selectedPromotion.id, // Actualizar el ID de la promoción
+                        percentage: selectedPromotion.percentage, // Actualizar el porcentaje
+                        originalPrice: this.editedItem.price, // Actualizar el precio original
+                        discountedPrice: newDiscountAmount, // Actualizar el descuento calculado
+                        type: "normal", // Mantener el tipo
+                    };
+
+                    // Actualizar el total sumando o restando la diferencia
+                    this.editedItem.total -= discountDifference;
+
+                    // Mostrar un mensaje de éxito (opcional)
+                    console.log("Promoción actualizada:", selectedPromotion);
+                    console.log("Diferencia de descuento:", discountDifference);
+                    console.log("Total actualizado:", this.editedItem.total);
+                } else {
+                    // Si no existe un registro, agregar uno nuevo
+                    this.editedItem.promotions.push({
+                        id: selectedPromotion.id,
+                        percentage: selectedPromotion.percentage,
+                        originalPrice: this.editedItem.price,
+                        discountedPrice: newDiscountAmount,
+                        type: "normal",
+                    });
+
+                    // Actualizar el total restando el nuevo descuento
+                    this.editedItem.total -= newDiscountAmount;
+
+                    // Mostrar un mensaje de éxito (opcional)
+                    console.log("Promoción aplicada:", selectedPromotion);
+                    console.log("Total después del descuento:", this.editedItem.total);
+                }
+
+                console.log("Promociones aplicadas:", this.editedItem.promotions);
+            }
+        },
+        onNormalsChange(newValue) {
+            if (newValue == 0) {
+                // Buscar y eliminar la promoción de tipo "adults"
+                const minorPromotionIndex = this.editedItem.promotions.findIndex(
+                    (promo) => promo.type === "normal"
+                );
+
+                if (minorPromotionIndex !== -1) {
+                    // Obtener la promoción eliminada
+                    const removedPromotion = this.editedItem.promotions[minorPromotionIndex];
+
+                    // Eliminar la promoción del array
+                    this.editedItem.promotions.splice(minorPromotionIndex, 1);
+
+                    // Actualizar el total sumando el descuento que se había aplicado
+                    this.editedItem.total += removedPromotion.discountedPrice;
+                    this.selectedPromotion = null;
+
+                    // Mostrar un mensaje de éxito (opcional)
+                    console.log("Promoción eliminada:", removedPromotion);
+                    console.log("Promociones aplicadas:", this.editedItem.promotions);
+                }
+            } else {
+                if (this.selectedPromotion) {
+                    this.applyPromotionNormal(this.selectedPromotion);
+                }
+            }
+        },
         async showBranches() {
             try {
                 const result = await handleRequest({
@@ -589,8 +960,9 @@ export default {
         validateQuantity() {
             const adults = Number(this.editedItem.adults);
             const minors = Number(this.editedItem.minors);
+            const normal = Number(this.normal);
             const quantity = Number(this.editedItem.quantity);
-            return adults + minors <= quantity;
+            return adults + minors + normal <= quantity;
         },
         updateDate(val) {
             this.input = val;
@@ -599,6 +971,8 @@ export default {
         },
         async showAdd() {
             this.aviable = '';
+            this.normal = '';
+            this.selectedPromotion = '';
             this.data = {};
             this.data.branch_id = Number(this.branch_id);
             try {
@@ -611,9 +985,11 @@ export default {
                 if (result.success) {
                     // Si la solicitud es exitosa, asignamos las sucursales
                     this.trips = result.data?.trips || [];
+                    this.promotions = result.data?.promotions || [];
                 } else {
                     // Si no hay datos, asignamos un array vacío
                     this.trips = [];
+                    this.promotions = [];
                 }
             } catch (error) {
                 this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
@@ -685,6 +1061,7 @@ export default {
                     "seats",
                     "adults",
                     "minors",
+                    "promotions"
                 ];
 
                 let updatedFields = Object.keys(this.editedItem)
@@ -747,6 +1124,7 @@ export default {
                     "seats",
                     "adults",
                     "minors",
+                    "promotions"
                 ];
                 let updatedFields = Object.keys(this.editedItem)
                     .filter(
@@ -811,6 +1189,25 @@ export default {
             this.data = {};
             this.data.branch_id = this.branch_id;
             this.data.ticket_id = item.id;
+
+            // Inicializar las variables de promoción
+            this.selectedPromotion = null;
+            this.selectedPromotionAdults = null;
+            this.selectedPromotionMinors = null;
+
+            // Buscar en el array de promociones
+            if (this.editedItem.promotions && this.editedItem.promotions.length > 0) {
+                this.editedItem.promotions.forEach((promotion) => {
+                    if (promotion.type === "normal") {
+                        this.selectedPromotion = promotion.id; // Asignar el ID de la promoción normal
+                        this.normal = item.quantity - item.adults - item.minors; // Asignar la cantidad (si existe)
+                    } else if (promotion.type === "adults") {
+                        this.selectedPromotionAdults = promotion.id; // Asignar el ID de la promoción para adultos
+                    } else if (promotion.type === "minors") {
+                        this.selectedPromotionMinors = promotion.id; // Asignar el ID de la promoción para menores
+                    }
+                });
+            }
             try {
                 const result = await handleRequest({
                     endpoint: "get-trip-date",
@@ -821,9 +1218,11 @@ export default {
                 if (result.success) {
                     // Si la solicitud es exitosa, asignamos las sucursales
                     this.trips = result.data?.trips || [];
+                    this.promotions = result.data?.promotions || [];
                 } else {
                     // Si no hay datos, asignamos un array vacío
                     this.trips = [];
+                    this.promotions = [];
                 }
             } catch (error) {
                 this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
