@@ -13,13 +13,13 @@
     </v-snackbar>
     <v-container style="min-width: 100%; min-height: 100%;">
         <v-card elevation="6" class="mx-2">
-            <v-toolbar color="#1976D2">
+            <v-toolbar :color="paleteColors.primary">
                 <v-row align="center">
                     <v-col cols="12" md="8" class="grow ml-4">
                         <span class="text-subtitle-1"><strong>Listado de Promociones</strong></span>
                     </v-col>
                     <v-col cols="12" md="3" class="text-right">
-                        <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
+                        <v-btn class="text-subtitle-1 ml-12" :color="paleteColors.white" variant="tonal" elevation="2"
                             prepend-icon="mdi-plus-circle" @click="showAdd">
                             Agregar Promoción
                         </v-btn>
@@ -35,14 +35,14 @@
                     style="max-height: 68vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
                     no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
                     <template v-slot:item.actions="{ item }">
-                        <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2"
+                        <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" :color="paleteColors.primary"
                             variant="tonal" elevation="1" title="Editar Promoción"></v-btn>
-                        <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171"
+                        <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" :color="paleteColors.error"
                             variant="tonal" elevation="1" title="Eliminar Promoción"></v-btn>
                     </template>
                     <!-- Columna de estado active -->
                     <template v-slot:item.active="{ item }">
-                        <v-chip :color="item.active ? 'green' : 'red'" text-color="white">
+                        <v-chip :color="item.active ? paleteColors.active : paleteColors.inactive" :text-color="paleteColors.white">
                             {{ item.active ? "Activa" : "Inactiva" }}
                         </v-chip>
                     </template>
@@ -54,7 +54,7 @@
     <v-dialog v-model="dialog" max-width="600px">
         <v-form ref="form" v-model="valid">
             <v-card>
-                <v-toolbar color="#1976D2">
+                <v-toolbar :color="paleteColors.primary">
                     <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
                 </v-toolbar>
                 <v-card-text>
@@ -98,8 +98,8 @@
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="#DA7171" variant="flat" @click="close">Cancelar</v-btn>
-                    <v-btn color="#1976D2" variant="flat" :loading="loading" @click="save"
+                    <v-btn :color="paleteColors.gris" variant="flat" @click="close">Cancelar</v-btn>
+                    <v-btn :color="paleteColors.primary" variant="flat" :loading="loading" @click="save"
                         :disabled="!valid">Aceptar</v-btn>
                 </v-card-actions>
             </v-card>
@@ -108,15 +108,15 @@
 
     <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card>
-            <v-toolbar color="#DA7171">
+            <v-toolbar :color="paleteColors.error">
                 <span class="text-subtitle-2 ml-4"> Eliminar una promoción</span>
             </v-toolbar>
-            <v-card-text class="mt-2 mb-2"> ¿Desea eliminar la promoción?</v-card-text>
+            <v-card-text class="mt-2 mb-2"> ¿Desea eliminar la promoción seleccionada?</v-card-text>
             <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="#DA7171" variant="flat" @click="closeDelete">Cancelar</v-btn>
-                <v-btn color="#1976D2" variant="flat" :loading="loading" @click="deleteItemConfirm">Aceptar</v-btn>
+                <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete">Cancelar</v-btn>
+                <v-btn :color="paleteColors.error" variant="flat" :loading="loading" @click="deleteItemConfirm">Aceptar</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -125,6 +125,7 @@
 
 <script>
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
+import { paleteColors } from '@/assets/colors';
 export default {
     data: () => ({
         snackbar: false,
@@ -133,6 +134,7 @@ export default {
         sb_timeout: 2000,
         sb_title: '',
         sb_icon: '',
+        paleteColors: paleteColors,
         valid: true,
         loading: false,
         dialog: false,
@@ -162,21 +164,21 @@ export default {
             name: '',
             description: '',
             percentage: '',
-            active: false,
+            active: true,
         },
         defaultItem: {
             id: '',
             name: '',
             description: '',
             percentage: '',
-            active: false,
+            active: true,
         },
         originalItem: {
             id: '',
             name: '',
             description: '',
             percentage: '',
-            active: false,
+            active: true,
         },
         editedIndex: -1,
         search: '',
@@ -247,6 +249,10 @@ export default {
                         obj[key] = this.editedItem[key];
                         return obj;
                     }, {});
+                // Asegúrate de que el campo 'active' se incluya si ha cambiado
+                if (this.editedItem.active === this.originalItem.active) {
+                    updatedFields.active = this.editedItem.active;
+                }
                 if (Object.keys(updatedFields).length > 0) {
                     try {
                         const result = await handleRequest({

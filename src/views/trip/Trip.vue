@@ -13,52 +13,79 @@
   </v-snackbar>
   <v-container style="min-width: 100%;">
     <v-card elevation="6" class="mx-2">
-      <v-toolbar color="#1976D2">
+      <v-toolbar :color="paleteColors.primary">
         <v-row align="center">
           <v-col cols="12" md="8" class="grow ml-4">
             <span class="text-subtitle-1"><strong>Viajes</strong></span>
           </v-col>
           <v-col cols="12" md="3" class="text-right">
-            <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
+            <v-btn class="text-subtitle-1 ml-12" :color="paleteColors.white" variant="tonal" elevation="2"
               prepend-icon="mdi-plus-circle" @click="showAdd">
               Agregar Viaje
             </v-btn>
           </v-col>
         </v-row>
       </v-toolbar>
-
       <v-card-text>
-        <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
-          hide-details>
-        </v-text-field>
-        <v-data-table :headers="headers" :search="search" :items="trips" class="elevation-1"
-          style="max-height: 68vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
-          no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
-          <template v-slot:item.actions="{ item }">
-            <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2" variant="tonal"
-              elevation="1" title="Editar Viaje"></v-btn>
-            <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171" variant="tonal"
-              elevation="1" title="Eliminar Viaje"></v-btn>
-          </template>
-          <template v-slot:item.origin="{ item }">
-            <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
-              <v-img :src="`${this.$axios.defaults.baseURL}images/${item.originImage
-                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
-            {{ item.origin }}
-          </template>
-          <template v-slot:item.destination="{ item }">
-            <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
-              <v-img :src="`${this.$axios.defaults.baseURL}images/${item.destinationImage
-                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
-            {{ item.destination }}
-          </template>
-          <template v-slot:item.vehicleName="{ item }">
-            <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
-              <v-img :src="`${this.$axios.defaults.baseURL}images/${item.vehicleImage
-                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
-            {{ item.vehicleName }}
-          </template>
-        </v-data-table>
+        <v-row>
+          <v-container fluid>
+            <v-cols cols="12" md="12">
+              <v-row v-if="mostrarFila" dense>
+                <v-col cols="12" md="3">
+                  <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="branch_id" :items="branches"
+                    label="Seleccione una Sucursal" prepend-inner-icon="mdi-store" item-title="name" item-value="id"
+                    variant="underlined" :rules="selectRules" density="compact">
+                    <template v-slot:item="{ props, item }">
+                      <v-list-item v-bind="props"
+                        :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`">
+                      </v-list-item>
+                    </template>
+                  </v-autocomplete><!-- @update:model-value="initialize()">-->
+                </v-col>
+                <v-col cols="12" md="2">
+                  <v-btn icon @click="initialize" :color="paleteColors.primary">
+                    <v-icon>mdi-magnify</v-icon></v-btn>
+                </v-col>
+              </v-row>
+            </v-cols>
+          </v-container>
+        </v-row>
+        <v-row dense>
+          <v-col cols="12">
+            <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+              hide-details>
+            </v-text-field>
+            <v-data-table :headers="headers" :search="search" :items="trips" class="elevation-1"
+              style="max-height: 68vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
+              no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
+              <template v-slot:item.actions="{ item }">
+                <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" :color="paleteColors.primary" variant="tonal"
+                  elevation="1" title="Editar Viaje"></v-btn>
+                <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" :color="paleteColors.error" variant="tonal"
+                  elevation="1" title="Eliminar Viaje"></v-btn>
+              </template>
+              <template v-slot:item.origin="{ item }">
+                <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
+                  <v-img :src="`${this.$axios.defaults.baseURL}images/${item.originImage
+                    }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
+                {{ item.origin }}
+              </template>
+              <template v-slot:item.destination="{ item }">
+                <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
+                  <v-img :src="`${this.$axios.defaults.baseURL}images/${item.destinationImage
+                    }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
+                {{ item.destination }}
+              </template>
+              <template v-slot:item.vehicleName="{ item }">
+                <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
+                  <v-img :src="`${this.$axios.defaults.baseURL}images/${item.vehicleImage
+                    }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
+                {{ item.vehicleName }}
+              </template>
+            </v-data-table>
+          </v-col>
+        </v-row>
+
       </v-card-text>
     </v-card>
   </v-container>
@@ -66,7 +93,7 @@
   <v-dialog v-model="dialog" max-width="700px">
     <v-form ref="form" v-model="valid" enctype="multipart/form-data">
       <v-card>
-        <v-toolbar color="#1976D2">
+        <v-toolbar :color="paleteColors.primary">
           <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
         </v-toolbar>
         <v-card-text>
@@ -154,7 +181,7 @@
                           prepend-icon="mdi-calendar" label="Fecha" density="compact"></v-text-field>
                       </template>
                       <v-locale-provider locale="es">
-                        <v-date-picker header="Calendario" title="Seleccione la fecha" color="#1976D2"
+                        <v-date-picker header="Calendario" title="Seleccione la fecha" :color="paleteColors.primary"
                           :modelValue="input" @update:model-value="updateDate" format="yyyy-MM-dd"
                           :min="new Date().toISOString().split('T')[0]"></v-date-picker>
                       </v-locale-provider>
@@ -179,13 +206,13 @@
               </v-window-item>
               <v-window-item value="worker" class="mt-4">
                 <v-card elevation="3" class="mx-2">
-                  <v-toolbar color="#1976D2">
+                  <v-toolbar :color="paleteColors.primary">
                     <v-row align="center">
                       <v-col cols="12" md="7" class="grow ml-4">
                         <span class="text-subtitle-1"><strong>Relación de Trabajadores</strong></span>
                       </v-col>
                       <v-col cols="12" md="4" class="text-right">
-                        <v-btn class="text-subtitle-1" color="white" variant="tonal" elevation="2"
+                        <v-btn class="text-subtitle-1" :color="paleteColors.white" variant="tonal" elevation="2"
                           prepend-icon="mdi-plus-circle" @click="showAssiegnedWorker">
                           Asignar Trabajador
                         </v-btn>
@@ -198,7 +225,7 @@
                       style="max-height: 68vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
                       no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
                       <template v-slot:item.actions="{ item }">
-                        <v-btn density="comfortable" icon="mdi-delete" @click="deleteItemWorker(item)" color="#DA7171"
+                        <v-btn density="comfortable" icon="mdi-delete" @click="deleteItemWorker(item)" :color="paleteColors.error"
                           variant="tonal" elevation="1" title="Eliminar Relación"></v-btn>
                       </template>
                       <template v-slot:item.name="{ item }">
@@ -217,8 +244,8 @@
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="#DA7171" variant="flat" @click="close">Cancelar</v-btn>
-          <v-btn color="#1976D2" variant="flat" @click="save" :disabled="(!valid || !editedItem.workers.length)"
+          <v-btn :color="paleteColors.gris" variant="flat" @click="close">Cancelar</v-btn>
+          <v-btn :color="paleteColors.primary" variant="flat" @click="save" :disabled="(!valid || !editedItem.workers.length)"
             :loading=loading>Aceptar</v-btn>
         </v-card-actions>
       </v-card>
@@ -226,16 +253,16 @@
   </v-dialog>
   <v-dialog v-model="dialogDelete" max-width="500px">
     <v-card>
-      <v-toolbar color="#DA7171">
+      <v-toolbar :color="paleteColors.error">
         <span class="text-subtitle-2 ml-4"> Eliminar un viaje</span>
       </v-toolbar>
 
-      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar el viaje?</v-card-text>
+      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar el viaje seleccionado?</v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="#DA7171" variant="flat" @click="closeDelete"> Cancelar </v-btn>
-        <v-btn color="#1976D2" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
+        <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete"> Cancelar </v-btn>
+        <v-btn :color="paleteColors.error" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -243,7 +270,7 @@
   <v-dialog v-model="dialogAssignedWorkers" max-width="400px">
     <v-form ref="form" v-model="valid" enctype="multipart/form-data">
       <v-card>
-        <v-toolbar color="#1976D2">
+        <v-toolbar :color="paleteColors.primary">
           <span class="text-subtitle-2 ml-4">Asignar trabajadores al viaje</span>
         </v-toolbar>
         <v-card-text>
@@ -270,8 +297,8 @@
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="#DA7171" variant="flat" @click="closeAssignedWorker">Cancelar</v-btn>
-          <v-btn color="#1976D2" variant="flat" @click="saveAssignedWorker" :disabled="!valid">Aceptar</v-btn>
+          <v-btn :color="paleteColors.gris" variant="flat" @click="closeAssignedWorker">Cancelar</v-btn>
+          <v-btn :color="paleteColors.primary" variant="flat" @click="saveAssignedWorker" :disabled="!valid">Aceptar</v-btn>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -279,6 +306,7 @@
 </template>
 
 <script>
+import { paleteColors } from "@/assets/colors";
 import LocalStorageService from "@/LocalStorageService";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
 import _ from 'lodash';
@@ -290,12 +318,14 @@ export default {
     sb_timeout: 2000,
     sb_title: "",
     sb_icon: "",
+    paleteColors: paleteColors,
     valid: true,
     loading: false,
     mostrar: false,
     dialog: false,
     dialogDelete: false,
     estimated: null,
+    mostrarFila: false,
     trips: [],
     routes: [],
     vehicles: [],
@@ -403,9 +433,9 @@ export default {
   },
   mounted() {
     this.role = JSON.parse(LocalStorageService.getItem('role'));
-    if (this.role === 'Administrador'){      
-    this.showBranches();
-    }else{
+    if (this.role === 'Administrador') {
+      this.showBranches();
+    } else {
       this.branch_id = LocalStorageService.getItem('branch_id');
     }
     this.timeSlots = this.generateTimeSlots();
@@ -426,11 +456,14 @@ export default {
         } else {
           // Si no hay datos, asignamos un array vacío
           this.branches = [];
+          this.mostrarFila = false;
         }
       } catch (error) {
+        this.mostrarFila = false;
         // Captura de errores no controlados
         this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
       } finally {
+        this.mostrarFila = true;
         this.loading = false;
         this.initialize();
       }
@@ -596,6 +629,9 @@ export default {
     async initialize() {
       this.data = {};
       this.data.branch_id = this.branch_id;
+      const today = new Date();
+      const formattedDate = today.toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+      //this.data.date = formattedDate;
       try {
         this.loading = true;
         const result = await handleRequest({
@@ -849,3 +885,13 @@ export default {
   },
 };
 </script>
+<style scoped>
+.selected-tab {
+  background-color: #1976D2;
+  /* Fondo del tab seleccionado */
+  color: white;
+  /* Texto blanco */
+  border-radius: 4px;
+  /* Esquinas redondeadas, opcional */
+}
+</style>

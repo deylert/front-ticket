@@ -16,10 +16,10 @@
     </v-snackbar>
     <v-container style="min-width: 100%; min-height: 100%">
         <v-card elevation="6" class="mx-2">
-            <v-toolbar color="#1976D2">
-                <span class="text-subtitle-2 ml-4"> Permisos por rol: {{ this.roleName }}</span>
+            <v-toolbar :color="paleteColors.primary">
+                <span class="text-subtitle-2 ml-4"> Permisos del rol: {{ this.roleName }}</span>
                 <v-spacer></v-spacer>
-                <v-btn class="text-subtitle-1 ml-12" prepend-icon="mdi-plus-circle" color="white" variant="tonal" @click="showAdd()">
+                <v-btn class="text-subtitle-1 ml-12" prepend-icon="mdi-plus-circle" :color="paleteColors.white" variant="tonal" @click="showAdd()">
                     Asignar Permiso
                 </v-btn>
             </v-toolbar>
@@ -32,7 +32,7 @@
                     style="max-height: 65vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
                     no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
                     <template v-slot:item.actions="{ item }">
-                        <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171"
+                        <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" :color="paleteColors.error"
                             variant="tonal" elevation="1" title="Eliminar Permiso"></v-btn>
                     </template>
                 </v-data-table>
@@ -43,7 +43,7 @@
     <v-dialog v-model="dialog" max-width="400px">
         <v-form ref="form" v-model="valid" enctype="multipart/form-data">
             <v-card>
-                <v-toolbar color="#1976D2">
+                <v-toolbar :color="paleteColors.primary">
                     <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
                 </v-toolbar>
                 <v-card-text>
@@ -78,8 +78,8 @@
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="#DA7171" variant="flat" @click="close">Cancelar</v-btn>
-                    <v-btn color="#1976D2" variant="flat" @click="save" :disabled="!valid"
+                    <v-btn :color="paleteColors.gris" variant="flat" @click="close">Cancelar</v-btn>
+                    <v-btn :color="paleteColors.primary" variant="flat" @click="save" :disabled="!valid"
                         :loading="loading">Aceptar</v-btn>
                 </v-card-actions>
             </v-card>
@@ -87,7 +87,7 @@
     </v-dialog>
     <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card>
-            <v-toolbar color="#DA7171">
+            <v-toolbar :color="paleteColors.error">
                 <span class="text-subtitle-2 ml-4"> Eliminar Permiso</span>
             </v-toolbar>
 
@@ -95,14 +95,15 @@
             <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="#DA7171" variant="flat" @click="closeDelete"> Cancelar </v-btn>
-                <v-btn color="#1976D2" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
+                <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete"> Cancelar </v-btn>
+                <v-btn :color="paleteColors.error" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
 </template>
 
 <script>
+import { paleteColors } from "@/assets/colors";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
 export default {
     props: {
@@ -119,6 +120,7 @@ export default {
         sb_timeout: 2000,
         sb_title: "",
         sb_icon: "",
+        paleteColors: paleteColors,
         valid: true,
         loading: false,
         mostrar: false,

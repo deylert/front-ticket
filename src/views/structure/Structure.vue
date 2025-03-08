@@ -11,68 +11,96 @@
       </v-col>
     </v-row>
   </v-snackbar>
-  <!--<v-toolbar color="#1976D2">
-    <v-row align="left">
-      <v-col cols="12" md="8" class="grow ml-4">
-        <span class="text-subtitle-1"><strong>Estructuras de asientos</strong></span>
-      </v-col>
-    </v-row>
-  </v-toolbar>
- <v-container>
-     Botón para abrir el diálogo (alineado a la derecha)
-    <div class="button-container">
-      <v-btn @click="dialog = true" color="primary">Agregar Estructura</v-btn>
-    </div>-->
-
   <!-- Diálogo para crear una nueva estructura-->
   <v-dialog v-model="dialog" fullscreen transition="dialog-bottom-transition">
     <v-card>
       <v-form ref="form" v-model="valid">
-        <v-toolbar color="#1976D2">
+        <v-toolbar :color="paleteColors.primary">
           <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
         </v-toolbar>
         <v-card-text>
           <v-row>
             <v-col cols="12" md="4">
-              <v-col cols="12" md="12">
-                <v-text-field v-model="editedItem.name" clearable label="Nombre" prepend-icon="mdi-tag-outline"
-                  variant="underlined" :rules="nameRules"></v-text-field>
-              </v-col>
-              <v-col cols="12" md="12">
-                <v-text-field v-model="editedItem.seatCount" label="Cantidad de Asientos" type="number"
-                  @input="generateSeatMap" prepend-icon="mdi-seat" :rules="seatCountRules"
-                  variant="underlined"></v-text-field>
-              </v-col>
-              <v-col cols="12" md="12">
-                <v-textarea v-model="editedItem.description" clearable label="Descripción" prepend-icon="mdi-note"
-                  variant="underlined"></v-textarea>
-              </v-col>
+              <v-text-field v-model="editedItem.name" clearable label="Nombre" prepend-icon="mdi-tag-outline"
+                variant="underlined" :rules="nameRules"></v-text-field>
             </v-col>
-            <v-col cols="12" md="8">
-              <v-card v-if="this.editedItem.seatMap.length > 0" class="seat-map-card">
-                <v-card-text>
-                  <!-- Botones de asientos -->
-                  <div v-for="(row, rowIndex) in editedItem.seatMap" :key="rowIndex" class="seat-row">
-                    <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex" :color="getSeatColor(seat)"
-                      @click="toggleSeat(rowIndex, seatIndex)" class="seat-button">
-                      <!-- Mostrar ícono de asiento si es un asiento -->
-                      <v-icon v-if="seat.type === 'seat'">mdi-seat</v-icon>
-                      <!-- Mostrar ícono de pasillo si es un pasillo -->
-                      <v-icon v-else-if="seat.type === 'aisle'">mdi-arrow-down</v-icon>
-                      <!-- Mostrar el número del asiento si es un asiento -->
-                      {{ seat.type === 'seat' ? seat.label : '' }}
-                    </v-btn>
+            <v-col cols="12" md="4">
+              <v-text-field v-model="editedItem.seatCount" label="Cantidad de Asientos" type="number"
+                @input="generateSeatMap" prepend-icon="mdi-seat" :rules="seatCountRules"
+                variant="underlined"></v-text-field>
+            </v-col>
+            <v-col cols="12" md="4">
+              <v-text-field v-model="editedItem.description" clearable label="Descripción" prepend-icon="mdi-note"
+                variant="underlined"></v-text-field>
+            </v-col>
+            <v-col cols="12" md="12">
+              <v-row dense>
+                <v-col cols="12" md="4">
+                  <div>
+                    <v-card>
+                      <v-toolbar :color="paleteColors.primary">
+                        <span class="text-subtitle-2 ml-4">Seleeccione una opción</span>
+                      </v-toolbar>
+                      <v-card-text>
+                        <v-radio-group v-model="selectedType">
+                          <!-- Radio buttons con íconos -->
+                          <v-radio label="Asiento" value="seat" color="primary">
+                            <template v-slot:label>
+                              <v-icon>mdi-seat</v-icon>
+                              <span class="ml-2">Asiento</span>
+                            </template>
+                          </v-radio>
+
+                          <v-radio label="Pasillo" value="aisle" color="secondary">
+                            <template v-slot:label>
+                              <v-icon>mdi-arrow-down</v-icon>
+                              <span class="ml-2">Pasillo</span>
+                            </template>
+                          </v-radio>
+
+                          <v-radio label="Desmarcar" value="unmark" color="grey">
+                            <template v-slot:label>
+                              <v-icon>mdi-close</v-icon>
+                              <span class="ml-2">Desmarcar</span>
+                            </template>
+                          </v-radio>
+                        </v-radio-group>
+                      </v-card-text>
+                      <v-divider></v-divider>
+                    </v-card>
                   </div>
-                </v-card-text>
-              </v-card>
+                </v-col>
+                <v-col cols="12" md="8">
+                  <v-card v-if="this.editedItem.seatMap.length > 0" class="seat-map-card">
+                    <v-toolbar :color="paleteColors.primary">
+                      <span class="text-subtitle-2 ml-4">Diagrama de Asientos</span>
+                    </v-toolbar>
+                    <v-card-text>
+                      <!-- Botones de asientos -->
+                      <div v-for="(row, rowIndex) in editedItem.seatMap" :key="rowIndex" class="seat-row">
+                        <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex" :color="getSeatColor(seat)"
+                          @click="confirmSelection(rowIndex, seatIndex)" class="seat-button">
+                          <!-- Mostrar ícono de asiento si es un asiento -->
+                          <v-icon v-if="seat.type === 'seat'">mdi-seat</v-icon>
+                          <!-- Mostrar ícono de pasillo si es un pasillo -->
+                          <v-icon v-else-if="seat.type === 'aisle'">mdi-arrow-down</v-icon>
+                          <span v-if="seat.type === 'aisle'">P</span>
+                          <!-- Mostrar el número del asiento si es un asiento -->
+                          {{ seat.type === 'seat' ? seat.label : '' }}
+                        </v-btn>
+                      </div>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn @click="close" color="#DA7171" variant="flat">Cancelar</v-btn>
-          <v-btn @click="save" color="#1976D2" variant="flat" :loading="this.loading" :disabled="!valid">Aceptar</v-btn>
+          <v-btn @click="close" :color="paleteColors.gris" variant="flat">Cancelar</v-btn>
+          <v-btn @click="save" :color="paleteColors.primary" variant="flat" :loading="this.loading" :disabled="!valid">Aceptar</v-btn>
         </v-card-actions>
 
       </v-form>
@@ -120,13 +148,13 @@
   <!-- Lista de estructuras guardadas -->
   <v-container style="min-width: 100%; min-height: 100%;">
     <v-card elevation="6" class="mx-2">
-      <v-toolbar color="#1976D2">
+      <v-toolbar :color="paleteColors.primary">
         <v-row align="center">
           <v-col cols="12" md="8" class="grow ml-4">
             <span class="text-subtitle-1"><strong>Estructuras de asientos</strong></span>
           </v-col>
           <v-col cols="12" md="3" class="text-right">
-            <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
+            <v-btn class="text-subtitle-1 ml-12" :color="paleteColors.white" variant="tonal" elevation="2"
               prepend-icon="mdi-plus-circle" @click="showAdd()">
               Agregar Estructura
             </v-btn>
@@ -159,48 +187,13 @@
             </div>
           </template>
           <template v-slot:item.actions="{ item }">
-            <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2" variant="tonal"
+            <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" :color="paleteColors.primary" variant="tonal"
               elevation="1" title="Editar Estructura"></v-btn>
-            <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171" variant="tonal"
+            <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" :color="paleteColors.error" variant="tonal"
               elevation="1" title="Eliminar Estructura"></v-btn>
           </template>
         </v-data-table>
       </v-card-text>
-      <!--<v-row>
-        <v-col v-for="(structure, index) in structures" :key="index" cols="12" sm="6" md="4" lg="3">
-          <v-card class="structure-card">
-            <v-card-text class="card-content">
-              <div class="structure-info">
-                <div class="text-h6">{{ structure.name }}</div>
-                <div class="text-body-1">{{ structure.description }}</div>
-                <div class="text-caption">Asientos: {{ structure.seatCount }}</div>
-              </div>
-
-              <div v-for="(row, rowIndex) in structure.seatMap" :key="rowIndex" class="seat-row">
-                <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex" :color="seat.selected ? 'primary' : ''"
-                  class="seat-button-preview" disabled>
-                  <v-icon v-if="seat.label">mdi-seat</v-icon>
-                  {{ seat.label ? `${seat.label}` : '' }}
-                </v-btn>
-              </div>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <div class="structure-actions">
-                <v-btn @click="deleteItem(structure)" color="#DA7171" variant="flat">Eliminar</v-btn>
-                <v-btn @click="editStructure(structure)" color="#1976D2" variant="flat" class="ml-1">Editar</v-btn>
-              </div>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
-
-      <div class="text-center mt-4">
-        <v-btn v-if="hasMore" @click="initialize" :loading="loading" color="primary">
-          Cargar más
-        </v-btn>
-        <p v-else>No hay más estructuras para mostrar.</p>
-      </div>-->
     </v-card>
   </v-container>
   <!-- Diálogo para mostrar el gráfico de asientos -->
@@ -217,7 +210,7 @@
 
           <!-- Gráfico de asientos -->
           <div v-for="(row, rowIndex) in selectedStructure.seatMap" :key="rowIndex" class="seat-row">
-            <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex" :color="seat.selected ? 'primary' : ''"
+            <v-btn v-for="(seat, seatIndex) in row" :key="seatIndex" :color="seat.selected ? paleteColors.primary : ''"
               class="seat-button-preview" disabled>
               <v-icon v-if="seat.label">mdi-seat</v-icon>
               {{ seat.label ? `${seat.label}` : '' }}
@@ -226,7 +219,7 @@
         </div>
       </v-card-text>
       <v-card-actions>
-        <v-btn @click="dialog = false" color="primary">
+        <v-btn @click="dialog = false" :color="paleteColors.gris">
           Cerrar
         </v-btn>
       </v-card-actions>
@@ -234,15 +227,15 @@
   </v-dialog>
   <v-dialog v-model="dialogDelete" max-width="500px">
     <v-card>
-      <v-toolbar color="#DA7171">
+      <v-toolbar :color="paleteColors.error">
         <span class="text-subtitle-2 ml-4"> Eliminar una estructura</span>
       </v-toolbar>
-      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar la estructura?</v-card-text>
+      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar la estructura seleccionada?</v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="#DA7171" variant="flat" @click="closeDelete">Cancelar</v-btn>
-        <v-btn color="#1976D2" variant="flat" :loading="loading" @click="deleteItemConfirm">Aceptar</v-btn>
+        <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete">Cancelar</v-btn>
+        <v-btn :color="paleteColors.primary" variant="flat" :loading="loading" @click="deleteItemConfirm">Aceptar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -250,6 +243,7 @@
 </template>
 
 <script>
+import { paleteColors } from "@/assets/colors";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
 export default {
   data() {
@@ -261,7 +255,7 @@ export default {
       name: '',
       description: '',
       page: 1,
-      /* */
+      paleteColors: paleteColors,
       snackbar: false,
       sb_type: '',
       sb_message: '',
@@ -327,7 +321,7 @@ export default {
       hasMore: false, // Indica si hay más páginas
       isLoading: false, // Para evitar múltiples solicitudes simultáneas
       dialogType: false, // Controla la visibilidad del diálogo
-      selectedType: null, // Tipo seleccionado (asiento o pasillo)
+      selectedType: 'seat', // Tipo seleccionado (asiento o pasillo)
       selectedSeat: { rowIndex: null, seatIndex: null }, // Almacena la posición del asiento seleccionad
       radioColor: '#1976D2', // Color por defecto
     };
@@ -351,24 +345,30 @@ export default {
   },
   methods: {
     // Confirma la selección del tipo (asiento o pasillo)
-    confirmSelection() {
-      const { rowIndex, seatIndex } = this.selectedSeat;
+    confirmSelection(rowIndex, seatIndex) {
+      /*const { rowIndex, seatIndex } = this.selectedSeat;
+      const seat = this.editedItem.seatMap[rowIndex][seatIndex];*/
       const seat = this.editedItem.seatMap[rowIndex][seatIndex];
+      // Guardar la posición del asiento seleccionado
+      this.selectedSeat = { rowIndex, seatIndex };
+      // Actualizar el color del radio button
+      this.radioColor = this.getSeatColor(seat);
+      //this.selectedType = seat.type;
 
       if (this.selectedType === 'seat') {
         this.setAsSeat(rowIndex, seatIndex);
       } else if (this.selectedType === 'aisle') {
         this.setAsAisle(rowIndex, seatIndex);
       } else if (this.selectedType === 'unmark') {
-        this.unmarkSeat(rowIndex, seatIndex); // Desmarcar el asiento o pasillo
+        this.resetSeatsFrom(rowIndex, seatIndex); // Desmarcar el asiento o pasillo
       }
 
       // Cerrar el diálogo y reiniciar la selección
-      this.dialogType = false;
-      this.selectedType = null;
+      //this.dialogType = false;
+      //this.selectedType = null;
     },
     // Marca el asiento como "asiento"
-    setAsSeat(rowIndex, seatIndex) {
+    /*setAsSeat(rowIndex, seatIndex) {
       const seat = this.editedItem.seatMap[rowIndex][seatIndex];
 
       // Verificar si se puede seleccionar más asientos
@@ -387,17 +387,131 @@ export default {
 
       // Agregar el número del asiento al array 'editedItem.seats'
       this.editedItem.seats.push(this.nextSeatNumber - 1);
-    },
-
-    setAsAisle(rowIndex, seatIndex) {
+    },*/
+    setAsSeat(rowIndex, seatIndex) {
       const seat = this.editedItem.seatMap[rowIndex][seatIndex];
 
+      // Verificar si se puede seleccionar más asientos
+      if (this.selectedCount >= this.editedItem.seatCount) {
+        return;
+      }
+
+      // Buscar el menor número disponible
+      const availableNumber = this.findAvailableSeatNumber();
+
+      // Marcar como asiento
+      seat.type = 'seat';
+      seat.selected = true;
+      seat.label = `${availableNumber}`;
+
+      // Incrementar el contador de asientos seleccionados
+      this.selectedCount++;
+    },
+
+    // Buscar el menor número disponible
+    findAvailableSeatNumber() {
+      const seatMap = this.editedItem.seatMap;
+      const usedNumbers = new Set();
+
+      // Recopilar todos los números de asientos en uso
+      for (let i = 0; i < seatMap.length; i++) {
+        for (let j = 0; j < seatMap[i].length; j++) {
+          const currentSeat = seatMap[i][j];
+
+          if (currentSeat.type === 'seat' && currentSeat.selected) {
+            usedNumbers.add(parseInt(currentSeat.label));
+          }
+        }
+      }
+
+      // Encontrar el menor número disponible
+      let availableNumber = 1;
+      while (usedNumbers.has(availableNumber)) {
+        availableNumber++;
+      }
+
+      return availableNumber;
+    },
+    setAsAisle(rowIndex, seatIndex) {
+      const seat = this.editedItem.seatMap[rowIndex][seatIndex];
+      if (seat.type === 'seat') {
+        this.selectedCount--;
+      }
       // Marcar como pasillo
       seat.type = 'aisle';
       seat.selected = false; // Los pasillos no son seleccionables
       seat.label = ''; // Los pasillos no tienen número
 
       // No se incrementa el contador de asientos
+    },
+    /*resetSeatsFrom(rowIndex, seatIndex) {
+      const seatMap = this.editedItem.seatMap;
+
+      // Obtener el asiento seleccionado
+      const selectedSeat = seatMap[rowIndex][seatIndex];
+      // Si es un seat, reducir selectedCount en 1
+      if (selectedSeat.type === 'seat') {
+        this.selectedCount = parseInt(selectedSeat.label) - 1 || 0;
+      }
+      // Si es un aisle, buscar el primer seat antes del aisle y tomar su valor
+      else if (selectedSeat.type === 'aisle') {
+        let foundSeat = null;
+
+        // Buscar hacia atrás desde el aisle seleccionado
+        for (let i = rowIndex; i >= 0; i--) {
+          // Determinar el índice de inicio para la fila actual
+          const startIndex = (i === rowIndex) ? seatIndex - 1 : seatMap[i].length - 1;
+
+          // Iterar desde el índice de inicio hacia atrás
+          for (let j = startIndex; j >= 0; j--) {
+            if (seatMap[i][j].type === 'seat') {
+              foundSeat = seatMap[i][j];
+              break;
+            }
+          }
+
+          // Si se encontró un seat, salir del bucle
+          if (foundSeat) {
+            break;
+          }
+        }
+
+        // Si se encontró un seat antes del aisle, actualizar selectedCount
+        if (foundSeat) {
+          console.log('foundSeat.label:', foundSeat.label); // Verificar el valor encontrado
+          this.selectedCount = parseInt(foundSeat.label) || 0;
+        } else {
+          console.log('No se encontró un seat antes del aisle.'); // Mensaje de depuración
+        }
+      }
+
+      // Reiniciar todos los asientos y pasillos a partir del seleccionado
+      for (let i = rowIndex; i < seatMap.length; i++) {
+        for (let j = (i === rowIndex ? seatIndex : 0); j < seatMap[i].length; j++) {
+          const currentSeat = seatMap[i][j];
+
+          // Reiniciar el asiento o pasillo
+          currentSeat.type = undefined;
+          currentSeat.selected = false;
+          currentSeat.label = '';
+        }
+      }
+
+      // Actualizar nextSeatNumber
+      this.nextSeatNumber = this.selectedCount + 1;
+    },*/
+    resetSeatsFrom(rowIndex, seatIndex) {
+      const seatMap = this.editedItem.seatMap;
+
+      // Obtener el asiento seleccionado
+      const selectedSeat = seatMap[rowIndex][seatIndex];
+      // Si es un seat, reducir selectedCount en 1
+      if (selectedSeat.type === 'seat') {
+        this.selectedCount--;
+      }
+      selectedSeat.type = undefined;
+      selectedSeat.selected = false;
+      selectedSeat.label = '';
     },
     toggleSeat(rowIndex, seatIndex) {
       const seat = this.editedItem.seatMap[rowIndex][seatIndex];
@@ -408,54 +522,16 @@ export default {
       this.radioColor = this.getSeatColor(seat);
       this.selectedType = seat.type;
       // Abrir el diálogo
-      this.dialogType = true;
-    },
-    unmarkSeat(rowIndex, seatIndex) {
-      const seat = this.editedItem.seatMap[rowIndex][seatIndex];
-
-      if (seat.type === 'seat') {
-        // Si es un asiento, reiniciar el contador y los asientos posteriores
-        this.resetSeatsFrom(rowIndex, seatIndex);
-      } else if (seat.type === 'aisle') {
-        // Si es un pasillo, simplemente desmarcarlo
-        seat.type = undefined;
-        seat.selected = false;
-        seat.label = '';
-      }
-    },
-    resetSeatsFrom(rowIndex, seatIndex) {
-      const seatMap = this.editedItem.seatMap;
-
-      // Recorrer todos los asientos y pasillos posteriores
-      for (let i = rowIndex; i < seatMap.length; i++) {
-        for (let j = (i === rowIndex ? seatIndex : 0); j < seatMap[i].length; j++) {
-          const currentSeat = seatMap[i][j];
-
-          if (currentSeat.type === 'seat' || currentSeat.type === 'aisle') {
-            // Reiniciar el asiento o pasillo
-            currentSeat.type = undefined;
-            currentSeat.selected = false;
-            currentSeat.label = '';
-
-            // Si era un asiento, reducir el contador
-            if (currentSeat.type === 'seat') {
-              this.selectedCount--;
-            }
-          }
-        }
-      }
-
-      // Reiniciar el contador al número del asiento desmarcado
-      this.nextSeatNumber = parseInt(seatMap[rowIndex][seatIndex].label) || 1;
+      //this.dialogType = true;
     },
     // Devuelve el color del botón según el tipo de asiento
     getSeatColor(seat) {
       if (seat.type === 'seat') {
-        return 'primary';
+        return paleteColors.primary;
       } else if (seat.type === 'aisle') {
-        return 'secondary';
+        return paleteColors.secondary;
       } else {
-        return 'grey';
+        return paleteColors.grey;
       }
     },
     /*async loadItems({ page, itemsPerPage, isSearch = false }) {
@@ -774,12 +850,12 @@ export default {
       );
 
       // Inicializar el contador de asientos seleccionados
-      this.selectedCount = this.editedItem.seats.length;
+      this.selectedCount = this.editedItem.seatCount;
 
       // Inicializar el siguiente número de asiento
-      this.nextSeatNumber = this.selectedCount > 0
+      /*this.nextSeatNumber = this.selectedCount > 0
         ? Math.max(...this.editedItem.seats) + 1
-        : 1;
+        : 1;*/
       this.editedIndex = 1;
       // Abrir el diálogo
       this.dialog = true;
@@ -1024,8 +1100,8 @@ export default {
 }
 
 .seat-map-card {
-  max-height: 80vh;
-  min-height: 80vh;
+  max-height: 69vh;
+  min-height: 69vh;
   /* 70% del alto de la ventana */
   overflow-y: auto;
   /* Hacer el contenido desplazable verticalmente */

@@ -1,13 +1,13 @@
 <template>
     <v-container style="min-width: 100%; min-height: 100%;">
         <v-card elevation="6" class="mx-2">
-            <v-toolbar color="#1976D2">
+            <v-toolbar :color="paleteColors.primary">
                 <v-row align="center">
                     <v-col cols="12" md="8" class="grow ml-4">
                         <span class="text-subtitle-1"><strong>Ventas Diarías</strong></span>
                     </v-col>
                     <v-col cols="12" md="3" class="text-right">
-                        <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
+                        <v-btn class="text-subtitle-1 ml-12" :color="paleteColors.white" variant="tonal" elevation="2"
                             prepend-icon="mdi-file-excel-box" @click="exportToExcel">
                             Exportar a Excel
                         </v-btn>
@@ -25,7 +25,7 @@
                                     density="compact"></v-text-field>
                             </template>
                             <v-locale-provider locale="es">
-                                <v-date-picker header="Calendario" title="Seleccione la fecha" color="#1976D2"
+                                <v-date-picker header="Calendario" title="Seleccione la fecha" :color="paleteColors.primary"
                                     :modelValue="input" @update:model-value="updateDate"
                                     format="yyyy-MM-dd"></v-date-picker>
                             </v-locale-provider>
@@ -40,14 +40,14 @@
                                     density="compact"></v-text-field>
                             </template>
                             <v-locale-provider locale="es">
-                                <v-date-picker header="Calendario" title="Seleccione la fecha" color="#1976D2"
+                                <v-date-picker header="Calendario" title="Seleccione la fecha" :color="paleteColors.primary"
                                     :modelValue="input2" format="yyyy-MM-dd" :min="dateFormatted"
                                     @update:model-value="updateDate1"></v-date-picker><!--@update:model-value="updateDate2"-->
                             </v-locale-provider>
                         </v-menu>
                     </v-col>
                     <v-col cols="12" md="3">
-                        <v-btn icon @click="initialize" color="#1976D2">
+                        <v-btn icon @click="initialize" :color="paleteColors.primary">
                             <v-icon>mdi-magnify</v-icon></v-btn>
                     </v-col>
                 </v-row>
@@ -133,6 +133,7 @@
 <script>
 import LocalStorageService from "@/LocalStorageService";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
+import { paleteColors } from "@/assets/colors";
 import { format } from 'date-fns';
 import * as XLSX from 'xlsx';
 export default {
@@ -143,6 +144,7 @@ export default {
         sb_timeout: 2000,
         sb_title: "",
         sb_icon: "",
+        paleteColors: paleteColors,
         valid: true,
         loading: false,
         mostrar: false,

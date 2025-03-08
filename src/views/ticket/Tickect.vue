@@ -13,54 +13,81 @@
     </v-snackbar>
     <v-container style="min-width: 100%; min-height: 100%;">
         <v-card elevation="6" class="mx-2">
-            <v-toolbar color="#1976D2">
+            <v-toolbar :color="paleteColors.primary">
                 <v-row align="center">
                     <v-col cols="12" md="8" class="grow ml-4">
                         <span class="text-subtitle-1"><strong>Ticket Vendidos</strong></span>
                     </v-col>
                     <v-col cols="12" md="3" class="text-right">
-                        <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
+                        <v-btn class="text-subtitle-1 ml-12" :color="paleteColors.white" variant="tonal" elevation="2"
                             prepend-icon="mdi-plus-circle" @click="showAdd">
                             Agregar Ticket
                         </v-btn>
                     </v-col>
                 </v-row>
             </v-toolbar>
-
             <v-card-text>
-                <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
-                    hide-details>
-                </v-text-field>
+                <v-row>
+                    <v-container fluid>
+                        <v-cols cols="12" md="12">
+                            <v-row v-if="mostrarFila" dense>
+                                <v-col cols="12" md="3">
+                                    <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="branch_id"
+                                        v-if="mostrarFila" :items="branches" label="Seleccione una Sucursal"
+                                        prepend-inner-icon="mdi-store" item-title="name" item-value="id"
+                                        variant="underlined" :rules="selectRules" density="compact">
+                                        <template v-slot:item="{ props, item }">
+                                            <v-list-item v-bind="props"
+                                                :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`">
+                                            </v-list-item>
+                                        </template>
+                                    </v-autocomplete><!-- @update:model-value="initialize()">-->
+                                </v-col>
+                                <v-col cols="12" md="2">
+                                    <v-btn icon @click="initialize" :color="paleteColors.primary">
+                                        <v-icon>mdi-magnify</v-icon></v-btn>
+                                </v-col>
+                            </v-row>
+                        </v-cols>
+                    </v-container>
+                </v-row>
+                <v-row dense>
+                    <v-col cols="12">
+                        <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar"
+                            single-line hide-details>
+                        </v-text-field>
 
-                <v-data-table :headers="headers" :search="search" :items="tickets" class="elevation-1"
-                    style="max-height: 65vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
-                    no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
-                    <template v-slot:item.actions="{ item }">
-                        <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2"
-                            variant="tonal" elevation="1" title="Editar Ticket"></v-btn>
-                        <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171"
-                            variant="tonal" elevation="1" title="Eliminar Ticket"></v-btn>
-                    </template>
-                    <template v-slot:item.tripOrigin="{ item }">
-                        <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
-                            <v-img :src="`${this.$axios.defaults.baseURL}images/${item.originImage
-                                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar>
-                        {{ item.tripOrigin }}
-                    </template>
-                    <template v-slot:item.tripDestination="{ item }">
-                        <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
-                            <v-img :src="`${this.$axios.defaults.baseURL}images/${item.destinationImage
-                                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar>
-                        {{ item.tripDestination }}
-                    </template>
-                </v-data-table>
+                        <v-data-table :headers="headers" :search="search" :items="tickets" class="elevation-1"
+                            style="max-height: 65vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
+                            no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
+                            <template v-slot:item.actions="{ item }">
+                                <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" :color="paleteColors.primary"
+                                    variant="tonal" elevation="1" title="Editar Ticket"></v-btn>
+                                <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" :color="paleteColors.error"
+                                    variant="tonal" elevation="1" title="Eliminar Ticket"></v-btn>
+                            </template>
+                            <template v-slot:item.tripOrigin="{ item }">
+                                <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
+                                    <v-img :src="`${this.$axios.defaults.baseURL}images/${item.originImage
+                                        }?t=${Date.now()}`" alt="image"></v-img> </v-avatar>
+                                {{ item.tripOrigin }}
+                            </template>
+                            <template v-slot:item.tripDestination="{ item }">
+                                <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
+                                    <v-img :src="`${this.$axios.defaults.baseURL}images/${item.destinationImage
+                                        }?t=${Date.now()}`" alt="image"></v-img> </v-avatar>
+                                {{ item.tripDestination }}
+                            </template>
+                        </v-data-table>
+                    </v-col>
+                </v-row>
             </v-card-text>
         </v-card>
     </v-container>
     <v-dialog v-model="dialog" max-width="700px">
         <v-form ref="form" v-model="valid" enctype="multipart/form-data">
             <v-card>
-                <v-toolbar color="#1976D2">
+                <v-toolbar :color="paleteColors.primary">
                     <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
                 </v-toolbar>
                 <v-card-text>
@@ -153,7 +180,7 @@
                                             prepend-icon="mdi-calendar" label="Fecha" density="compact"></v-text-field>
                                     </template>
                                     <v-locale-provider locale="es">
-                                        <v-date-picker header="Calendario" title="Seleccione la fecha" color="#1976D2"
+                                        <v-date-picker header="Calendario" title="Seleccione la fecha" :color="paleteColors.primary"
                                             :modelValue="input" @update:model-value="updateDate" format="yyyy-MM-dd"
                                             :min="new Date().toISOString().split('T')[0]"></v-date-picker>
                                     </v-locale-provider>
@@ -199,7 +226,6 @@
                                             <v-card-title class="text-h6">Seleccione sus asientos</v-card-title>
                                             <v-card-text>
                                                 <v-row>
-                                                    <!-- Mostrar asientos en filas de 2 -->
                                                     <!-- Mostrar asientos en filas de 2 -->
                                                     <v-col cols="12" class="d-flex align-center justify-center">
                                                         <div class="seat-map-preview"
@@ -371,8 +397,8 @@
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="#DA7171" variant="flat" @click="close">Cancelar</v-btn>
-                    <v-btn color="#1976D2" variant="flat" @click="save"
+                    <v-btn :color="paleteColors.gris" variant="flat" @click="close">Cancelar</v-btn>
+                    <v-btn :color="paleteColors.primary" variant="flat" @click="save"
                         :disabled="!valid || Number(selectedSeats.length) !== Number(editedItem.quantity)"
                         :loading="loading">Aceptar</v-btn>
                 </v-card-actions>
@@ -381,16 +407,16 @@
     </v-dialog>
     <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card>
-            <v-toolbar color="#DA7171">
+            <v-toolbar :color="paleteColors.error">
                 <span class="text-subtitle-2 ml-4"> Eliminar un Ticket</span>
             </v-toolbar>
 
-            <v-card-text class="mt-2 mb-2"> ¿Desea eliminar el ticket?</v-card-text>
+            <v-card-text class="mt-2 mb-2"> ¿Desea eliminar el ticket seleccionado?</v-card-text>
             <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="#DA7171" variant="flat" @click="closeDelete"> Cancelar </v-btn>
-                <v-btn color="#1976D2" variant="flat" @click="deleteItemConfirm" :loading="loading"> Aceptar </v-btn>
+                <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete"> Cancelar </v-btn>
+                <v-btn :color="paleteColors.primary" variant="flat" @click="deleteItemConfirm" :loading="loading"> Aceptar </v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -400,7 +426,7 @@
 import LocalStorageService from "@/LocalStorageService";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
 import _ from 'lodash';
-import { format } from 'date-fns';
+import { paleteColors } from "@/assets/colors";
 export default {
     data: () => ({
         snackbar: false,
@@ -409,9 +435,11 @@ export default {
         sb_timeout: 2000,
         sb_title: "",
         sb_icon: "",
+        paleteColors: paleteColors,
         valid: true,
         loading: false,
         mostrar: false,
+        mostrarFila: false,
         dialog: false,
         dialogDelete: false,
         branch_id: '',
@@ -865,24 +893,27 @@ export default {
                     this.editedItem.branch_id = this.branches[0].id;
                     this.branch_id = this.branches[0].id;
                 } else {
+                    this.mostrarFila = false;
                     // Si no hay datos, asignamos un array vacío
                     this.branches = [];
                 }
             } catch (error) {
+                this.mostrarFila = false;
                 // Captura de errores no controlados
                 this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
             } finally {
+                this.mostrarFila = true;
                 this.loading = false;
                 this.initialize();
             }
         },
         getSeatColor(seat) {
             if (this.isSeatReserved(seat.label)) {
-                return 'red'; // Asiento reservado
+                return this.paleteColors.error; // Asiento reservado
             } else if (this.selectedSeats.includes(Number(seat.label))) {
-                return 'primary'; // Asiento seleccionado
+                return this.paleteColors.primary; // Asiento seleccionado
             } else {
-                return 'green'; // Asiento disponible
+                return this.paleteColors.green; // Asiento disponible
             }
         },
         isSeatAvailable(seat) {
@@ -975,6 +1006,9 @@ export default {
             this.selectedPromotion = '';
             this.data = {};
             this.data.branch_id = Number(this.branch_id);
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+            //this.data.date = formattedDate;
             try {
                 const result = await handleRequest({
                     endpoint: "get-trip-date",
@@ -1011,7 +1045,9 @@ export default {
             try {
                 this.loading = true;
                 this.data = {};
-                this.data.date = format(new Date(), 'yyyy-MM-dd');
+                const today = new Date();
+                const formattedDate = today.toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+                this.data.date = formattedDate;
                 this.data.branch_id = Number(this.branch_id);
                 const result = await handleRequest({
                     endpoint: "get-tickets-date",
@@ -1208,6 +1244,9 @@ export default {
                     }
                 });
             }
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+            //this.data.date = formattedDate;
             try {
                 const result = await handleRequest({
                     endpoint: "get-trip-date",

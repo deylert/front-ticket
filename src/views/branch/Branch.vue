@@ -13,13 +13,13 @@
   </v-snackbar>
   <v-container style="min-width: 100%; min-height: 100%">
     <v-card elevation="6" class="mx-2">
-      <v-toolbar color="#1976D2">
+      <v-toolbar :color="paleteColors.primary">
         <v-row align="center">
           <v-col cols="12" md="8" class="grow ml-4">
             <span class="text-subtitle-1"><strong>Sucursales</strong></span>
           </v-col>
           <v-col cols="12" md="3" class="text-right">
-            <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
+            <v-btn class="text-subtitle-1 ml-12" :color="paleteColors.white" variant="tonal" elevation="2"
               prepend-icon="mdi-plus-circle" @click="showAddBranch">
               Agregar Sucursal
             </v-btn>
@@ -35,15 +35,15 @@
           style="max-height: 68vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
           no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
           <template v-slot:item.actions="{ item }">
-            <v-btn density="comfortable" icon="mdi-account-tie" @click="showAddWorker(item)" color="#388E3C"
+            <v-btn density="comfortable" icon="mdi-account-tie" @click="showAddWorker(item)" :color="paleteColors.green"
               variant="tonal" elevation="1" title="Agregar Trabajador"></v-btn>
-            <v-btn density="comfortable" icon="mdi-car" @click="showAddVehicle(item)" color="#FF9800" variant="tonal"
+            <v-btn density="comfortable" icon="mdi-car" @click="showAddVehicle(item)" :color="paleteColors.orange" variant="tonal"
               elevation="1" title="Agregar Vehículo"></v-btn>
-            <v-btn density="comfortable" icon="mdi-map-marker" @click="showAddRoute(item)" color="#8BC34A" variant="tonal"
+            <v-btn density="comfortable" icon="mdi-map-marker" @click="showAddRoute(item)" :color="paleteColors.route" variant="tonal"
               elevation="1" title="Agregar Ruta"></v-btn>
-            <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2" variant="tonal"
+            <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" :color="paleteColors.primary" variant="tonal"
               elevation="1" title="Editar Sucursal"></v-btn>
-            <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171" variant="tonal"
+            <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" :color="paleteColors.error" variant="tonal"
               elevation="1" title="Eliminar Sucursal"></v-btn>
           </template>
           <template v-slot:item.name="{ item }">
@@ -66,7 +66,7 @@
   <v-dialog v-model="dialog" max-width="600px">
     <v-form ref="form" v-model="valid" enctype="multipart/form-data">
       <v-card>
-        <v-toolbar color="#1976D2">
+        <v-toolbar :color="paleteColors.primary">
           <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
         </v-toolbar>
         <v-card-text>
@@ -117,24 +117,24 @@
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="#DA7171" variant="flat" @click="close">Cancelar</v-btn>
-          <v-btn color="#1976D2" variant="flat" @click="save" :disabled="!valid" :loading="loading">Aceptar</v-btn>
+          <v-btn :color="paleteColors.gris" variant="flat" @click="close">Cancelar</v-btn>
+          <v-btn :color="paleteColors.primary" variant="flat" @click="save" :disabled="!valid" :loading="loading">Aceptar</v-btn>
         </v-card-actions>
       </v-card>
     </v-form>
   </v-dialog>
   <v-dialog v-model="dialogDelete" max-width="500px">
     <v-card>
-      <v-toolbar color="#DA7171">
+      <v-toolbar :color="paleteColors.error">
         <span class="text-subtitle-2 ml-4"> Eliminar Sucursal</span>
       </v-toolbar>
 
-      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar una sucursal?</v-card-text>
+      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar la sucursal seleccionada?</v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="#DA7171" variant="flat" @click="closeDelete"> Cancelar </v-btn>
-        <v-btn color="#1976D2" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
+        <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete"> Cancelar </v-btn>
+        <v-btn :color="paleteColors.error" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -149,7 +149,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="flat" color="#1976D2" @click="closeDialogBranchWorker">Cerrar</v-btn>
+        <v-btn variant="flat" :color="paleteColors.gris" @click="closeDialogBranchWorker">Cerrar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -164,7 +164,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="flat" color="#1976D2" @click="closeDialogBranchVehicle">Cerrar</v-btn>
+        <v-btn variant="flat" :color="paleteColors.gris" @click="closeDialogBranchVehicle">Cerrar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -179,7 +179,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="flat" color="#1976D2" @click="closeDialogBranchRoute">Cerrar</v-btn>
+        <v-btn variant="flat" :color="paleteColors.gris" @click="closeDialogBranchRoute">Cerrar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -190,6 +190,7 @@ import { handleRequest } from "@/utils/api"; // Ruta al archivo
 import BranchWorker from "../branchworker/BranchWorker.vue";
 import BranchVehicle from "../branchvehicle/BranchVehicle.vue";
 import BranchRoute from "../branchroute/BranchRoute.vue";
+import { paleteColors } from "@/assets/colors";
 export default {
   components: {
     BranchWorker,
@@ -203,6 +204,7 @@ export default {
     sb_timeout: 2000,
     sb_title: "",
     sb_icon: "",
+    paleteColors: paleteColors,
     valid: true,
     loading: false,
     mostrar: false,

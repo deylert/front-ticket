@@ -26,6 +26,15 @@
             </v-list-item>
 
           </v-list-group>
+
+          <v-list-group value="Mantenedores" v-if="filteredMenuSecurity.length !== 0">
+            <template v-slot:activator="{ props }">
+              <v-list-item v-bind="props" prepend-icon="mdi-shield-account" title="Seguridad"></v-list-item>
+            </template>
+
+            <v-list-item v-for="item in filteredMenuSecurity" style="padding-left: 20px !important" :key="item.title" :prepend-icon="item.icon" :title="item.title"
+            :to="item.to" :value="item.value"></v-list-item> <!-- Filtrado directo usando v-if -->
+          </v-list-group>
           
           <v-list-group value="Reportes" v-if="filteredMenuReports.length !== 0">
             <template v-slot:activator="{ props }">
@@ -75,10 +84,12 @@ export default {
       ['Permisos', 'mdi-shield-check', '/permission'],
     ],*/
     mainteiners: [
-      { title: "Roles", icon: "mdi-account-cog-outline", to: "role", permission: "view_roles" },
-      { title: "Permisos", icon: "mdi-shield-check", to: "permission", permission: "view_permissions" },
       { title: "Estructuras de asientos", icon: "mdi-bus-side", to: "structure", permission: "view_structures" },
       { title: "Promociones", icon: "mdi-tag-outline", to: "promotion", permission: "view_promotions" },
+    ],
+    security: [
+      { title: "Roles", icon: "mdi-account-cog-outline", to: "role", permission: "view_roles" },
+      { title: "Permisos", icon: "mdi-shield-check", to: "permission", permission: "view_permissions" },
     ],
     administracion: [
       { icon: "mdi-office-building", title: "Negocio", to: "company", value: "company", permission: "view_business" },
@@ -104,6 +115,9 @@ export default {
   computed: {
     filteredMenuAdministracion() {
       return this.administracion.filter(item => this.permissions.includes(item.permission));
+    },
+    filteredMenuSecurity() {
+      return this.security.filter(item => this.permissions.includes(item.permission));
     },
     filteredMenuMainteiners() {
       return this.mainteiners.filter(item => this.permissions.includes(item.permission));

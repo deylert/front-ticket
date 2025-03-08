@@ -13,13 +13,13 @@
   </v-snackbar>
   <v-container fluid>
     <v-card elevation="6" class="mx-2">
-      <v-toolbar color="#1976D2">
+      <v-toolbar :color="paleteColors.primary">
         <v-row align="center">
           <v-col cols="12" md="8" class="grow ml-4">
             <span class="text-subtitle-1"><strong>Dsipositivos</strong></span>
           </v-col>
           <v-col cols="12" md="3" class="text-right">
-            <v-btn class="text-subtitle-1 ml-12" color="white" variant="tonal" elevation="2"
+            <v-btn class="text-subtitle-1 ml-12" :color="paleteColors.white" variant="tonal" elevation="2"
               prepend-icon="mdi-plus-circle" @click="showAdd">
               Agregar Dispositivo
             </v-btn>
@@ -35,9 +35,9 @@
           style="max-height: 68vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
           no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
           <template v-slot:item.actions="{ item }">
-            <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2" variant="tonal"
+            <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" :color="paleteColors.primary" variant="tonal"
               elevation="1" title="Editar Dispositivo"></v-btn>
-            <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171" variant="tonal"
+            <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" :color="paleteColors.error" variant="tonal"
               elevation="1" title="Eliminar Dispositivo"></v-btn>
           </template>
           <template v-slot:item.name="{ item }">
@@ -54,8 +54,9 @@
             {{ item.companyName }}
           </template>
           <template v-slot:item.status="{ item }">
-            <span v-if="item.status === 1" class="text-success">Activo</span>
-            <span v-else class="text-error">Inactivo</span>
+            <v-chip :color="item.status === 1 ? paleteColors.active : paleteColors.inactive" :text-color="paleteColors.white">
+                            {{ item.status === 1 ? "Activo" : "Inactivo" }}
+                        </v-chip>
           </template>
         </v-data-table>
       </v-card-text>
@@ -64,7 +65,7 @@
   <v-dialog v-model="dialog" max-width="700px">
     <v-form ref="form" v-model="valid" enctype="multipart/form-data">
       <v-card>
-        <v-toolbar color="#1976D2">
+        <v-toolbar :color="paleteColors.primary">
           <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
         </v-toolbar>
         <v-card-text>
@@ -109,7 +110,7 @@
                       prepend-icon="mdi-calendar" label="Fecha de Adquisición"></v-text-field>
                   </template>
                   <v-locale-provider locale="es">
-                    <v-date-picker header="Calendario" title="Seleccione la fecha" color="primary" :modelValue="input"
+                    <v-date-picker header="Calendario" title="Seleccione la fecha" :color="paleteColors.primary" :modelValue="input"
                       @update:model-value="updateDate" format="yyyy-MM-dd" :max="dateFormatted2"></v-date-picker>
                   </v-locale-provider>
                 </v-menu>
@@ -123,7 +124,7 @@
                       prepend-icon="mdi-calendar" label="Fecha de Mantenimiento"></v-text-field>
                   </template>
                   <v-locale-provider locale="es">
-                    <v-date-picker header="Calendario" title="Seleccione la fecha" color="primary" :modelValue="input2"
+                    <v-date-picker header="Calendario" title="Seleccione la fecha" :color="paleteColors.primary" :modelValue="input2"
                       format="yyyy-MM-dd" :min="dateFormatted"
                       @update:model-value="updateDate1"></v-date-picker><!--@update:model-value="updateDate2"-->
                   </v-locale-provider>
@@ -160,8 +161,8 @@
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="#DA7171" variant="flat" @click="close">Cancelar</v-btn>
-          <v-btn color="#1976D2" variant="flat" @click="save" :disabled="!valid" :loading="loading">Aceptar</v-btn>
+          <v-btn :color="paleteColors.gris" variant="flat" @click="close">Cancelar</v-btn>
+          <v-btn :color="paleteColors.primary" variant="flat" @click="save" :disabled="!valid" :loading="loading">Aceptar</v-btn>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -169,18 +170,18 @@
   <v-dialog v-model="dialogDelete" max-width="500px">
     <v-card>
 
-      <v-toolbar color="#DA7171">
+      <v-toolbar :color="paleteColors.error">
         <span class="text-subtitle-2 ml-4"> Eliminar Dispositivo</span>
       </v-toolbar>
 
-      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar un dispositivo?</v-card-text>
+      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar el dispositivo seleccionado?</v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="#DA7171" variant="flat" @click="closeDelete">
+        <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete">
           Cancelar
         </v-btn>
-        <v-btn color="#1976D2" variant="flat" @click="deleteItemConfirm">
+        <v-btn :color="paleteColors.error" variant="flat" @click="deleteItemConfirm">
           Aceptar
         </v-btn>
 
@@ -190,6 +191,7 @@
 </template>
 
 <script>
+import { paleteColors } from "@/assets/colors";
 import LocalStorageService from "@/LocalStorageService";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
 export default {
@@ -200,6 +202,7 @@ export default {
     sb_timeout: 2000,
     sb_title: '',
     sb_icon: '',
+    paleteColors: paleteColors,
     valid: true,
     loading: false,
     mostrar: false,

@@ -16,7 +16,7 @@
     </v-snackbar>
     <v-container style="min-width: 100%; min-height: 100%">
         <v-card elevation="6" class="mx-2">
-            <v-toolbar color="#1976D2">
+            <v-toolbar :color="paleteColors.primary">
                 <span class="text-subtitle-2 ml-4"> Rutas de la Sucursal: </span>
                 <span class="text-subtitle-2 ml-4">
                     <!-- Avatar del vehículo -->
@@ -24,10 +24,11 @@
                         <v-img :src="`${this.$axios.defaults.baseURL}images/${this.branch.image}?t=${Date.now()}`"
                             alt="image"></v-img>
                     </v-avatar>
-                     {{ this.branch.name }}
+                    {{ this.branch.name }}
                 </span>
                 <v-spacer></v-spacer>
-                <v-btn class="text-subtitle-1 ml-12" prepend-icon="mdi-plus-circle" color="white" variant="tonal" elevation="2" @click="showAdd()">
+                <v-btn class="text-subtitle-1 ml-12" prepend-icon="mdi-plus-circle" :color="paleteColors.white"
+                    variant="tonal" elevation="2" @click="showAdd()">
                     Agregar Ruta
                 </v-btn>
             </v-toolbar>
@@ -40,10 +41,10 @@
                     style="max-height: 65vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
                     no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
                     <template v-slot:item.actions="{ item }">
-                        <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" color="#1976D2"
-                            variant="tonal" elevation="1" title="Editar Ruta"></v-btn>
-                        <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" color="#DA7171"
-                            variant="tonal" elevation="1" title="Eliminar Ruta"></v-btn>
+                        <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)"
+                            :color="paleteColors.primary" variant="tonal" elevation="1" title="Editar Ruta"></v-btn>
+                        <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)"
+                            :color="paleteColors.error" variant="tonal" elevation="1" title="Eliminar Ruta"></v-btn>
                     </template>
                     <template v-slot:item.originName="{ item }">
                         <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
@@ -57,6 +58,9 @@
                                 }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
                         {{ item.destinationName }}
                     </template>
+                    <template v-slot:item.price="{ item }">
+                        {{ formatNumber(Number(item.price)) }}
+                    </template>
                 </v-data-table>
             </v-card-text>
         </v-card>
@@ -65,7 +69,7 @@
     <v-dialog v-model="dialog" max-width="450px">
         <v-form ref="form" v-model="valid" enctype="multipart/form-data">
             <v-card>
-                <v-toolbar color="#1976D2">
+                <v-toolbar :color="paleteColors.primary">
                     <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
                 </v-toolbar>
                 <v-card-text>
@@ -74,7 +78,8 @@
                             <v-col cols="12" md="12">
                                 <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.route_id"
                                     :items="routes" label="Ruta" prepend-icon="mdi-road" item-title="name"
-                                    item-value="id" variant="underlined" :rules="selectRules" density="compact" :disabled="this.editedIndex === 1">
+                                    item-value="id" variant="underlined" :rules="selectRules" density="compact"
+                                    :disabled="this.editedIndex === 1">
                                     <template v-slot:item="{ props, item }">
                                         <v-list-item v-bind="props">
                                             <v-list-item-content>
@@ -134,8 +139,8 @@
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="#DA7171" variant="flat" @click="close">Cancelar</v-btn>
-                    <v-btn color="#1976D2" variant="flat" @click="save" :disabled="!valid"
+                    <v-btn :color="paleteColors.gris" variant="flat" @click="close">Cancelar</v-btn>
+                    <v-btn :color="paleteColors.primary" variant="flat" @click="save" :disabled="!valid"
                         :loading="loading">Aceptar</v-btn>
                 </v-card-actions>
             </v-card>
@@ -143,22 +148,23 @@
     </v-dialog>
     <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card>
-            <v-toolbar color="#DA7171">
+            <v-toolbar :color="paleteColors.error">
                 <span class="text-subtitle-2 ml-4"> Eliminar Ruta</span>
             </v-toolbar>
 
-            <v-card-text class="mt-2 mb-2"> ¿Desea eliminar la ruta?</v-card-text>
+            <v-card-text class="mt-2 mb-2"> ¿Desea eliminar la ruta seleccionada?</v-card-text>
             <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="#DA7171" variant="flat" @click="closeDelete"> Cancelar </v-btn>
-                <v-btn color="#1976D2" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
+                <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete"> Cancelar </v-btn>
+                <v-btn :color="paleteColors.error" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
 </template>
 
 <script>
+import { paleteColors } from "@/assets/colors";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
 export default {
     props: {
@@ -175,6 +181,7 @@ export default {
         sb_timeout: 2000,
         sb_title: "",
         sb_icon: "",
+        paleteColors: paleteColors,
         valid: true,
         loading: false,
         mostrar: false,
@@ -225,6 +232,20 @@ export default {
         this.initialize();
     },
     methods: {
+        formatNumber(value) {
+            // Si el valor es menor que 1000, devuelve el valor original con dos decimales
+            if (value < 1000) {
+                return (Math.round((value + Number.EPSILON) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            // Primero, redondea el valor a dos decimales
+            value = Math.round((value + Number.EPSILON) * 100) / 100;
+
+            // Convierte el valor a cadena con formato de número local (en-US)
+            let formattedValue = value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            return formattedValue;
+        },
         async showAdd() {
             this.data = {};
             try {
