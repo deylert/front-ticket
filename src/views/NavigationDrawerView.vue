@@ -27,7 +27,7 @@
 
           </v-list-group>
 
-          <v-list-group value="Mantenedores" v-if="filteredMenuSecurity.length !== 0">
+          <v-list-group value="Seguridad" v-if="filteredMenuSecurity.length !== 0">
             <template v-slot:activator="{ props }">
               <v-list-item v-bind="props" prepend-icon="mdi-shield-account" title="Seguridad"></v-list-item>
             </template>

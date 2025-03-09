@@ -392,7 +392,7 @@ export default {
       const seat = this.editedItem.seatMap[rowIndex][seatIndex];
 
       // Verificar si se puede seleccionar más asientos
-      if (this.selectedCount >= this.editedItem.seatCount) {
+      if (this.selectedCount >= this.editedItem.seatCount || seat.label || /\d/.test(seat.label)) {
         return;
       }
 
