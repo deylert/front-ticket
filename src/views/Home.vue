@@ -13,27 +13,27 @@
   </v-snackbar>
   <v-container style="min-width: 100%; min-height: 100%; background-color: #F5F5F5;">
     <v-row v-if="showWelcomeMessage" align="stretch">
-      <v-col  cols="12" class="text-center">
-      <v-card class="elevation-4 pa-6">
-        <v-icon color="primary" size="64">mdi-hand-wave</v-icon>
-        <v-card-title class="text-h4 font-weight-bold">
-          Bienvenido a la Administración de BusGo
-        </v-card-title>
-      </v-card>
-    </v-col>
+      <v-col cols="12" class="text-center">
+        <v-card class="elevation-4 pa-6">
+          <v-icon color="primary" size="64">mdi-hand-wave</v-icon>
+          <v-card-title class="text-h4 font-weight-bold">
+            Bienvenido a la Administración de BusGo
+          </v-card-title>
+        </v-card>
+      </v-col>
     </v-row>
     <v-row v-else align="stretch">
       <!-- Información general de viajes -->
       <v-col cols="12" md="6">
         <v-row align="stretch">
-          <v-col cols="12" md="6" v-for="(stat, index) in sales" :key="index">
-            <v-card class="mx-0" :style="{ borderRadius: '8px', border: 'none' }">
+          <v-col cols="12" sm="6" md="6" v-for="(stat, index) in sales" :key="index">
+            <v-card class="mx-1 ma-sm-1" :style="{ borderRadius: '8px', border: 'none' }">
               <template v-slot:title>
                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                  <span>{{ stat.title }}</span> <!-- Título a la izquierda -->
+                  <span>{{ stat.title }}</span>
                   <v-avatar :color="stat.color + '-darken-2'" size="48">
                     <v-icon :color="stat.color" size="28">{{ stat.icon }}</v-icon>
-                  </v-avatar> <!-- Icono a la derecha -->
+                  </v-avatar>
                 </div>
               </template>
               <v-card-text>
@@ -55,41 +55,29 @@
                 </v-col>
               </v-card-text>
             </v-card>
-
           </v-col>
         </v-row>
       </v-col>
 
+      <!-- Gráfica -->
       <v-col cols="12" md="6">
-        <v-row align="stretch">
-          <v-col cols="12" md="12">
-            <v-card class="mx-0" align="center">
-              <template v-slot:title>
-                <div class="d-flex align-center">
-                  <v-icon color="#1976D2" class="mr-2">mdi-information</v-icon>
-                  <span>Información</span>
-                </div>
-              </template>
-              <Bar :dataArray="earlyYear" />
-              <v-card-text class="py-1"> </v-card-text>
-            </v-card>
-          </v-col>
-          <!--<v-col cols="12" md="12">
-            <v-card class="mx-0" height="auto">
-              <template v-slot:title>
-                <v-icon color="#1976D2" left>mdi-information</v-icon>
-                Información
-              </template>
-              <Doughnut />
-              <v-card-text class="py-1"> </v-card-text>
-            </v-card>
-          </v-col>-->
-        </v-row>
+        <v-card class="mx-1 ma-sm-1" align="center">
+          <template v-slot:title>
+            <div class="d-flex align-center">
+              <v-icon color="#1976D2" class="mr-2">mdi-information</v-icon>
+              <span>Información</span>
+            </div>
+          </template>
+          <Bar :dataArray="earlyYear" />
+          <v-card-text class="py-1"></v-card-text>
+        </v-card>
       </v-col>
+    </v-row>
 
-      <!-- Listado de viajes recientes -->
-      <v-col cols="12" md="12" class="mx-0">
-        <v-card class="elevation-4">
+    <!-- Tabla de viajes -->
+    <v-row align="stretch">
+      <v-col cols="12">
+        <v-card class="elevation-4 mx-1 ma-sm-1">
           <v-container fluid>
             <v-toolbar color="white">
               <v-row align="center">
@@ -98,19 +86,18 @@
                 </v-col>
               </v-row>
             </v-toolbar>
-            <!--<v-card-title class="font-weight-bold;"><span color="white">Vehículos</span></v-card-title>-->
             <v-divider />
             <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
               hide-details>
             </v-text-field>
-            <v-data-table :headers="headers" :search="search" :items="trips" class="elevation-1"
-              :items-per-page-text="'Elementos por páginas'" items-per-page="5" no-data-text="No hay datos disponibles"
-              :loading="loading" loading-text="Cargando datos...">
+            <v-data-table :headers="headers" :items="trips" :search="search" fixed-header class="elevation-1"
+              :items-per-page="5" no-data-text="No hay datos disponibles" :loading="loading"
+              loading-text="Cargando datos...">
               <template v-slot:item.vehiclePlate="{ item }">
                 <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
                   <v-img :src="`${this.$axios.defaults.baseURL}images/${item.vehicleImage}?t=${Date.now()}`"
                     alt="image"></v-img>
-                </v-avatar><!--+'?$'+Date.now()-->
+                </v-avatar>
                 {{ item.vehiclePlate }}
               </template>
               <template v-slot:item.dineroGenerado="{ item }">
@@ -120,39 +107,6 @@
           </v-container>
         </v-card>
       </v-col>
-      <!-- Información de ingresos y gastos 
-      <v-col cols="12" md="6" class="mx-0">
-        <v-card>
-          <v-card-title class="font-weight-bold" :style="{ backgroundColor: '#1976D2' }">Ingresos y Gastos</v-card-title>
-          <v-divider />
-          <v-row class="pa-3">
-            <v-col cols="6" v-for="(finance, index) in finances" :key="index" class="text-center">
-              <v-card class="elevation-3 mx-auto" :color="finance.color"
-                :style="{ borderRadius: '16px', border: 'none' }">
-                <v-card-item class="pa-4">
-                  <template v-slot:prepend>
-                    <v-avatar :color="finance.color + '-darken-2'" size="48" class="elevation-4">
-                      <v-icon size="28" color="white">{{ finance.icon }}</v-icon>
-                    </v-avatar>
-                  </template>
-
-                  <v-card-title class="text-h6 font-weight-bold text-white">
-                    {{ finance.type }}
-                  </v-card-title>
-                </v-card-item>
-
-                <v-card-text class="text-center pb-0">
-                  <div class="text-h4 font-weight-black text-white">
-                    ${{ finance.amount }}
-                  </div>
-                  <v-progress-linear v-if="finance.progress" :model-value="finance.progress" color="white" height="6"
-                    class="mt-3" />
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-card>
-      </v-col>-->
     </v-row>
   </v-container>
 </template>
@@ -195,17 +149,17 @@ export default {
       ],
     };
   },
-  
+
   mounted() {
     this.role = JSON.parse(LocalStorageService.getItem('role'));
     this.permissions = JSON.parse(LocalStorageService.getItem('permissions')); // Recuperar permisos
 
-  // Verificar si el usuario tiene el permiso necesario
-  if (this.permissions.includes('view_dashboard')){    
-    this.initialize();
-  }else{
-    this.showWelcomeMessage = true;
-  }
+    // Verificar si el usuario tiene el permiso necesario
+    if (this.permissions.includes('view_dashboard')) {
+      this.initialize();
+    } else {
+      this.showWelcomeMessage = true;
+    }
     if (this.role === 'Administrador') {
       this.type = 'Negocio';
     } else {

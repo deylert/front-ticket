@@ -21,7 +21,7 @@
                     <v-col cols="12" md="3" class="text-right">
                         <v-btn class="text-subtitle-1 ml-12" :color="paleteColors.white" variant="tonal" elevation="2"
                             prepend-icon="mdi-plus-circle" @click="showAdd">
-                            Agregar Ticket
+                            Vender Ticket
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -44,7 +44,7 @@
                                     </v-autocomplete><!-- @update:model-value="initialize()">-->
                                 </v-col>
                                 <v-col cols="12" md="2">
-                                    <v-btn icon @click="initialize" :color="paleteColors.primary">
+                                    <v-btn icon @click="initialize" :color="paleteColors.primary" density="comfortable">
                                         <v-icon>mdi-magnify</v-icon></v-btn>
                                 </v-col>
                             </v-row>
@@ -61,10 +61,12 @@
                             style="max-height: 65vh; overflow-y: auto;" :items-per-page-text="'Elementos por páginas'"
                             no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
                             <template v-slot:item.actions="{ item }">
-                                <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" :color="paleteColors.primary"
-                                    variant="tonal" elevation="1" title="Editar Ticket"></v-btn>
-                                <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" :color="paleteColors.error"
-                                    variant="tonal" elevation="1" title="Eliminar Ticket"></v-btn>
+                                <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)"
+                                    :color="paleteColors.primary" variant="tonal" elevation="1"
+                                    title="Editar Ticket"></v-btn>
+                                <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)"
+                                    :color="paleteColors.error" variant="tonal" elevation="1"
+                                    title="Eliminar Ticket"></v-btn>
                             </template>
                             <template v-slot:item.tripOrigin="{ item }">
                                 <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
@@ -84,315 +86,444 @@
             </v-card-text>
         </v-card>
     </v-container>
-    <v-dialog v-model="dialog" max-width="700px">
+    <v-dialog v-model="dialog" fullscreen transition="dialog-bottom-transition">
         <v-form ref="form" v-model="valid" enctype="multipart/form-data">
-            <v-card>
+            <v-card style="height: 100vh;">
                 <v-toolbar :color="paleteColors.primary">
                     <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
                 </v-toolbar>
                 <v-card-text>
-                    <v-container>
-                        <v-row style="margin-top: 5px">
-                            <!-- Selección de viaje -->
-                            <v-col cols="12" md="12">
-                                <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.trip_id"
-                                    :items="trips" label="Viaje" prepend-icon="mdi-road" item-title="name"
-                                    item-value="id" variant="underlined" :rules="selectRules" density="compact"
-                                    @update:model-value="updateSeats">
-                                    <template v-slot:item="{ props, item }">
-                                        <div>
-                                            <v-list-item v-bind="props">
-                                                <v-list-item-content>
-                                                    <v-row align="center" no-gutters>
-                                                        <!-- Origen -->
-                                                        <v-col cols="12" md="6" class="d-flex align-center">
-                                                            <v-avatar>
-                                                                <v-img
-                                                                    :src="`${this.$axios.defaults.baseURL}images/${item.raw.originImage}`"
-                                                                    max-width="40" />
-                                                            </v-avatar>
-                                                            <div class="ml-2 text-truncate" :title="item.raw.origin"
-                                                                style="max-width: 200px;">
-                                                                {{ item.raw.origin }}
+                    <v-row style="margin-top: 5px">
+                        <!-- Selección de viaje -->
+                        <v-col cols="12" md="12">
+                            <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.trip_id"
+                                :items="trips" label="Rutas" prepend-icon="mdi-road" item-title="name" item-value="id"
+                                variant="underlined" :rules="selectRules" density="compact"
+                                @update:model-value="updateSeats" :menu-props="{ maxHeight: 400 }">
+                                <template v-slot:item="{ props, item }">
+                                    <v-card class="mx-1 my-2" elevation="2">
+                                        <v-list-item v-bind="props">
+                                            <v-list-item-content>
+                                                <v-row align="center" no-gutters>
+                                                    <!-- Columna 1: Origen -->
+                                                    <v-col cols="12" md="4" class="d-flex align-center">
+                                                        <v-avatar>
+                                                            <v-img
+                                                                :src="`${this.$axios.defaults.baseURL}images/${item.raw.originImage}`"
+                                                                max-width="40" />
+                                                        </v-avatar>
+                                                        <div class="ml-2">
+                                                            <div class="text-caption text-grey">
+                                                                <v-icon small class="mr-1">mdi-map-marker</v-icon>
+                                                                Origen
                                                             </div>
-                                                        </v-col>
+                                                            <v-tooltip location="top">
+                                                                <template v-slot:activator="{ props: tooltipProps }">
+                                                                    <div v-bind="tooltipProps" class="text-truncate"
+                                                                        style="max-width: 80%;">
+                                                                        {{ item.raw.origin }}
+                                                                    </div>
+                                                                </template>
+                                                                <span>{{ item.raw.origin }}</span>
+                                                                <!-- Texto completo en el tooltip -->
+                                                            </v-tooltip>
+                                                        </div>
+                                                    </v-col>
 
-                                                        <!-- Destino -->
-                                                        <v-col cols="12" md="6" class="d-flex align-center">
-                                                            <v-avatar>
-                                                                <v-img
-                                                                    :src="`${this.$axios.defaults.baseURL}images/${item.raw.destinationImage}`"
-                                                                    max-width="40" />
-                                                            </v-avatar>
-                                                            <div class="ml-2 text-truncate"
-                                                                :title="item.raw.destination" style="max-width: 200px;">
-                                                                {{ item.raw.destination }}
+                                                    <!-- Columna 2: Destino -->
+                                                    <v-col cols="12" md="4" class="d-flex align-center">
+                                                        <v-avatar>
+                                                            <v-img
+                                                                :src="`${this.$axios.defaults.baseURL}images/${item.raw.destinationImage}`"
+                                                                max-width="40" />
+                                                        </v-avatar>
+                                                        <div class="ml-2">
+                                                            <div class="text-caption text-grey">
+                                                                <v-icon small class="mr-1">mdi-map-marker-check</v-icon>
+                                                                Destino
                                                             </div>
-                                                        </v-col>
-                                                    </v-row>
+                                                            <v-tooltip location="top">
+                                                                <template v-slot:activator="{ props: tooltipProps }">
+                                                                    <div v-bind="tooltipProps" class="text-truncate"
+                                                                        style="max-width: 80%;">
+                                                                        {{ item.raw.destination }}
+                                                                    </div>
+                                                                </template>
+                                                                <span>{{ item.raw.destination }}</span>
+                                                                <!-- Texto completo en el tooltip -->
+                                                            </v-tooltip>
+                                                        </div>
+                                                    </v-col>
 
-                                                    <!-- Horario y Llegada -->
-                                                    <v-row align="center" no-gutters>
-                                                        <v-col cols="auto" class="d-flex align-center">
-                                                            <div class="text-truncate" style="max-width: 150px;">
+                                                    <!-- Columna 3: Horario, Llegada y Vehículo -->
+                                                    <v-col cols="12" md="4" class="d-flex align-center">
+                                                        <div>
+                                                            <div class="text-truncate">
+                                                                <v-icon small class="mr-1">mdi-clock-outline</v-icon>
                                                                 <strong>Salida:</strong> {{ item.raw.schedule }}
                                                             </div>
-                                                        </v-col>
-                                                        <v-col cols="auto" class="d-flex align-center ml-4">
-                                                            <div class="text-truncate" style="max-width: 150px;">
+                                                            <div class="text-truncate">
+                                                                <v-icon small
+                                                                    class="mr-1">mdi-clock-check-outline</v-icon>
                                                                 <strong>Llegada:</strong> {{ item.raw.arrival }}
                                                             </div>
-                                                        </v-col>
-                                                        <v-col cols="auto" class="d-flex align-center ml-4">
-                                                            <v-avatar>
-                                                                <v-img
-                                                                    :src="`${this.$axios.defaults.baseURL}images/${item.raw.imageVehicle}`"
-                                                                    max-width="40" />
-                                                            </v-avatar>
-                                                            <div class="ml-2 text-truncate" :title="item.raw.plate"
-                                                                style="max-width: 200px;">
+                                                            <div class="text-truncate">
+                                                                <v-icon small class="mr-1">mdi-bus</v-icon>
+                                                                <strong>Vehículo:</strong>
+                                                                <v-avatar>
+                                                                    <v-img
+                                                                        :src="`${this.$axios.defaults.baseURL}images/${item.raw.imageVehicle}`"
+                                                                        max-width="40" />
+                                                                </v-avatar>
                                                                 {{ item.raw.plate }}
-                                                            </div>
-                                                        </v-col>
-                                                    </v-row>
-                                                </v-list-item-content>
-                                            </v-list-item>
-                                        </div>
-                                        <v-divider></v-divider>
-                                    </template>
-                                </v-autocomplete>
-                            </v-col>
-
-                            <!-- Método de pago -->
-                            <v-col cols="12" md="6">
-                                <v-select v-model="editedItem.method" :items="paymentMethods" label="Método de pago"
-                                    item-value="value" item-title="text" variant="underlined" density="compact"
-                                    :rules="[(v) => !!v || 'Seleccione un método de pago']"
-                                    prepend-icon="mdi-cash"></v-select>
-                            </v-col>
-
-                            <!-- Fecha -->
-                            <v-col cols="12" md="6">
-                                <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40"
-                                    transition="scale-transition" offset-y min-width="190px">
-                                    <template v-slot:activator="{ props }">
-                                        <v-text-field v-bind="props" :modelValue="dateFormatted" variant="underlined"
-                                            prepend-icon="mdi-calendar" label="Fecha" density="compact"></v-text-field>
-                                    </template>
-                                    <v-locale-provider locale="es">
-                                        <v-date-picker header="Calendario" title="Seleccione la fecha" :color="paleteColors.primary"
-                                            :modelValue="input" @update:model-value="updateDate" format="yyyy-MM-dd"
-                                            :min="new Date().toISOString().split('T')[0]"></v-date-picker>
-                                    </v-locale-provider>
-                                </v-menu>
-                            </v-col>
-
-                            <!-- Precio del pasaje -->
-                            <v-col cols="12" md="4">
-                                <v-text-field v-model="editedItem.price" label="Precio del pasaje" type="number"
-                                    variant="underlined" density="compact" prepend-icon="mdi-cash"
-                                    :rules="[(v) => v > 0 || 'Debe ser un precio válido']"
-                                    placeholder="Ingrese el precio del pasaje" min="0" step="0.01"
-                                    readonly></v-text-field>
-                            </v-col>
-
-                            <!-- Cantidad de pasajes -->
-                            <v-col cols="12" md="4">
-                                <v-text-field v-model="editedItem.quantity" label="Cantidad de pasajes" type="number"
-                                    variant="underlined" density="compact" prepend-icon="mdi-ticket"
-                                    placeholder="Ingrese la cantidad" min="1" @update:model-value="calculateTotal"
-                                    :rules="quantityAndPassengerRules" :disabled="!editedItem.trip_id || !aviable"
-                                    :hint="!editedItem.quantity ? `Asientos disponibles: ${aviable}` : ''"
-                                    persistent-hint></v-text-field>
-                            </v-col>
-
-                            <!-- Selección de asientos -->
-                            <v-col cols="12" md="4" v-if="editedItem.quantity">
-                                <v-row>
-                                    <v-menu v-model="showSeatsMenu" activator="parent" offset-y
-                                        :close-on-content-click="false" :close-on-click-outside="false"
-                                        :close-on-back="false">
-                                        <template v-slot:activator="{ props }">
-                                            <v-text-field v-bind="props" ref="seatsField"
-                                                :value="selectedSeats.length > 0 ? selectedSeats.join(', ') : 'Seleccionar Asientos'"
-                                                color="primary" dark readonly style="text-transform: none"
-                                                :disabled="editedItem.quantity <= 0" prepend-icon="mdi-seat"
-                                                variant="underlined"
-                                                :rules="[v => selectedSeats.length > 0 || 'Debe seleccionar al menos un asiento']"></v-text-field>
-                                        </template>
-
-                                        <!-- Contenido del menú -->
-                                        <v-card style="max-width: 300px">
-                                            <v-card-title class="text-h6">Seleccione sus asientos</v-card-title>
-                                            <v-card-text>
-                                                <v-row>
-                                                    <!-- Mostrar asientos en filas de 2 -->
-                                                    <v-col cols="12" class="d-flex align-center justify-center">
-                                                        <div class="seat-map-preview"
-                                                            style="display: flex; flex-direction: column;">
-                                                            <div v-for="(row, rowIndex) in seatMap" :key="rowIndex"
-                                                                class="seat-row"
-                                                                style="display: flex; flex-direction: row;">
-                                                                <template v-for="(seat, seatIndex) in row"
-                                                                    :key="seatIndex">
-                                                                    <v-btn v-if="seat.type" :color="getSeatColor(seat)"
-                                                                        class="seat-button-preview"
-                                                                        :disabled="!isSeatAvailable(seat)"
-                                                                        @click="toggleSeat(seat)"
-                                                                        style="min-width: 30px; min-height: 30px; font-size: 0.8rem; font-weight: bold;">
-                                                                        <!-- Mostrar ícono de asiento si es un asiento -->
-                                                                        <v-icon
-                                                                            v-if="seat.type === 'seat'">mdi-seat</v-icon>
-                                                                        <!-- Mostrar ícono de pasillo y una "P" si es un pasillo -->
-                                                                        <span v-if="seat.type === 'aisle'">
-                                                                            <v-icon>mdi-arrow-down</v-icon> P
-                                                                        </span>
-                                                                        <!-- Mostrar el número del asiento si es un asiento -->
-                                                                        {{ seat.type === 'seat' ? seat.label : '' }}
-                                                                    </v-btn>
-                                                                </template>
                                                             </div>
                                                         </div>
                                                     </v-col>
                                                 </v-row>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </v-card>
+                                </template>
+                            </v-autocomplete>
+                        </v-col>
 
-                                                <!-- Mensaje de error si se seleccionan demasiados asientos -->
-                                                <v-alert v-if="selectedSeats.length != editedItem.quantity" type="error"
-                                                    class="mt-3">
-                                                    Debe Seleccionar {{ editedItem.quantity }} asiento(s).
-                                                </v-alert>
-                                            </v-card-text>
-                                            <v-card-actions>
-                                                <v-spacer></v-spacer>
-                                                <!-- Botón para cerrar el menú -->
-                                                <v-btn variant="text" @click="showSeatsMenu = false"
-                                                    :disabled="Number(selectedSeats.length) !== Number(editedItem.quantity)">
-                                                    Cerrar
-                                                </v-btn>
-                                            </v-card-actions>
-                                        </v-card>
-                                    </v-menu>
+                        <!-- Método de pago -->
+                        <v-col cols="12" md="2">
+                            <v-select v-model="editedItem.method" :items="paymentMethods" label="Método de pago"
+                                item-value="value" item-title="text" variant="underlined" density="compact"
+                                :rules="[(v) => !!v || 'Seleccione un método de pago']" prepend-icon="mdi-cash">
+                                <template v-slot:item="{ props, item }">
+                                    <v-list-item v-bind="props">
+                                        <template v-slot:prepend>
+                                            <v-icon :icon="item.raw.icon"></v-icon> <!-- Ícono de la opción -->
+                                        </template>
+                                    </v-list-item>
+                                </template>
+                            </v-select>
+                        </v-col>
+
+                        <!-- Fecha -->
+                        <v-col cols="12" md="2">
+                            <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40"
+                                transition="scale-transition" offset-y min-width="190px">
+                                <template v-slot:activator="{ props }">
+                                    <v-text-field v-bind="props" :modelValue="dateFormatted" variant="underlined"
+                                        prepend-icon="mdi-calendar" label="Fecha" density="compact"></v-text-field>
+                                </template>
+                                <v-locale-provider locale="es">
+                                    <v-date-picker header="Calendario" title="Seleccione la fecha"
+                                        :color="paleteColors.primary" :modelValue="input"
+                                        @update:model-value="updateDate" format="yyyy-MM-dd"
+                                        :min="new Date().toISOString().split('T')[0]"></v-date-picker>
+                                </v-locale-provider>
+                            </v-menu>
+                        </v-col>
+
+                        <!-- Precio del pasaje -->
+                        <v-col cols="12" md="2">
+                            <v-text-field v-model="editedItem.price" label="Precio del pasaje" type="number"
+                                variant="underlined" density="compact" prepend-icon="mdi-cash"
+                                :rules="[(v) => v > 0 || 'Debe ser un precio válido']"
+                                placeholder="Ingrese el precio del pasaje" min="0" step="0.01" readonly></v-text-field>
+                        </v-col>
+
+                        <!-- Cantidad de pasajes -->
+                        <v-col cols="12" md="2">
+                            <v-text-field v-model="editedItem.quantity" label="Cantidad de pasajes" type="number"
+                                variant="underlined" density="compact" prepend-icon="mdi-ticket"
+                                placeholder="Ingrese la cantidad" min="1" @update:model-value="calculateTotal"
+                                :rules="quantityAndPassengerRules" :disabled="!editedItem.trip_id || !aviable"
+                                :hint="!editedItem.quantity ? `Asientos disponibles: ${aviable}` : ''"
+                                persistent-hint></v-text-field>
+                        </v-col>
+
+                        <!-- Selección de asientos -->
+                        <v-col cols="12" md="2" v-if="editedItem.quantity">
+                            <v-row>
+                                <v-menu v-model="showSeatsMenu" activator="parent" offset-y
+                                    :close-on-content-click="false" :close-on-click-outside="false"
+                                    :close-on-back="false">
+                                    <template v-slot:activator="{ props }">
+                                        <v-text-field v-bind="props" ref="seatsField"
+                                            :value="selectedSeats.length > 0 ? selectedSeats.join(', ') : 'Seleccionar Asientos'"
+                                            color="primary" dark readonly style="text-transform: none"
+                                            :disabled="editedItem.quantity <= 0" prepend-icon="mdi-seat"
+                                            variant="underlined"
+                                            :rules="[v => selectedSeats.length > 0 || 'Debe seleccionar al menos un asiento']"></v-text-field>
+                                    </template>
+                                    <!-- Contenido del menú -->
+                                    <v-card style="max-width: 400px">
+                                        <v-toolbar :color="paleteColors.primary">
+                                            <span class="text-subtitle-2 ml-4">Seleccione los asientos</span>
+                                        </v-toolbar>
+                                        <v-card-text>
+                                            <v-row>
+                                                <!-- Mostrar asientos en filas de 2 -->
+                                                <v-col cols="12" class="d-flex align-center justify-center">
+                                                    <div class="seat-map-preview"
+                                                        style="display: flex; flex-direction: column;">
+                                                        <div v-for="(row, rowIndex) in seatMap" :key="rowIndex"
+                                                            class="seat-row"
+                                                            style="display: flex; flex-direction: row;">
+                                                            <template v-for="(seat, seatIndex) in row" :key="seatIndex">
+                                                                <v-btn v-if="seat.type" :color="getSeatColor(seat)"
+                                                                    class="seat-button-preview ma-1"
+                                                                    :disabled="!isSeatAvailable(seat)"
+                                                                    @click="toggleSeat(seat)"
+                                                                    style="min-width: 30px; min-height: 30px; font-size: 0.8rem; font-weight: bold;">
+                                                                    <!-- Mostrar ícono de asiento si es un asiento -->
+                                                                    <v-icon
+                                                                        v-if="seat.type === 'seat'">mdi-seat</v-icon>
+                                                                    <!-- Mostrar ícono de pasillo y una "P" si es un pasillo -->
+                                                                    <span v-if="seat.type === 'aisle'">
+                                                                        <v-icon>mdi-arrow-down</v-icon> P
+                                                                    </span>
+                                                                    <!-- Mostrar el número del asiento si es un asiento -->
+                                                                    {{ seat.type === 'seat' ? seat.label : '' }}
+                                                                </v-btn>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </v-col>
+                                            </v-row>
+
+                                            <!-- Mensaje de error si se seleccionan demasiados asientos -->
+                                            <v-alert v-if="selectedSeats.length != editedItem.quantity" type="error"
+                                                class="mt-3">
+                                                Debe Seleccionar {{ editedItem.quantity }} asiento(s).
+                                            </v-alert>
+                                        </v-card-text>
+                                        <v-card-actions>
+                                            <v-spacer></v-spacer>
+                                            <!-- Botón para cerrar el menú -->
+                                            <v-btn variant="flat" @click="showSeatsMenu = false"
+                                                :color="paleteColors.gris"
+                                                :disabled="Number(selectedSeats.length) !== Number(editedItem.quantity)">
+                                                Cerrar
+                                            </v-btn>
+                                        </v-card-actions>
+                                    </v-card>
+                                </v-menu>
+                            </v-row>
+                        </v-col>
+                    </v-row>
+                    <!-- Pasajeros adultos y menores -->
+                    <v-row>
+                        <v-col cols="12" md="6">
+                            <!-- Pasajeros estándar -->
+                            <v-card class="pa-4 mb-4">
+                                <v-row>
+                                    <!-- Campo para pasajeros estándar -->
+                                    <v-col cols="12" md="6">
+                                        <v-text-field v-model="normal" label="Pasajeros Estandar" type="number"
+                                            variant="underlined" density="compact" prepend-icon="mdi-account"
+                                            placeholder="Ingrese la cantidad de adultos" min="0"
+                                            @update:model-value="onNormalsChange"
+                                            :rules="quantityAndPassengerRules" :disabled="isDisabledNormal"></v-text-field>
+                                    </v-col>
+
+                                    <!-- Botón para aplicar promoción o autocomplete para seleccionar promoción -->
+                                    <v-col cols="12" md="6">
+                                        <!-- Mostrar botón "Aplicar Promoción" solo si `normal` tiene valor y no hay promoción seleccionada -->
+                                        <v-btn v-if="!showPromotion" @click="showPromotion = showPromotionField" variant="outlined"
+                                            prepend-icon="mdi-tag" color="primary" :disabled="isDisabledNormal">
+                                            Aplicar Promoción
+                                        </v-btn>
+
+                                        <!-- Mostrar autocomplete y botón "Eliminar Promoción" si `showPromotionField` es true -->
+                                        <div v-if="this.showPromotion">
+                                            <v-autocomplete :no-data-text="'No hay datos disponibles'"
+                                                v-model="selectedPromotion" :items="promotions"
+                                                label="Seleccionar promoción" item-title="name" item-value="id"
+                                                variant="underlined" density="compact" prepend-icon="mdi-tag"
+                                                @update:model-value="applyPromotionNormal">
+                                                <template v-slot:item="{ props, item }">
+                                                    <v-list-item v-bind="props">
+                                                        <v-list-item-subtitle>
+                                                            <strong>Descuento:</strong> {{ item.raw.percentage }}%
+                                                        </v-list-item-subtitle>
+                                                        <v-list-item-subtitle>
+                                                            <v-tooltip bottom>
+                                                                <template v-slot:activator="{ props }">
+                                                                    <div class="truncate" v-bind="props"
+                                                                        style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                                        <strong>Descripción:</strong> {{
+                                                                            item.raw.description }}
+                                                                    </div>
+                                                                </template>
+                                                                <span>{{ item.raw.description }}</span>
+                                                            </v-tooltip>
+                                                        </v-list-item-subtitle>
+                                                    </v-list-item>
+                                                </template>
+                                            </v-autocomplete>
+                                            <!-- Botón para eliminar promoción -->
+                                            <v-btn v-if="selectedPromotion" @click="removePromotionNormal" variant="text"
+                                                color="error" prepend-icon="mdi-close">
+                                                Eliminar Promoción
+                                            </v-btn>
+                                        </div>
+                                    </v-col>
                                 </v-row>
-                            </v-col>
-                        </v-row>
-                        <!-- Pasajeros adultos y menores -->
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-text-field v-model="normal" label="Pasajeros" type="number" variant="underlined"
-                                    density="compact" prepend-icon="mdi-account"
-                                    placeholder="Ingrese la cantidad de adultos" min="0"
-                                    @update:model-value="onNormalsChange"
-                                    :rules="quantityAndPassengerRules"></v-text-field>
-                            </v-col>
-                            <v-col cols="12" md="6" v-if="showPromotionField">
-                                <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="selectedPromotion"
-                                    :items="promotions" label="Seleccionar promoción" item-title="name" item-value="id"
-                                    variant="underlined" density="compact" prepend-icon="mdi-tag"
-                                    @update:model-value="applyPromotionNormal">
-                                    <!-- Slot para personalizar cómo se muestran los ítems -->
-                                    <template v-slot:item="{ props, item }">
-                                        <v-list-item v-bind="props">
-                                            <v-list-item-subtitle>
-                                                <strong>Descuento:</strong> {{ item.raw.percentage }}%
-                                            </v-list-item-subtitle>
+                            </v-card>
 
-                                            <v-list-item-subtitle>
-                                                <v-tooltip bottom>
-                                                    <template v-slot:activator="{ props }">
-                                                        <div class="truncate" v-bind="props"
-                                                            style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                            <strong>Descripción:</strong> {{ item.raw.description }}
-                                                        </div>
+                            <!-- Pasajeros adultos mayores -->
+                            <v-card class="pa-4 mb-4">
+                                <v-row>
+                                    <v-col cols="12" md="6">
+                                        <v-text-field v-model="editedItem.adults" label="Pasajeros adultos mayor"
+                                            type="number" variant="underlined" density="compact"
+                                            prepend-icon="mdi-account-supervisor"
+                                            placeholder="Ingrese la cantidad de adultos" min="0"
+                                            @update:model-value="onAdultsChange"
+                                            :rules="quantityAndPassengerRules"
+                                            :disabled="isDisabledAdult"></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" md="6">
+                                        <v-btn v-if="!showPromotionAdults" @click="showPromotionAdults = showPromotionFieldAdults"
+                                            variant="outlined" prepend-icon="mdi-tag" color="primary" :disabled="isDisabledAdult">
+                                            Aplicar Promoción
+                                        </v-btn>
+                                        <div v-if="this.showPromotionAdults">
+                                            <v-autocomplete :no-data-text="'No hay datos disponibles'"
+                                                v-model="selectedPromotionAdults" :items="promotions"
+                                                label="Seleccionar promoción" item-title="name" item-value="id"
+                                                variant="underlined" density="compact" prepend-icon="mdi-tag"
+                                                @update:model-value="applyPromotionAdults">
+                                                <template v-slot:item="{ props, item }">
+                                                    <v-list-item v-bind="props">
+                                                        <v-list-item-subtitle>
+                                                            <strong>Descuento:</strong> {{ item.raw.percentage }}%
+                                                        </v-list-item-subtitle>
+                                                        <v-list-item-subtitle>
+                                                            <v-tooltip bottom>
+                                                                <template v-slot:activator="{ props }">
+                                                                    <div class="truncate" v-bind="props"
+                                                                        style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                                        <strong>Descripción:</strong> {{
+                                                                            item.raw.description }}
+                                                                    </div>
+                                                                </template>
+                                                                <span>{{ item.raw.description }}</span>
+                                                            </v-tooltip>
+                                                        </v-list-item-subtitle>
+                                                    </v-list-item>
+                                                </template>
+                                            </v-autocomplete>
+                                            <v-btn v-if="selectedPromotionAdults" @click="removePromotionAdult" variant="text" color="error"
+                                                prepend-icon="mdi-close">
+                                                Eliminar Promoción
+                                            </v-btn>
+                                        </div>
+                                    </v-col>
+                                </v-row>
+                            </v-card>
+
+                            <!-- Pasajeros menores de edad -->
+                            <v-card class="pa-4 mb-4">
+                                <v-row>
+                                    <v-col cols="12" md="6">
+                                        <v-text-field v-model="editedItem.minors" label="Pasajeros menores de edad"
+                                            type="number" variant="underlined" density="compact"
+                                            prepend-icon="mdi-account-child"
+                                            placeholder="Ingrese la cantidad de menores" min="0"
+                                            @update:model-value="onMinorsChange"
+                                            :rules="quantityAndPassengerRules" :disabled="isDisabledMinor"></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" md="6">
+                                        <v-btn v-if="!showPromotionMinors" @click="showPromotionMinors = showPromotionFieldMinors"
+                                            variant="outlined" prepend-icon="mdi-tag" color="primary" :disabled="isDisabledMinor">
+                                            Aplicar Promoción
+                                        </v-btn>
+                                        <div v-if="this.showPromotionMinors">
+                                            <v-autocomplete :no-data-text="'No hay datos disponibles'"
+                                                v-model="selectedPromotionMinors" :items="promotions"
+                                                label="Seleccionar promoción" item-title="name" item-value="id"
+                                                variant="underlined" density="compact" prepend-icon="mdi-tag"
+                                                @update:model-value="applyPromotionMinors">
+                                                <template v-slot:item="{ props, item }">
+                                                    <v-list-item v-bind="props">
+                                                        <v-list-item-subtitle>
+                                                            <strong>Descuento:</strong> {{ item.raw.percentage }}%
+                                                        </v-list-item-subtitle>
+                                                        <v-list-item-subtitle>
+                                                            <v-tooltip bottom>
+                                                                <template v-slot:activator="{ props }">
+                                                                    <div class="truncate" v-bind="props"
+                                                                        style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                                        <strong>Descripción:</strong> {{
+                                                                            item.raw.description }}
+                                                                    </div>
+                                                                </template>
+                                                                <span>{{ item.raw.description }}</span>
+                                                            </v-tooltip>
+                                                        </v-list-item-subtitle>
+                                                    </v-list-item>
+                                                </template>
+                                            </v-autocomplete>
+                                            <v-btn v-if="selectedPromotionMinors" @click="removePromotionMinor" variant="text" color="error"
+                                                prepend-icon="mdi-close">
+                                                Eliminar Promoción
+                                            </v-btn>
+                                        </div>
+                                    </v-col>
+                                </v-row>
+                            </v-card>
+
+                            <!-- Total a pagar -->
+                            <v-card class="pa-4">
+                                <v-row>
+                                    <v-col cols="12" md="6">
+                                        <v-text-field v-model="editedItem.total" label="Total a pagar" type="number"
+                                            variant="underlined" density="compact" prepend-icon="mdi-cash"
+                                            readonly></v-text-field>
+                                    </v-col>
+                                </v-row>
+                            </v-card>
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <!-- Mapa de asientos visible -->
+                            <v-card style="max-width: 50%;" v-if="aviable">
+                                <v-toolbar :color="paleteColors.primary">
+                                    <span class="text-subtitle-2 ml-4">Seleccione los asientos</span>
+                                </v-toolbar>
+                                <v-card-text>
+                                    <v-row>
+                                        <!-- Mostrar asientos en filas de 2 -->
+                                        <v-col cols="12" class="d-flex align-center justify-center">
+                                            <div class="seat-map-preview"
+                                                style="display: flex; flex-direction: column;">
+                                                <div v-for="(row, rowIndex) in seatMap" :key="rowIndex" class="seat-row"
+                                                    style="display: flex; flex-direction: row;">
+                                                    <template v-for="(seat, seatIndex) in row" :key="seatIndex">
+                                                        <v-btn v-if="seat.type" :color="getSeatColor(seat)"
+                                                            class="seat-button-preview ma-1"
+                                                            :disabled="!isSeatAvailable(seat)" @click="toggleSeat(seat)"
+                                                            style="min-width: 30px; min-height: 30px; font-size: 0.8rem; font-weight: bold;">
+                                                            <!-- Mostrar ícono de asiento si es un asiento -->
+                                                            <v-icon v-if="seat.type === 'seat'">mdi-seat</v-icon>
+                                                            <!-- Mostrar ícono de pasillo y una "P" si es un pasillo -->
+                                                            <span v-if="seat.type === 'aisle'">
+                                                                <v-icon>mdi-arrow-down</v-icon> P
+                                                            </span>
+                                                            <!-- Mostrar el número del asiento si es un asiento -->
+                                                            {{ seat.type === 'seat' ? seat.label : '' }}
+                                                        </v-btn>
                                                     </template>
-                                                    <span>{{ item.raw.description }}</span>
-                                                </v-tooltip>
-                                            </v-list-item-subtitle>
-                                        </v-list-item>
-                                    </template>
-                                </v-autocomplete>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-text-field v-model="editedItem.adults" label="Pasajeros adultos" type="number"
-                                    variant="underlined" density="compact" prepend-icon="mdi-account"
-                                    placeholder="Ingrese la cantidad de adultos" min="0"
-                                    @update:model-value="onAdultsChange"
-                                    :rules="quantityAndPassengerRules"></v-text-field>
-                            </v-col>
-                            <v-col cols="12" md="6" v-if="showPromotionFieldAdults">
-                                <v-autocomplete :no-data-text="'No hay datos disponibles'"
-                                    v-model="selectedPromotionAdults" :items="promotions" label="Seleccionar promoción"
-                                    item-title="name" item-value="id" variant="underlined" density="compact"
-                                    prepend-icon="mdi-tag" @update:model-value="applyPromotionAdults">
-                                    <!-- Slot para personalizar cómo se muestran los ítems -->
-                                    <template v-slot:item="{ props, item }">
-                                        <v-list-item v-bind="props">
-                                            <v-list-item-subtitle>
-                                                <strong>Descuento:</strong> {{ item.raw.percentage }}%
-                                            </v-list-item-subtitle>
+                                                </div>
+                                            </div>
+                                        </v-col>
+                                    </v-row>
 
-                                            <v-list-item-subtitle>
-                                                <v-tooltip bottom>
-                                                    <template v-slot:activator="{ props }">
-                                                        <div class="truncate" v-bind="props"
-                                                            style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                            <strong>Descripción:</strong> {{ item.raw.description }}
-                                                        </div>
-                                                    </template>
-                                                    <span>{{ item.raw.description }}</span>
-                                                </v-tooltip>
-                                            </v-list-item-subtitle>
-                                        </v-list-item>
-                                    </template>
-                                </v-autocomplete>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-
-                            <v-col cols="12" md="6">
-                                <v-text-field v-model="editedItem.minors" label="Pasajeros menores" type="number"
-                                    variant="underlined" density="compact" prepend-icon="mdi-account-child"
-                                    placeholder="Ingrese la cantidad de menores" min="0"
-                                    @update:model-value="onMinorsChange"
-                                    :rules="quantityAndPassengerRules"></v-text-field>
-                            </v-col>
-                            <v-col cols="12" md="6" v-if="showPromotionFieldMinors">
-                                <v-autocomplete :no-data-text="'No hay datos disponibles'"
-                                    v-model="selectedPromotionMinors" :items="promotions" label="Seleccionar promoción"
-                                    item-title="name" item-value="id" variant="underlined" density="compact"
-                                    prepend-icon="mdi-tag" @update:model-value="applyPromotionMinors">
-                                    <!-- Slot para personalizar cómo se muestran los ítems -->
-                                    <template v-slot:item="{ props, item }">
-                                        <v-list-item v-bind="props">
-                                            <v-list-item-subtitle>
-                                                <strong>Descuento:</strong> {{ item.raw.percentage }}%
-                                            </v-list-item-subtitle>
-
-                                            <v-list-item-subtitle>
-                                                <v-tooltip bottom>
-                                                    <template v-slot:activator="{ props }">
-                                                        <div class="truncate" v-bind="props"
-                                                            style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                            <strong>Descripción:</strong> {{ item.raw.description }}
-                                                        </div>
-                                                    </template>
-                                                    <span>{{ item.raw.description }}</span>
-                                                </v-tooltip>
-                                            </v-list-item-subtitle>
-                                        </v-list-item>
-                                    </template>
-                                </v-autocomplete>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-text-field v-model="editedItem.total" label="Total a pagar" type="number"
-                                    variant="underlined" density="compact" prepend-icon="mdi-cash"
-                                    readonly></v-text-field>
-                            </v-col>
-                        </v-row>
-                    </v-container>
+                                    <!-- Mensaje de error si se seleccionan demasiados asientos -->
+                                    <v-alert v-if="selectedSeats.length != editedItem.quantity" type="error"
+                                        class="mt-3">
+                                        Debe Seleccionar {{ editedItem.quantity }} asiento(s).
+                                    </v-alert>
+                                </v-card-text>
+                            </v-card>
+                        </v-col>
+                    </v-row>
                 </v-card-text>
                 <v-divider></v-divider>
                 <v-card-actions>
@@ -416,7 +547,9 @@
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete"> Cancelar </v-btn>
-                <v-btn :color="paleteColors.primary" variant="flat" @click="deleteItemConfirm" :loading="loading"> Aceptar </v-btn>
+                <v-btn :color="paleteColors.primary" variant="flat" @click="deleteItemConfirm" :loading="loading">
+                    Aceptar
+                </v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -523,9 +656,9 @@ export default {
             promotions: [],
         },
         paymentMethods: [
-            { text: "Efectivo", value: "Efectivo" },
-            { text: "Débito", value: "Debito" },
-            { text: "Crédito", value: "Credito" },
+            { text: "Efectivo", value: "Efectivo", icon: "mdi-cash" },
+            { text: "Débito", value: "Debito", icon: "mdi-credit-card-outline" },
+            { text: "Crédito", value: "Credito", icon: "mdi-credit-card-multiple-outline" },
         ],
         editedIndex: -1,
         search: "",
@@ -540,6 +673,9 @@ export default {
         selectedPromotionAdults: null,
         selectedPromotionMinors: null,
         selectedPromotion: null,
+        showPromotion: false,
+        showPromotionAdults: false,
+        showPromotionMinors: false,
         normal: '',
         nameRules: [
             (v) => !!v || "El campo es requerido",
@@ -554,7 +690,7 @@ export default {
     }),
     computed: {
         formTitle() {
-            return this.editedIndex === -1 ? "Agregar Ticket" : "Editar Ticket";
+            return this.editedIndex === -1 ? "Venta de Ticket" : "Editar Ticket";
         },
         dateFormatted() {
             const date = this.input ? new Date(this.input) : new Date();
@@ -600,6 +736,15 @@ export default {
         },
         showPromotionField() {
             return this.normal > 0 && this.promotions.length > 0;
+        },
+        isDisabledNormal() {
+            return (Number(this.editedItem.adults) + Number(this.editedItem.minors)) >= Number(this.editedItem.quantity);
+        },
+        isDisabledAdult() {
+            return (Number(this.normal) + Number(this.editedItem.minors)) >= Number(this.editedItem.quantity);
+        },
+        isDisabledMinor() {
+            return (Number(this.normal) + Number(this.editedItem.adults)) >= Number(this.editedItem.quantity);
         },
     },
     watch: {
@@ -680,6 +825,31 @@ export default {
                 console.log("Promociones aplicadas adults:", this.editedItem.promotions);
             }
         },
+        removePromotionAdult() {
+            // Buscar la promoción de tipo "normal"
+            const existingPromotionIndex = this.editedItem.promotions.findIndex(
+                (promo) => promo.type === "adults"
+            );
+
+            if (existingPromotionIndex !== -1) {
+                // Obtener la promoción existente
+                const existingPromotion = this.editedItem.promotions[existingPromotionIndex];
+
+                // Sumar el valor del descuento al total
+                this.editedItem.total += existingPromotion.discountedPrice;
+
+                // Eliminar la promoción de la lista
+                this.editedItem.promotions.splice(existingPromotionIndex, 1);
+
+                // Reiniciar la promoción seleccionada
+                this.selectedPromotionAdults = null;
+                this.showPromotionAdults = false;
+
+                // Mostrar un mensaje de éxito (opcional)
+                console.log("Promoción eliminada:", existingPromotion);
+                console.log("Total restaurado:", this.editedItem.total);
+            }
+        },
         onAdultsChange(newValue) {
             if (newValue == 0) {
                 // Buscar y eliminar la promoción de tipo "adults"
@@ -697,7 +867,7 @@ export default {
                     // Actualizar el total sumando el descuento que se había aplicado
                     this.editedItem.total += removedPromotion.discountedPrice;
                     this.selectedPromotionAdults = null;
-
+                    this.showPromotionAdults = false;
                     // Mostrar un mensaje de éxito (opcional)
                     console.log("Promoción eliminada adults:", removedPromotion);
                     console.log("Total actualizado adults:", this.total);
@@ -766,6 +936,31 @@ export default {
                 console.log("Promociones aplicadas minors:", this.editedItem.promotions);
             }
         },
+        removePromotionMinor() {
+            // Buscar la promoción de tipo "normal"
+            const existingPromotionIndex = this.editedItem.promotions.findIndex(
+                (promo) => promo.type === "minors"
+            );
+
+            if (existingPromotionIndex !== -1) {
+                // Obtener la promoción existente
+                const existingPromotion = this.editedItem.promotions[existingPromotionIndex];
+
+                // Sumar el valor del descuento al total
+                this.editedItem.total += existingPromotion.discountedPrice;
+
+                // Eliminar la promoción de la lista
+                this.editedItem.promotions.splice(existingPromotionIndex, 1);
+
+                // Reiniciar la promoción seleccionada
+                this.selectedPromotionMinors = null;
+                this.showPromotionMinors = false;
+
+                // Mostrar un mensaje de éxito (opcional)
+                console.log("Promoción eliminada:", existingPromotion);
+                console.log("Total restaurado:", this.editedItem.total);
+            }
+        },
         onMinorsChange(newValue) {
             if (newValue == 0) {
                 // Buscar y eliminar la promoción de tipo "adults"
@@ -783,7 +978,7 @@ export default {
                     // Actualizar el total sumando el descuento que se había aplicado
                     this.editedItem.total += removedPromotion.discountedPrice;
                     this.selectedPromotionMinors = null;
-
+                    this.showPromotionMinors = false;
                     // Mostrar un mensaje de éxito (opcional)
                     console.log("Promoción eliminada minors:", removedPromotion);
                     console.log("Total actualizado minors:", this.total);
@@ -852,6 +1047,31 @@ export default {
                 console.log("Promociones aplicadas:", this.editedItem.promotions);
             }
         },
+        removePromotionNormal() {
+            // Buscar la promoción de tipo "normal"
+            const existingPromotionIndex = this.editedItem.promotions.findIndex(
+                (promo) => promo.type === "normal"
+            );
+
+            if (existingPromotionIndex !== -1) {
+                // Obtener la promoción existente
+                const existingPromotion = this.editedItem.promotions[existingPromotionIndex];
+
+                // Sumar el valor del descuento al total
+                this.editedItem.total += existingPromotion.discountedPrice;
+
+                // Eliminar la promoción de la lista
+                this.editedItem.promotions.splice(existingPromotionIndex, 1);
+
+                // Reiniciar la promoción seleccionada
+                this.selectedPromotion = null;
+                this.showPromotion = false;
+
+                // Mostrar un mensaje de éxito (opcional)
+                console.log("Promoción eliminada:", existingPromotion);
+                console.log("Total restaurado:", this.editedItem.total);
+            }
+        },
         onNormalsChange(newValue) {
             if (newValue == 0) {
                 // Buscar y eliminar la promoción de tipo "adults"
@@ -869,6 +1089,7 @@ export default {
                     // Actualizar el total sumando el descuento que se había aplicado
                     this.editedItem.total += removedPromotion.discountedPrice;
                     this.selectedPromotion = null;
+                    this.showPromotion = false;
 
                     // Mostrar un mensaje de éxito (opcional)
                     console.log("Promoción eliminada:", removedPromotion);
@@ -912,7 +1133,10 @@ export default {
                 return this.paleteColors.error; // Asiento reservado
             } else if (this.selectedSeats.includes(Number(seat.label))) {
                 return this.paleteColors.primary; // Asiento seleccionado
-            } else {
+            } else if (seat.type === 'aisle') {
+                return this.paleteColors.gris; // Asiento seleccionado
+            }
+            else {
                 return this.paleteColors.green; // Asiento disponible
             }
         },

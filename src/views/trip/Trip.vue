@@ -43,7 +43,7 @@
                   </v-autocomplete><!-- @update:model-value="initialize()">-->
                 </v-col>
                 <v-col cols="12" md="2">
-                  <v-btn icon @click="initialize" :color="paleteColors.primary">
+                  <v-btn icon @click="initialize" :color="paleteColors.primary" density="comfortable">
                     <v-icon>mdi-magnify</v-icon></v-btn>
                 </v-col>
               </v-row>
