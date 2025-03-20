@@ -105,10 +105,8 @@
                   variant="underlined" :rules="[v => !!v || 'La placa es requerida']"></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="editedItem.rut" clearable label="RUT" prepend-icon="mdi-card-account-details"
-                  variant="underlined" :rules="[v => !!v || 'El RUT es requerido',
-                  v => /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/.test(v) || 'El RUT debe estar en el formato XX.XXX.XXX-Y (ejemplo: 12.345.678-9)'
-                  ]">
+                <v-text-field v-model="editedItem.rut" clearable label="RUT" prepend-icon="mdi-identifier"
+                  variant="underlined" :rules="rutRules">
                 </v-text-field>
               </v-col>
               <v-col cols="12" md="6">
@@ -212,7 +210,7 @@ export default {
     vehicles: [],
     structures: [],
     data: {},
-    selectedVehicle: null,
+    selectedVehicle: [],
     dialogVehicleWorker: null,
     headers: [
       //{ title: 'Sucursal', value: 'branchName', width: '20%' },
@@ -270,7 +268,10 @@ export default {
       (v) => (v && v.length >= 3) ||
         "El campo debe tener al menos de 3 caracteres",
     ],
-    selectRules: [(v) => !!v || "Seleccionar al menos un elemento"]
+    selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
+    rutRules: [
+      (v) => !v || /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/.test(v) || "El RUT debe estar en el formato XX.XXX.XXX-Y (ejemplo: 12.345.678-9)",
+    ],
   }),
   computed: {
     formTitle() {
@@ -595,7 +596,7 @@ export default {
     },
     closeDialogVehicleWorker() {
       this.dialogVehicleWorker = false; // Cerramos el diálogo
-      this.selectedVehicle = null;
+      this.selectedVehicle = [];
     },
   },
 };

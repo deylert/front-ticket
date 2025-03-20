@@ -72,6 +72,9 @@
                                         <v-list-item v-bind="props"
                                             :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`"
                                             :title="item.raw.name">
+                                            <!--<v-list-item-subtitle class="d-flex flex-column">
+                                                <div>Rol: {{ item.raw.role }}</div>
+                                            </v-list-item-subtitle>-->
                                             <v-list-item-subtitle class="d-flex flex-column">
                                                 <div>Correo: {{ item.raw.email }}</div>
                                             </v-list-item-subtitle>
@@ -131,7 +134,7 @@ export default {
         valid: true,
         loading: false,
         mostrar: false,
-
+        loadingDelete: false,
         dialog: false,
         dialogDelete: false,
         vehicleworkers: [],

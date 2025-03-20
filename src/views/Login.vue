@@ -245,8 +245,10 @@ export default {
           // LocalStorageService.setItem('nameBusiness', user.nameBusiness);
           // LocalStorageService.setItem('imageBusiness', user.imageBusiness);
           // LocalStorageService.setItem('business_id', user.business_id);
-          LocalStorageService.setItem('permissions', user.permissions);
-
+          const permissions = user.permissions.map(permission => permission.split(',')[0].trim());
+          LocalStorageService.setItem('permissions', permissions);
+          //LocalStorageService.setItem('permissions', user.permissions);
+          console.log();
           // Reiniciar el formulario
           this.editedItem = Object.assign({}, this.defaultItem);
 

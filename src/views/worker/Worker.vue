@@ -92,7 +92,7 @@
                   variant="underlined"></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="editedItem.phone" clearable label="Tléfono" prepend-icon="mdi-phone"
+                <v-text-field v-model="editedItem.phone" clearable label="Teléfono" prepend-icon="mdi-phone"
                   variant="underlined" :rules="mobileRules"></v-text-field>
               </v-col>
             </v-row>
@@ -231,7 +231,7 @@ export default {
     selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
     requiredRules: [(v) => !!v || "El campo es requerido"],
     mobileRules: [
-      v => !!v || 'El número de móvil es requerido',
+      v => !!v || 'El número de teléfono es requerido',
       v => /^\+569\d{8}$/.test(v) || 'Formato de número móvil inválido. Ejemplo: +56912345678'
     ],
     rutRules: [v => !!v || 'El RUT es requerido',

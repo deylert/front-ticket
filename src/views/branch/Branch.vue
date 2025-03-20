@@ -210,7 +210,7 @@ export default {
     mostrar: false,
     file: null,
     imgMiniatura: "",
-    selectedBranch: null,
+    selectedBranch: [],
     dialog: false,
     dialogDelete: false,
     companies: [],
@@ -594,7 +594,7 @@ export default {
     },
     closeDialogBranchWorker() {
       this.dialogBranchWorker = false; // Cerramos el diálogo
-      this.selectedBranch = null;
+      this.selectedBranch = [];
     },
     showAddVehicle(item) {
       this.selectedBranch = item; // Asignamos el trabajador seleccionado
@@ -602,7 +602,7 @@ export default {
     },
     closeDialogBranchVehicle() {
       this.dialogBranchVehicle = false; // Cerramos el diálogo
-      this.selectedBranch = null;
+      this.selectedBranch = [];
     },
     showAddRoute(item) {
       this.selectedBranch = item; // Asignamos el trabajador seleccionado
@@ -610,7 +610,7 @@ export default {
     },
     closeDialogBranchRoute() {
       this.dialogBranchRoute = false; // Cerramos el diálogo
-      this.selectedBranch = null;
+      this.selectedBranch = [];
     },
   },
 };

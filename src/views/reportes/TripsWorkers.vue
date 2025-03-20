@@ -38,8 +38,8 @@
                                     density="compact"></v-text-field>
                             </template>
                             <v-locale-provider locale="es">
-                                <v-date-picker header="Calendario" title="Seleccione la fecha" :color="paleteColors.primary"
-                                    :modelValue="input" @update:model-value="updateDate"
+                                <v-date-picker header="Calendario" title="Seleccione la fecha"
+                                    :color="paleteColors.primary" :modelValue="input" @update:model-value="updateDate"
                                     format="yyyy-MM-dd"></v-date-picker>
                             </v-locale-provider>
                         </v-menu>
@@ -53,14 +53,33 @@
                                     density="compact"></v-text-field>
                             </template>
                             <v-locale-provider locale="es">
-                                <v-date-picker header="Calendario" title="Seleccione la fecha" :color="paleteColors.primary"
-                                    :modelValue="input2" format="yyyy-MM-dd" :min="dateFormatted"
+                                <v-date-picker header="Calendario" title="Seleccione la fecha"
+                                    :color="paleteColors.primary" :modelValue="input2" format="yyyy-MM-dd"
+                                    :min="dateFormatted"
                                     @update:model-value="updateDate1"></v-date-picker><!--@update:model-value="updateDate2"-->
                             </v-locale-provider>
                         </v-menu>
                     </v-col>
+
+                    <v-col cols="12" md="3"  v-if="mostrarFila">
+                        <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="branch_id" :items="branches"
+                            label="Seleccione una Sucursal" prepend-inner-icon="mdi-store" item-title="name"
+                            item-value="id" variant="underlined" :rules="selectRules" density="compact">
+                            <template v-slot:item="{ props, item }">
+                                <v-list-item v-bind="props"
+                                    :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`">
+                                    <template v-slot:title>
+                                        {{ item.raw.name }} <!-- Nombre de la sucursal -->
+                                    </template>
+                                    <template v-slot:subtitle>
+                                        Rol: {{ item.raw.role }} <!-- Nombre del rol -->
+                                    </template>
+                                </v-list-item>
+                            </template>
+                        </v-autocomplete><!-- @update:model-value="initialize()">-->
+                    </v-col>
                     <v-col cols="12" md="3">
-                        <v-btn icon @click="initialize" :color="paleteColors.primary">
+                        <v-btn icon @click="initialize" :color="paleteColors.primary" density="comfortable">
                             <v-icon>mdi-magnify</v-icon></v-btn>
                     </v-col>
                 </v-row>
@@ -133,9 +152,12 @@ export default {
         ],
 
         branch_id: '',
+        worker_id: '',
+        workers: [],
         role: '',
         response: [],
         branches: [],
+        mostrarFila: false,
         data: {},
         menu: false,
         menu2: false,
@@ -168,6 +190,7 @@ export default {
     },
     mounted() {
         this.role = JSON.parse(LocalStorageService.getItem('role'));
+        this.worker_id = LocalStorageService.getItem('worker_id');
         if (this.role === 'Administrador') {
             this.showBranches();
         } else {
@@ -191,9 +214,12 @@ export default {
         },
         async showBranches() {
             try {
+                this.data = {};
+                //this.data.worker_id = this.worker_id;
                 const result = await handleRequest({
-                    endpoint: 'branch',
-                    method: 'GET',
+                    endpoint: 'worker-branches',
+                    method: 'POST',
+                    data: this.data
                 });
 
                 if (result.success) {
@@ -209,6 +235,9 @@ export default {
                 // Captura de errores no controlados
                 //this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
             } finally {
+                if (this.branches.length > 1) {
+                    this.mostrarFila = true;
+                }
                 this.loading = false;
                 this.initialize();
             }

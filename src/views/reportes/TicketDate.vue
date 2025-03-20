@@ -4,7 +4,7 @@
             <v-toolbar :color="paleteColors.primary">
                 <v-row align="center">
                     <v-col cols="12" md="8" class="grow ml-4">
-                        <span class="text-subtitle-1"><strong>Ventas Diarías</strong></span>
+                        <span class="text-subtitle-1"><strong>Ventas Diarias</strong></span>
                     </v-col>
                     <v-col cols="12" md="3" class="text-right">
                         <v-btn class="text-subtitle-1 ml-12" :color="paleteColors.white" variant="tonal" elevation="2"
@@ -15,39 +15,68 @@
                 </v-row>
             </v-toolbar>
             <v-card-text>
-                <v-row>
-                    <v-col cols="12" md="3">
+                <v-row dense>
+                    <v-col cols="12" md="2">
                         <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40"
                             transition="scale-transition" offset-y min-width="290px">
                             <template v-slot:activator="{ props }">
                                 <v-text-field v-bind="props" :modelValue="dateFormatted" variant="underlined"
-                                    prepend-icon="mdi-calendar" label="Fecha de inicio"
+                                    prepend-inner-icon="mdi-calendar" label="Fecha de inicio"
                                     density="compact"></v-text-field>
                             </template>
                             <v-locale-provider locale="es">
-                                <v-date-picker header="Calendario" title="Seleccione la fecha" :color="paleteColors.primary"
-                                    :modelValue="input" @update:model-value="updateDate"
+                                <v-date-picker header="Calendario" title="Seleccione la fecha"
+                                    :color="paleteColors.primary" :modelValue="input" @update:model-value="updateDate"
                                     format="yyyy-MM-dd"></v-date-picker>
                             </v-locale-provider>
                         </v-menu>
                     </v-col>
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="2">
                         <v-menu v-model="menu2" :close-on-content-click="false" :nudge-right="40"
                             transition="scale-transition" offset-y min-width="290px">
                             <template v-slot:activator="{ props }">
                                 <v-text-field v-bind="props" :modelValue="dateFormatted1" variant="underlined"
-                                    prepend-icon="mdi-calendar" label="Fecha Terminación"
+                                    prepend-inner-icon="mdi-calendar" label="Fecha Terminación"
                                     density="compact"></v-text-field>
                             </template>
                             <v-locale-provider locale="es">
-                                <v-date-picker header="Calendario" title="Seleccione la fecha" :color="paleteColors.primary"
-                                    :modelValue="input2" format="yyyy-MM-dd" :min="dateFormatted"
+                                <v-date-picker header="Calendario" title="Seleccione la fecha"
+                                    :color="paleteColors.primary" :modelValue="input2" format="yyyy-MM-dd"
+                                    :min="dateFormatted"
                                     @update:model-value="updateDate1"></v-date-picker><!--@update:model-value="updateDate2"-->
                             </v-locale-provider>
                         </v-menu>
                     </v-col>
+                    <v-col cols="12" md="3" v-if="(type === 'Sucursal' && mostrarFila)">
+                        <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="branch_id" :items="branches"
+                            label="Seleccione una Sucursal" prepend-inner-icon="mdi-store" item-title="name"
+                            item-value="id" variant="underlined" :rules="selectRules" density="compact">
+                            <template v-slot:item="{ props, item }">
+                                <v-list-item v-bind="props"
+                                    :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`">
+                                </v-list-item>
+                            </template>
+                        </v-autocomplete><!-- @update:model-value="initialize()">-->
+                    </v-col>
+                    <v-col cols="12" md="2">
+                        <v-select v-model="type" :items="options" label="Seleccione una opción" variant="underlined"
+                            density="compact" item-title="title" item-value="value">
+                            <!-- Personalizar cómo se muestran las opciones en la lista -->
+                            <template v-slot:item="{ props, item }">
+                                <v-list-item v-bind="props">
+                                    <template v-slot:prepend>
+                                        <v-icon :icon="item.raw.icon"></v-icon> <!-- Ícono de la opción -->
+                                    </template>
+                                </v-list-item>
+                            </template>
+                            <!-- Ícono para el select -->
+                            <template v-slot:prepend-inner>
+                                <v-icon icon="mdi-form-dropdown"></v-icon>
+                            </template>
+                        </v-select>
+                    </v-col>
                     <v-col cols="12" md="3">
-                        <v-btn icon @click="initialize" :color="paleteColors.primary">
+                        <v-btn icon @click="initialize" :color="paleteColors.primary" density="comfortable">
                             <v-icon>mdi-magnify</v-icon></v-btn>
                     </v-col>
                 </v-row>
@@ -85,7 +114,8 @@
                                     </v-col>
                                     <v-col cols="12" v-for="(total, index) in this.response.totalesPorMetodo"
                                         :key="index" class="pa-1">
-                                        <strong>{{ total.metodo }}:</strong> ${{ this.formatNumber(Number(total.total)) }}
+                                        <strong>{{ total.metodo }}:</strong> ${{
+                                            this.formatNumber(Number(total.total)) }}
                                     </v-col>
                                     <v-col cols="12" class="font-weight-bold pa-1">
                                         TOTAL: ${{ this.formatNumber(Number(this.response.totales)) }}
@@ -132,10 +162,12 @@ export default {
         mostrar: false,
         dialog: false,
         type: 'Sucursal',
+        mostrarFila: false,
         branch_id: '',
         company_id: '',
         role: '',
         response: [],
+        branches:[],
         data: {},
         menu: false,
         menu2: false,
@@ -143,6 +175,10 @@ export default {
         input2: null,
         date: null,
         endDate: null,
+        options: [
+            { title: 'Negocio', value: 'Company', icon: 'mdi-office-building' }, // Opción Negocio con ícono
+            { title: 'Sucursal', value: 'Sucursal', icon: 'mdi-store' }, // Opción Sucursal con ícono
+        ],
     }),
     computed: {
         dateFormatted() {
@@ -172,6 +208,7 @@ export default {
         if (this.role === 'Administrador') {
             this.showBranches();
             this.type = "Company";
+            this.mostrarFila = true;
         } else {
             this.type = "Sucursal"
             this.branch_id = LocalStorageService.getItem('branch_id');

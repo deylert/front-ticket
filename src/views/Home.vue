@@ -12,7 +12,17 @@
     </v-row>
   </v-snackbar>
   <v-container style="min-width: 100%; min-height: 100%; background-color: #F5F5F5;">
-    <v-row align="stretch">
+    <v-row v-if="showWelcomeMessage" align="stretch">
+      <v-col  cols="12" class="text-center">
+      <v-card class="elevation-4 pa-6">
+        <v-icon color="primary" size="64">mdi-hand-wave</v-icon>
+        <v-card-title class="text-h4 font-weight-bold">
+          Bienvenido a la Administración de BusGo
+        </v-card-title>
+      </v-card>
+    </v-col>
+    </v-row>
+    <v-row v-else align="stretch">
       <!-- Información general de viajes -->
       <v-col cols="12" md="6">
         <v-row align="stretch">
@@ -108,39 +118,8 @@
               </template>
             </v-data-table>
           </v-container>
-          <!--<v-list class="pa-2" density="compact">
-            <v-list-item v-for="(trip, index) in microbuses" :key="index" class="py-2 border-b">
-              <template v-slot:prepend>
-                <v-icon color="blue-darken-2" icon="mdi-map-marker" size="32" />
-              </template>
-
-              <v-row align="center" class="flex-nowrap text-nowrap">
-                <v-col cols="4" md="3">
-                  <span class="text-medium-emphasis text-body-1">{{ trip.patente }}</span>
-                </v-col>
-
-                <v-col cols="5" md="6">
-                  <div class="d-flex align-center text-medium-emphasis">
-                    <v-icon icon="mdi-car" size="18" class="mr-1" />
-                    <span class="text-caption">{{ trip.vehicle }}</span>
-                    <v-divider vertical class="mx-3" />
-                    <v-icon icon="mdi-calendar" size="18" class="mr-1" />
-                    <span class="text-caption">{{ trip.date }}</span>
-                  </div>
-                </v-col>
-
-                <v-col cols="3" md="3" class="text-end">
-                  <v-btn variant="outlined" size="small" color="blue-darken-2" @click="viewTripDetails(trip)">
-                    Detalles
-                    <v-icon icon="mdi-chevron-right" end />
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-list-item>
-          </v-list>-->
         </v-card>
       </v-col>
-
       <!-- Información de ingresos y gastos 
       <v-col cols="12" md="6" class="mx-0">
         <v-card>
@@ -195,6 +174,7 @@ export default {
       sb_title: '',
       sb_icon: '',
       role: '',
+      showWelcomeMessage: false, // Controlar si se muestra el mensaje de bienvenida
       branch_id: '',
       sales: [],
       data: {},
@@ -215,15 +195,23 @@ export default {
       ],
     };
   },
+  
   mounted() {
     this.role = JSON.parse(LocalStorageService.getItem('role'));
+    this.permissions = JSON.parse(LocalStorageService.getItem('permissions')); // Recuperar permisos
+
+  // Verificar si el usuario tiene el permiso necesario
+  if (this.permissions.includes('view_dashboard')){    
+    this.initialize();
+  }else{
+    this.showWelcomeMessage = true;
+  }
     if (this.role === 'Administrador') {
       this.type = 'Negocio';
     } else {
       this.branch_id = JSON.parse(LocalStorageService.getItem('branch_id'));
       this.type = 'Sucursal';
     }
-    this.initialize();
   },
   methods: {
     formatNumber(value) {

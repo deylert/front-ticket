@@ -150,7 +150,7 @@ export default {
     dialogDelete: false,
     roles: [],
     data: {},
-    selectedRole: null,
+    selectedRole: [],
     dialogRolePermission: null,
     typeOptions: [
       {
@@ -384,7 +384,7 @@ export default {
     },
     closeDialogRolePermission() {
       this.dialogRolePermission = false; // Cerramos el diálogo
-      this.selectedRole = null;
+      this.selectedRole = [];
     },
     showAlert(sb_type, sb_message, sb_timeout) {
       this.sb_type = sb_type;

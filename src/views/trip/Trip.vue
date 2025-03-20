@@ -59,10 +59,10 @@
               style="max-height: 68vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
               no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
               <template v-slot:item.actions="{ item }">
-                <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" :color="paleteColors.primary" variant="tonal"
-                  elevation="1" title="Editar Viaje"></v-btn>
-                <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" :color="paleteColors.error" variant="tonal"
-                  elevation="1" title="Eliminar Viaje"></v-btn>
+                <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" :color="paleteColors.primary"
+                  variant="tonal" elevation="1" title="Editar Viaje"></v-btn>
+                <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" :color="paleteColors.error"
+                  variant="tonal" elevation="1" title="Eliminar Viaje"></v-btn>
               </template>
               <template v-slot:item.origin="{ item }">
                 <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
@@ -191,16 +191,16 @@
                 <v-row>
                   <v-col cols="12" md="4">
                     <v-select v-model="editedItem.schedule" :items="timeSlots" label="Hora de salida"
-                      variant="underlined" density="compact" clearable prepend-icon="mdi-calendar-clock"
+                      variant="underlined" density="compact" prepend-icon="mdi-calendar-clock"
                       @update:model-value="updateArrival"></v-select>
                   </v-col>
                   <v-col cols="12" md="4">
                     <v-select v-model="editedItem.arrival" :items="timeSlots" label="Hora de llegada"
-                      variant="underlined" density="compact" clearable prepend-icon="mdi-calendar-clock"></v-select>
+                      variant="underlined" density="compact" prepend-icon="mdi-calendar-clock"></v-select>
                   </v-col>
                   <v-col cols="12" md="4">
-                    <v-text-field v-model="editedItem.price" clearable label="Precio" prepend-icon="mdi-currency-usd"
-                      variant="underlined" :rules="priceRules" type="number" density="compact"></v-text-field>
+                    <v-text-field v-model="editedItem.price" label="Precio" prepend-icon="mdi-currency-usd"
+                      variant="underlined" :rules="priceRules" type="number" density="compact" min="0"></v-text-field>
                   </v-col>
                 </v-row>
               </v-window-item>
@@ -225,8 +225,8 @@
                       style="max-height: 68vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
                       no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
                       <template v-slot:item.actions="{ item }">
-                        <v-btn density="comfortable" icon="mdi-delete" @click="deleteItemWorker(item)" :color="paleteColors.error"
-                          variant="tonal" elevation="1" title="Eliminar Relación"></v-btn>
+                        <v-btn density="comfortable" icon="mdi-delete" @click="deleteItemWorker(item)"
+                          :color="paleteColors.error" variant="tonal" elevation="1" title="Eliminar Relación"></v-btn>
                       </template>
                       <template v-slot:item.name="{ item }">
                         <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
@@ -245,8 +245,8 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn :color="paleteColors.gris" variant="flat" @click="close">Cancelar</v-btn>
-          <v-btn :color="paleteColors.primary" variant="flat" @click="save" :disabled="(!valid || !editedItem.workers.length)"
-            :loading=loading>Aceptar</v-btn>
+          <v-btn :color="paleteColors.primary" variant="flat" @click="save"
+            :disabled="(!valid || !editedItem.workers.length)" :loading=loading>Aceptar</v-btn>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -298,7 +298,8 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn :color="paleteColors.gris" variant="flat" @click="closeAssignedWorker">Cancelar</v-btn>
-          <v-btn :color="paleteColors.primary" variant="flat" @click="saveAssignedWorker" :disabled="!valid">Aceptar</v-btn>
+          <v-btn :color="paleteColors.primary" variant="flat" @click="saveAssignedWorker"
+            :disabled="!valid">Aceptar</v-btn>
         </v-card-actions>
       </v-card>
     </v-form>
