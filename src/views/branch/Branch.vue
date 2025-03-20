@@ -49,13 +49,13 @@
           <template v-slot:item.name="{ item }">
             <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
               <v-img :src="`${this.$axios.defaults.baseURL}images/${item.image
-                }`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
+                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
             {{ item.name }}
           </template>
           <template v-slot:item.companyName="{ item }">
             <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
               <v-img :src="`${this.$axios.defaults.baseURL}images/${item.companyImage
-                }`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
+                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
             {{ item.companyName }}
           </template>
         </v-data-table>
