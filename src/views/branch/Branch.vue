@@ -49,13 +49,13 @@
           <template v-slot:item.name="{ item }">
             <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
               <v-img :src="`${this.$axios.defaults.baseURL}images/${item.image
-                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
+                }`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
             {{ item.name }}
           </template>
           <template v-slot:item.companyName="{ item }">
             <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
               <v-img :src="`${this.$axios.defaults.baseURL}images/${item.companyImage
-                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
+                }`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
             {{ item.companyName }}
           </template>
         </v-data-table>
@@ -102,7 +102,7 @@
             </v-row>
             <v-row>
               <v-col cols="12" md="6">
-                <v-file-input clearable v-model="file" ref="fileInput" label="Imagen del Negocio" variant="underlined"
+                <v-file-input clearable v-model="file" ref="fileInput" label="Imagen Sucursal" variant="underlined"
                   density="compact" name="file" accept=".png, .jpg, .jpeg" @change="onFileSelected">
                 </v-file-input>
               </v-col>
@@ -270,10 +270,7 @@ export default {
         "Formato de número móvil inválido. Ejemplo: +56912345678",
     ],
     rutRules: [
-      (v) => !!v || "El RUT es requerido",
-      (v) =>
-        /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/.test(v) ||
-        "El RUT debe estar en el formato XX.XXX.XXX-Y (ejemplo: 12.345.678-9)",
+      (v) => !v || /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/.test(v) || "El RUT debe estar en el formato XX.XXX.XXX-Y (ejemplo: 12.345.678-9)",
     ],
   }),
   computed: {
