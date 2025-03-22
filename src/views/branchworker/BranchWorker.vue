@@ -109,7 +109,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete"> Cancelar </v-btn>
-        <v-btn :color="paleteColors.primary" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
+        <v-btn :color="paleteColors.error" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

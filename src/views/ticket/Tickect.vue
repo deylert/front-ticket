@@ -95,11 +95,11 @@
                 <v-card-text>
                     <v-row style="margin-top: 5px">
                         <!-- Selección de viaje -->
-                        <v-col cols="12" md="12">
+                        <v-col cols="12" md="9">
                             <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.trip_id"
                                 :items="trips" label="Rutas" prepend-icon="mdi-road" item-title="name" item-value="id"
                                 variant="underlined" :rules="selectRules" density="compact"
-                                @update:model-value="updateSeats" :menu-props="{ maxHeight: 400 }">
+                                @update:model-value="updateSeats" :menu-props="{ maxHeight: 400, maxWidth: 600 }" >
                                 <template v-slot:item="{ props, item }">
                                     <v-card class="mx-1 my-2" elevation="2">
                                         <v-list-item v-bind="props">
@@ -120,7 +120,7 @@
                                                             <v-tooltip location="top">
                                                                 <template v-slot:activator="{ props: tooltipProps }">
                                                                     <div v-bind="tooltipProps" class="text-truncate"
-                                                                        style="max-width: 80%;">
+                                                                        style="max-width: 100%;">
                                                                         {{ item.raw.origin }}
                                                                     </div>
                                                                 </template>
@@ -145,7 +145,7 @@
                                                             <v-tooltip location="top">
                                                                 <template v-slot:activator="{ props: tooltipProps }">
                                                                     <div v-bind="tooltipProps" class="text-truncate"
-                                                                        style="max-width: 80%;">
+                                                                        style="max-width: 100%;">
                                                                         {{ item.raw.destination }}
                                                                     </div>
                                                                 </template>
@@ -186,6 +186,7 @@
                                 </template>
                             </v-autocomplete>
                         </v-col>
+                        <v-col cols="12" md="3"></v-col>
 
                         <!-- Método de pago -->
                         <v-col cols="12" md="2">
@@ -238,27 +239,24 @@
                         </v-col>
 
                         <!-- Selección de asientos -->
-                        <v-col cols="12" md="2" v-if="editedItem.quantity">
-                            <v-row>
+                        <v-col cols="12" md="2" v-if="false">
+                            <!--<v-row>
                                 <v-menu v-model="showSeatsMenu" activator="parent" offset-y
                                     :close-on-content-click="false" :close-on-click-outside="false"
                                     :close-on-back="false">
-                                    <template v-slot:activator="{ props }">
-                                        <v-text-field v-bind="props" ref="seatsField"
-                                            :value="selectedSeats.length > 0 ? selectedSeats.join(', ') : 'Seleccionar Asientos'"
+                                    <template v-slot:activator="{ props }">-->
+                                        <v-text-field :value="selectedSeats.length > 0 ? selectedSeats.join(', ') : 'Seleccionar Asientos'"
                                             color="primary" dark readonly style="text-transform: none"
-                                            :disabled="editedItem.quantity <= 0" prepend-icon="mdi-seat"
-                                            variant="underlined"
-                                            :rules="[v => selectedSeats.length > 0 || 'Debe seleccionar al menos un asiento']"></v-text-field>
-                                    </template>
-                                    <!-- Contenido del menú -->
+                                            :disabled="editedItem.quantity <= 0" prepend-icon="mdi-seat" density="compact"
+                                            variant="underlined" :rules="[v => selectedSeats.length > 0 || 'Debe seleccionar al menos un asiento']"></v-text-field>
+                                    <!--</template>-->
+                                    <!-- Contenido del menú 
                                     <v-card style="max-width: 400px">
                                         <v-toolbar :color="paleteColors.primary">
                                             <span class="text-subtitle-2 ml-4">Seleccione los asientos</span>
                                         </v-toolbar>
                                         <v-card-text>
                                             <v-row>
-                                                <!-- Mostrar asientos en filas de 2 -->
                                                 <v-col cols="12" class="d-flex align-center justify-center">
                                                     <div class="seat-map-preview"
                                                         style="display: flex; flex-direction: column;">
@@ -271,14 +269,13 @@
                                                                     :disabled="!isSeatAvailable(seat)"
                                                                     @click="toggleSeat(seat)"
                                                                     style="min-width: 30px; min-height: 30px; font-size: 0.8rem; font-weight: bold;">
-                                                                    <!-- Mostrar ícono de asiento si es un asiento -->
                                                                     <v-icon
                                                                         v-if="seat.type === 'seat'">mdi-seat</v-icon>
-                                                                    <!-- Mostrar ícono de pasillo y una "P" si es un pasillo -->
+
                                                                     <span v-if="seat.type === 'aisle'">
                                                                         <v-icon>mdi-arrow-down</v-icon> P
                                                                     </span>
-                                                                    <!-- Mostrar el número del asiento si es un asiento -->
+
                                                                     {{ seat.type === 'seat' ? seat.label : '' }}
                                                                 </v-btn>
                                                             </template>
@@ -287,7 +284,6 @@
                                                 </v-col>
                                             </v-row>
 
-                                            <!-- Mensaje de error si se seleccionan demasiados asientos -->
                                             <v-alert v-if="selectedSeats.length != editedItem.quantity" type="error"
                                                 class="mt-3">
                                                 Debe Seleccionar {{ editedItem.quantity }} asiento(s).
@@ -295,7 +291,6 @@
                                         </v-card-text>
                                         <v-card-actions>
                                             <v-spacer></v-spacer>
-                                            <!-- Botón para cerrar el menú -->
                                             <v-btn variant="flat" @click="showSeatsMenu = false"
                                                 :color="paleteColors.gris"
                                                 :disabled="Number(selectedSeats.length) !== Number(editedItem.quantity)">
@@ -304,7 +299,7 @@
                                         </v-card-actions>
                                     </v-card>
                                 </v-menu>
-                            </v-row>
+                            </v-row>-->
                         </v-col>
                     </v-row>
                     <!-- Pasajeros adultos y menores -->
@@ -496,19 +491,38 @@
                                                 <div v-for="(row, rowIndex) in seatMap" :key="rowIndex" class="seat-row"
                                                     style="display: flex; flex-direction: row;">
                                                     <template v-for="(seat, seatIndex) in row" :key="seatIndex">
-                                                        <v-btn v-if="seat.type" :color="getSeatColor(seat)"
+                                                        <!--<v-btn v-if="seat.type" :color="getSeatColor(seat)"
                                                             class="seat-button-preview ma-1"
                                                             :disabled="!isSeatAvailable(seat)" @click="toggleSeat(seat)"
                                                             style="min-width: 30px; min-height: 30px; font-size: 0.8rem; font-weight: bold;">
-                                                            <!-- Mostrar ícono de asiento si es un asiento -->
                                                             <v-icon v-if="seat.type === 'seat'">mdi-seat</v-icon>
-                                                            <!-- Mostrar ícono de pasillo y una "P" si es un pasillo -->
                                                             <span v-if="seat.type === 'aisle'">
                                                                 <v-icon>mdi-arrow-down</v-icon> P
                                                             </span>
-                                                            <!-- Mostrar el número del asiento si es un asiento -->
                                                             {{ seat.type === 'seat' ? seat.label : '' }}
-                                                        </v-btn>
+                                                        </v-btn>-->
+                                                        <div v-if="seat.type" 
+                                                            :class="['seat-icon-preview', 'ma-1', { 'disabled': !isSeatAvailable(seat) }]" 
+                                                            :style="{ color: getSeatColor(seat) }" 
+                                                            @click="toggleSeat(seat)" 
+                                                            style="cursor: pointer; font-weight: bold; position: relative;">
+                                                            
+                                                            <!-- Mostrar ícono de asiento -->
+                                                            <v-icon v-if="seat.type === 'seat'" size="x-large" class="seat-icon">
+                                                            mdi-seat
+                                                            </v-icon>
+                                                            
+                                                            <!-- Mostrar ícono de pasillo -->
+                                                            <v-icon v-if="seat.type === 'aisle'" size="x-large" class="aisle-icon">
+                                                            mdi-arrow-split-vertical
+                                                            </v-icon>
+
+                                                            <!-- Superponer el número del asiento -->
+                                                            <span v-if="seat.type === 'seat'" class="seat-label">{{ seat.label }}</span>
+
+                                                            <!-- Superponer la "P" del pasillo -->
+                                                            <span v-if="seat.type === 'aisle'" class="aisle-label">P</span>
+                                                        </div>
                                                     </template>
                                                 </div>
                                             </div>
@@ -547,7 +561,7 @@
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete"> Cancelar </v-btn>
-                <v-btn :color="paleteColors.primary" variant="flat" @click="deleteItemConfirm" :loading="loading">
+                <v-btn :color="paleteColors.error" variant="flat" @click="deleteItemConfirm" :loading="loading">
                     Aceptar
                 </v-btn>
             </v-card-actions>
@@ -1144,6 +1158,12 @@ export default {
             return seat.label && !this.isSeatReserved(seat.label);
         },
         updateSeats(tripId) {
+            this.seats = 0;
+                this.availableSeats = [];
+                this.reservedSeats = [];
+                this.aviable = 0;
+                this.editedItem.quantity = '';
+            this.selectedSeats = [];
             const selectedTrip = this.trips.find((trip) => trip.id === tripId);
 
             if (selectedTrip) {
@@ -1561,8 +1581,49 @@ export default {
     },
 };
 </script>
-<style>
-.seat-map-preview {
-    margin-top: 10px;
+<style scoped>
+.seat-icon-preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative; /* Necesario para posicionar los elementos hijos de forma absoluta */
+}
+
+.disabled {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Estilos para el ícono de asiento */
+.seat-icon {
+  font-size: 3rem; /* Tamaño del ícono */
+}
+
+/* Estilos para el ícono de pasillo */
+.aisle-icon {
+  font-size: 3rem; /* Tamaño del ícono */
+}
+
+/* Estilos para el número del asiento */
+.seat-label {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1rem; /* Tamaño del número */
+  font-weight: bold;
+  color: black; /* Color del texto */
+}
+
+/* Estilos para la "P" del pasillo */
+.aisle-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1rem; /* Tamaño de la "P" */
+  font-weight: bold;
+  color: black; /* Color del texto */
 }
 </style>

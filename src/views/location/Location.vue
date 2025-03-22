@@ -62,7 +62,7 @@
             <v-row>
               <v-col cols="12" md="12">
                 <v-text-field v-model="editedItem.address" clearable label="Dirección"
-                  prepend-icon="mdi-map-marker-outline" variant="underlined" :rules="nameRules"></v-text-field>
+                  prepend-icon="mdi-map-marker-outline" variant="underlined" :rules="addressRules" hint="Ejemplo: Terminal Magallanes"></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field v-model="editedItem.longitude" clearable label="Logintud" prepend-icon="mdi-earth"
@@ -198,6 +198,11 @@ export default {
     ],
     selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
     requiredRules: [(v) => !!v || "El campo es requerido"],
+    addressRules: [
+      (v) => !!v || "El campo es requerido", // Verifica que el campo no esté vacío
+      (v) => (v && v.length <= 30) || "El campo debe tener 30 caracteres máximo", // Verifica que tenga máximo 30 caracteres
+      (v) => (v && v.length >= 3) || "El campo debe tener al menos 3 caracteres", // Verifica que tenga al menos 3 caracteres
+    ],
   }),
   computed: {
     formTitle() {
