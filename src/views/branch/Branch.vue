@@ -472,7 +472,9 @@ export default {
           console.error("Error al cargar la imagen", error);
           this.showAlert("error", "Error al cargar la imagen.", 3000);
         }
-        try {
+      };
+      
+      try {
           const result = await handleRequest({
             endpoint: "company",
             method: "GET",
@@ -494,7 +496,6 @@ export default {
         } finally {
           this.dialog = true;
         }
-      };
     },
     deleteItem(item) {
       this.editedIndex = 1;
