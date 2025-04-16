@@ -105,6 +105,7 @@ export default {
       { icon: "mdi-road-variant", title: "Rutas", to: "route", value: "route", permission: "view_routes" },
       { icon: "mdi-steering", title: "Viajes", to: "trip", value: "trip", permission: "view_trips" },
       { icon: "mdi-ticket", title: "Tickets", to: "ticket", value: "ticket", permission: "view_tickets" },
+      { icon: "mdi-alert", title: "Incidentes", to: "incident", value: "incident", permission: "view_incidents" }
     ],
     reports: [
       { title: "Monto generado", icon: "mdi-finance", to: "ticketdate", permission: "view_ticketsdate" },

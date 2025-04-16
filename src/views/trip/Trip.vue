@@ -190,13 +190,13 @@
                 </v-row>
                 <v-row>
                   <v-col cols="12" md="4">
-                    <v-select v-model="editedItem.schedule" :items="timeSlots" label="Hora de salida"
+                    <v-select v-model="editedItem.schedule" :items="filteredTimeSlots" label="Hora de salida"
                       variant="underlined" density="compact" prepend-icon="mdi-calendar-clock"
-                      @update:model-value="updateArrival"></v-select>
+                      @update:modelValue="updateArrival" :disabled="!this.editedItem.route_id" :key="timeSlotsKey"></v-select>
                   </v-col>
                   <v-col cols="12" md="4">
-                    <v-select v-model="editedItem.arrival" :items="timeSlots" label="Hora de llegada"
-                      variant="underlined" density="compact" prepend-icon="mdi-calendar-clock"></v-select>
+                    <v-text-field v-model="editedItem.arrival" label="Hora de llegada" disabled="true"
+                      variant="underlined" density="compact" prepend-icon="mdi-calendar-clock"></v-text-field>
                   </v-col>
                   <v-col cols="12" md="4">
                     <v-text-field v-model="editedItem.price" label="Precio" prepend-icon="mdi-currency-usd"
@@ -325,7 +325,8 @@ export default {
     mostrar: false,
     dialog: false,
     dialogDelete: false,
-    estimated: null,
+    estimated: 0,
+    timeSlotsKey: 0,
     mostrarFila: false,
     trips: [],
     routes: [],
@@ -431,6 +432,9 @@ export default {
     getDate() {
       return this.input ? new Date(this.input) : new Date();
     },
+    filteredTimeSlots() {
+      return this.generateTimeSlots();
+    }
   },
   mounted() {
     this.role = JSON.parse(LocalStorageService.getItem('role'));
@@ -439,7 +443,15 @@ export default {
     } else {
       this.branch_id = LocalStorageService.getItem('branch_id');
     }
-    this.timeSlots = this.generateTimeSlots();
+  },
+  watch: {
+    // Observar cambios en la fecha para resetear selección
+    'editedItem.date'(newDate) {
+      this.editedItem.schedule = null; // Limpiar selección
+      this.editedItem.arrival = null; // Limpiar selección
+
+      this.timeSlotsKey += 1; // Forzar recreación del v-select
+    }
   },
   methods: {
     async showBranches() {
@@ -482,47 +494,86 @@ export default {
       const matchedRoute = this.routes.find((route) => route.id === this.editedItem.route_id);
       // Si se encuentra el objeto, asignamos su propiedad 'estimated' a this.estimated
       this.estimated = matchedRoute ? matchedRoute.estimated : null;
+      this.editedItem.arrival = null;
+      this.editedItem.schedule = null;
     },
     updateArrival() {
+      console.log("Datos iniciales - schedule:", this.editedItem.schedule, "estimated:", this.estimated);
+      
+      // Validación básica
       if (!this.editedItem.schedule || !this.estimated) {
-        this.editedItem.arrival = null; // Manejo de casos donde no hay valores válidos
+        this.editedItem.arrival = null;
         return;
       }
 
-      // Convertir el valor de schedule (hora:minuto) en minutos totales
+      // Usar fecha del item o fecha actual si es null
+      const baseDate = this.editedItem.date ? new Date(this.editedItem.date) : new Date();
+      
+      // Extraer horas y minutos del schedule
       const [hours, minutes] = this.editedItem.schedule.split(":").map(Number);
-      const scheduleInMinutes = hours * 60 + minutes;
-
-      // Sumar el tiempo estimado (this.estimated)
-      const arrivalInMinutes = scheduleInMinutes + this.estimated;
-
-      // Convertir minutos totales de llegada a formato hora:minuto
-      const arrivalHours = Math.floor(arrivalInMinutes / 60) % 24; // Aseguramos que sea un formato de 24 horas
-      const arrivalMinutes = arrivalInMinutes % 60;
-
-      const formattedArrival = `${String(arrivalHours).padStart(2, "0")}:${String(arrivalMinutes).padStart(2, "0")}`;
-
-      // Asignar el valor calculado a editedItem.arrival
+      
+      // Configurar la hora en la fecha base
+      baseDate.setHours(hours, minutes, 0, 0);
+      
+      // Sumar los minutos estimados (convertidos a milisegundos)
+      const arrivalDate = new Date(baseDate.getTime() + this.estimated * 60000);
+      
+      // Formatear a YYYY-MM-DD HH:MM:SS
+      const formattedArrival = arrivalDate.toISOString()
+        .replace('T', ' ')
+        .replace(/\.\d{3}Z$/, '');
+      
       this.editedItem.arrival = formattedArrival;
+      console.log("Hora de llegada calculada:", this.editedItem.arrival);
     },
     generateTimeSlots() {
       const slots = [];
+      const now = new Date();
+      const selectedDate = this.editedItem.date ? 
+        this.editedItem.date : 
+        new Date().toISOString().split('T')[0];
+      
+      // Comparar solo día/mes/año
+      const isToday = this.today(selectedDate);
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      console.log('isToday');
+      console.log(isToday);
       for (let hour = 0; hour < 24; hour++) {
         for (let minute = 0; minute < 60; minute += 5) {
-          // Incrementos de 5 minutos
-          const formattedHour = String(hour).padStart(2, "0");
-          const formattedMinute = String(minute).padStart(2, "0");
-          slots.push(`${formattedHour}:${formattedMinute}`);
+          const slotMinutes = hour * 60 + minute;
+          
+          // Si es hoy, saltar slots pasados
+          if (isToday && slotMinutes <= currentMinutes) {
+            continue;
+          }
+          
+          slots.push(`${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
         }
       }
+      
       return slots;
     },
+
+    today(date) {
+    // Obtener la fecha actual
+    const hoy = new Date();
+    
+    // Formatear la fecha actual al mismo formato YYYY-MM-DD
+    const año = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    const hoyFormateado = `${año}-${mes}-${dia}`;
+    
+    // Comparar con la fecha proporcionada
+    return date === hoyFormateado;
+  },
     updateDate(val) {
       this.input = val;
       this.editedItem.date = this.dateFormatted;
       this.menu = false;
     },
     async showAdd() {
+      this.tab = 1;
       this.data = {};
       this.filteredWorkers = [];
       this.data.branch_id = this.branch_id;
@@ -823,6 +874,7 @@ export default {
       }
     },
     deleteItem(item) {
+      this.tab = 1;
       this.editedIndex = 1;
       this.editedItem.id = item.id;
       this.dialogDelete = true;

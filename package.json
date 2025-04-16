@@ -22,6 +22,7 @@
     "lodash": "^4.17.21",
     "pinia": "^2.0.0",
     "pizzip": "^3.1.8",
+    "qrcode": "^1.5.4",
     "roboto-fontface": "*",
     "vee-validate": "^4.11.0",
     "vue": "^3.2.0",
@@ -36,6 +37,7 @@
     "yup": "^1.2.0"
   },
   "devDependencies": {
+    "@types/qrcode": "^1.5.5",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "eslint": "^8.37.0",

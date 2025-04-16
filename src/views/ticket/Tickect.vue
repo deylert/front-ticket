@@ -206,7 +206,7 @@
                         <!-- Fecha -->
                         <v-col cols="12" md="2">
                             <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40"
-                                transition="scale-transition" offset-y min-width="190px">
+                                transition="scale-transition" offset-y min-width="190px" disabled="true">
                                 <template v-slot:activator="{ props }">
                                     <v-text-field v-bind="props" :modelValue="dateFormatted" variant="underlined"
                                         prepend-icon="mdi-calendar" label="Fecha" density="compact"></v-text-field>
@@ -240,66 +240,11 @@
 
                         <!-- Selección de asientos -->
                         <v-col cols="12" md="2" v-if="false">
-                            <!--<v-row>
-                                <v-menu v-model="showSeatsMenu" activator="parent" offset-y
-                                    :close-on-content-click="false" :close-on-click-outside="false"
-                                    :close-on-back="false">
-                                    <template v-slot:activator="{ props }">-->
                                         <v-text-field :value="selectedSeats.length > 0 ? selectedSeats.join(', ') : 'Seleccionar Asientos'"
                                             color="primary" dark readonly style="text-transform: none"
                                             :disabled="editedItem.quantity <= 0" prepend-icon="mdi-seat" density="compact"
                                             variant="underlined" :rules="[v => selectedSeats.length > 0 || 'Debe seleccionar al menos un asiento']"></v-text-field>
-                                    <!--</template>-->
-                                    <!-- Contenido del menú 
-                                    <v-card style="max-width: 400px">
-                                        <v-toolbar :color="paleteColors.primary">
-                                            <span class="text-subtitle-2 ml-4">Seleccione los asientos</span>
-                                        </v-toolbar>
-                                        <v-card-text>
-                                            <v-row>
-                                                <v-col cols="12" class="d-flex align-center justify-center">
-                                                    <div class="seat-map-preview"
-                                                        style="display: flex; flex-direction: column;">
-                                                        <div v-for="(row, rowIndex) in seatMap" :key="rowIndex"
-                                                            class="seat-row"
-                                                            style="display: flex; flex-direction: row;">
-                                                            <template v-for="(seat, seatIndex) in row" :key="seatIndex">
-                                                                <v-btn v-if="seat.type" :color="getSeatColor(seat)"
-                                                                    class="seat-button-preview ma-1"
-                                                                    :disabled="!isSeatAvailable(seat)"
-                                                                    @click="toggleSeat(seat)"
-                                                                    style="min-width: 30px; min-height: 30px; font-size: 0.8rem; font-weight: bold;">
-                                                                    <v-icon
-                                                                        v-if="seat.type === 'seat'">mdi-seat</v-icon>
-
-                                                                    <span v-if="seat.type === 'aisle'">
-                                                                        <v-icon>mdi-arrow-down</v-icon> P
-                                                                    </span>
-
-                                                                    {{ seat.type === 'seat' ? seat.label : '' }}
-                                                                </v-btn>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                </v-col>
-                                            </v-row>
-
-                                            <v-alert v-if="selectedSeats.length != editedItem.quantity" type="error"
-                                                class="mt-3">
-                                                Debe Seleccionar {{ editedItem.quantity }} asiento(s).
-                                            </v-alert>
-                                        </v-card-text>
-                                        <v-card-actions>
-                                            <v-spacer></v-spacer>
-                                            <v-btn variant="flat" @click="showSeatsMenu = false"
-                                                :color="paleteColors.gris"
-                                                :disabled="Number(selectedSeats.length) !== Number(editedItem.quantity)">
-                                                Cerrar
-                                            </v-btn>
-                                        </v-card-actions>
-                                    </v-card>
-                                </v-menu>
-                            </v-row>-->
+                                    
                         </v-col>
                     </v-row>
                     <!-- Pasajeros adultos y menores -->
@@ -1213,10 +1158,19 @@ export default {
                     this.selectedSeats.splice(index, 1);
                 }
                 // Forzar la validación del campo después de cambiar selectedSeats
-                this.$refs.seatsField.validate();
+                //this.$refs.seatsField.validate();
             }
         },
         calculateTotal() {
+            this.editedItem.adults = 0;
+            this.editedItem.minors = 0;
+            this.normal = 0;
+            this.selectedPromotionAdults= null;
+            this.selectedPromotionMinors= null;
+            this.selectedPromotion= null;
+            this.showPromotion= false;
+            this.showPromotionAdults= false;
+            this.showPromotionMinors= false;
             //this.editedItem.total = this.editedItem.price * this.editedItem.quantity;
             const price = Number(this.editedItem.price) || 0;
             const quantity = Number(this.editedItem.quantity) || 0;

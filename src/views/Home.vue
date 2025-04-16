@@ -75,7 +75,7 @@
     </v-row>
 
     <!-- Tabla de viajes -->
-    <v-row align="stretch">
+    <v-row align="stretch" v-if="!showWelcomeMessage">
       <v-col cols="12">
         <v-card class="elevation-4 mx-1 ma-sm-1">
           <v-container fluid>
