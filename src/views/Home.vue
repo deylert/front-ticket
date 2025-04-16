@@ -103,6 +103,37 @@
               <template v-slot:item.dineroGenerado="{ item }">
                 <span style="font-weight: bold;">{{ this.formatNumber(item.dineroGenerado) }}</span>
               </template>
+              <template v-slot:item.horario="{ item }">
+  <v-tooltip location="top">
+    <template v-slot:activator="{ props }">
+      <div v-bind="props" class="d-flex flex-column time-cell">
+        <div class="d-flex flex-column time-cell">
+          <v-icon small color="primary" class="mr-1">mdi-clock-outline</v-icon>
+          <span class="font-weight-medium">
+            {{ formatTimeRange(item.horario) }}
+          </span>
+        </div>
+        <span class="text-caption text-grey">
+          {{ item.estimated }} minutos
+        </span>
+      </div>
+    </template>
+    <span>Horario completo:<br>{{ item.horario }}</span>
+  </v-tooltip>
+</template>
+              <!--<template v-slot:item.horario="{ item }">
+      <div class="d-flex flex-column time-cell">
+        <div class="d-flex align-center">
+          <v-icon small color="primary" class="mr-1">mdi-clock-outline</v-icon>
+          <span class="font-weight-medium">
+            {{ formatTimeRange(item.horario) }}
+          </span>
+        </div>
+        <span v-if="showDuration(item)" class="text-caption text-grey">
+          {{ calculateDuration(item.horario) }}
+        </span>
+      </div>
+    </template>-->
             </v-data-table>
           </v-container>
         </v-card>
@@ -168,6 +199,34 @@ export default {
     }
   },
   methods: {
+    formatTimeRange(timeRange) {
+    if (!timeRange) return '--';
+    
+    const [start, end] = timeRange.split(' - ');
+    return `${this.formatTime(start)} → ${this.formatTime(end)}`;
+  },
+  
+  formatTime(datetime) {
+    if (!datetime) return '--';
+    return datetime.split(' ')[1].substring(0, 5); // Extrae solo HH:MM
+  },
+  
+  showDuration(item) {
+    return item.horario && item.horario.includes(' - ');
+  },
+  
+  calculateDuration(timeRange) {
+    if (!timeRange) return '';
+    
+    const [startStr, endStr] = timeRange.split(' - ');
+    const start = new Date(startStr);
+    const end = new Date(endStr);
+    
+    const diffMs = end - start;
+    const diffMins = Math.round(diffMs / 60000);
+    
+    return `${diffMins} min`;
+  },
     formatNumber(value) {
       // Si el valor es menor que 1000, devuelve el valor original con dos decimales
       if (value < 1000) {
