@@ -1,480 +1,605 @@
 <template>
-    <v-snackbar class="mt-12" location="right top" :timeout="sb_timeout" :color="sb_type" elevation="24"
-        :multi-line="true" vertical v-model="snackbar">
-        <v-row>
-            <v-col md="2">
-                <v-avatar :icon="sb_icon" color="sb_type" size="40"></v-avatar>
-            </v-col>
-            <v-col md="10">
-                <h4>{{ sb_title }}</h4>
-                {{ sb_message }}
-                <div v-if="branch">
-                    <!-- Aquí puedes agregar más información sobre la sucursal -->
-                </div>
-            </v-col>
-        </v-row>
-    </v-snackbar>
-    <v-container style="min-width: 100%; min-height: 100%">
-        <v-card elevation="6" class="mx-2">
-            <v-toolbar :color="paleteColors.primary">
-                <span class="text-subtitle-2 ml-4"> Rutas de la Sucursal: </span>
-                <span class="text-subtitle-2 ml-4">
-                    <!-- Avatar del vehículo -->
-                    <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
-                        <v-img :src="`${this.$axios.defaults.baseURL}images/${this.branch.image}?t=${Date.now()}`"
-                            alt="image"></v-img>
-                    </v-avatar>
-                    {{ this.branch.name }}
-                </span>
-                <v-spacer></v-spacer>
-                <v-btn class="text-subtitle-1 ml-12" prepend-icon="mdi-plus-circle" :color="paleteColors.white"
-                    variant="tonal" elevation="2" @click="showAdd()">
-                    Agregar Ruta
-                </v-btn>
-            </v-toolbar>
+  <v-snackbar
+    class="mt-12"
+    location="right top"
+    :timeout="sb_timeout"
+    :color="sb_type"
+    elevation="24"
+    :multi-line="true"
+    vertical
+    v-model="snackbar"
+  >
+    <v-row>
+      <v-col md="2">
+        <v-avatar :icon="sb_icon" color="sb_type" size="40"></v-avatar>
+      </v-col>
+      <v-col md="10">
+        <h4>{{ sb_title }}</h4>
+        {{ sb_message }}
+        <div v-if="branch">
+          <!-- Aquí puedes agregar más información sobre la sucursal -->
+        </div>
+      </v-col>
+    </v-row>
+  </v-snackbar>
+  <v-container style="min-width: 100%; min-height: 100%">
+    <v-card elevation="6" class="mx-2">
+      <v-toolbar :color="paleteColors.primary">
+        <span class="text-subtitle-2 ml-4"> Rutas de la Sucursal: </span>
+        <span class="text-subtitle-2 ml-4">
+          <!-- Avatar del vehículo -->
+          <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
+            <v-img
+              :src="`${this.$axios.defaults.baseURL}images/${
+                this.branch.image
+              }?t=${Date.now()}`"
+              alt="image"
+            ></v-img>
+          </v-avatar>
+          {{ this.branch.name }}
+        </span>
+        <v-spacer></v-spacer>
+        <v-btn
+          class="text-subtitle-1 ml-12"
+          prepend-icon="mdi-plus-circle"
+          :color="paleteColors.white"
+          variant="tonal"
+          elevation="2"
+          @click="showAdd()"
+        >
+          Agregar Ruta
+        </v-btn>
+      </v-toolbar>
 
-            <v-card-text>
-                <v-text-field class="mt-1 mb-1" v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
-                    hide-details>
+      <v-card-text>
+        <v-text-field
+          class="mt-1 mb-1"
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Buscar"
+          single-line
+          hide-details
+        >
+        </v-text-field>
+        <v-data-table
+          :headers="headers"
+          :search="search"
+          :items="branchroutes"
+          class="elevation-1"
+          style="max-height: 65vh; overflow-y: auto"
+          :items-per-page-text="'Elementos por páginas'"
+          no-data-text="No hay datos disponibles"
+          :loading="loading"
+          loading-text="Cargando datos..."
+        >
+          <template v-slot:item.actions="{ item }">
+            <v-btn
+              density="comfortable"
+              icon="mdi-pencil"
+              @click="editItem(item)"
+              :color="paleteColors.primary"
+              variant="tonal"
+              elevation="1"
+              title="Editar Ruta"
+            ></v-btn>
+            <v-btn
+              density="comfortable"
+              icon="mdi-delete"
+              @click="deleteItem(item)"
+              :color="paleteColors.error"
+              variant="tonal"
+              elevation="1"
+              title="Eliminar Ruta"
+            ></v-btn>
+          </template>
+          <template v-slot:item.originName="{ item }">
+            <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
+              <v-img
+                :src="`${this.$axios.defaults.baseURL}images/${
+                  item.originImage
+                }?t=${Date.now()}`"
+                alt="image"
+              ></v-img> </v-avatar
+            ><!--+'?$'+Date.now()-->
+            {{ item.originName }}
+          </template>
+          <template v-slot:item.destinationName="{ item }">
+            <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
+              <v-img
+                :src="`${this.$axios.defaults.baseURL}images/${
+                  item.destinationImage
+                }?t=${Date.now()}`"
+                alt="image"
+              ></v-img> </v-avatar
+            ><!--+'?$'+Date.now()-->
+            {{ item.destinationName }}
+          </template>
+          <template v-slot:item.price="{ item }">
+            {{ formatNumber(Number(item.price)) }}
+          </template>
+        </v-data-table>
+      </v-card-text>
+    </v-card>
+  </v-container>
+
+  <v-dialog v-model="dialog" max-width="550px">
+    <v-form ref="form" v-model="valid" enctype="multipart/form-data">
+      <v-card>
+        <v-toolbar :color="paleteColors.primary">
+          <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
+        </v-toolbar>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12" md="12">
+                <v-autocomplete
+                  :no-data-text="'No hay datos disponibles'"
+                  v-model="editedItem.route_id"
+                  :items="routes"
+                  label="Ruta"
+                  prepend-icon="mdi-road"
+                  item-title="name"
+                  item-value="id"
+                  variant="underlined"
+                  :rules="selectRules"
+                  density="compact"
+                  :disabled="this.editedIndex === 1"
+                >
+                  <template v-slot:item="{ props, item }">
+                    <v-card class="mx-1 my-2" elevation="2">
+                      <v-list-item v-bind="props">
+                        <v-list-item-content>
+                          <v-row align="center" no-gutters>
+                            <!-- Columna 1: Origen -->
+                            <v-col cols="12" md="6" class="d-flex align-center pa-2">
+                              <v-avatar size="40">
+                                <v-img
+                                  :src="`${this.$axios.defaults.baseURL}images/${item.raw.originImage}`"
+                                />
+                              </v-avatar>
+                              <div class="ml-2 flex-grow-1">
+                                <div class="text-caption text-grey">
+                                  <v-icon small class="mr-1">mdi-map-marker</v-icon>
+                                  Origen
+                                </div>
+                                <v-tooltip location="top">
+                                  <template v-slot:activator="{ props: tooltipProps }">
+                                    <div v-bind="tooltipProps" class="text-truncate">
+                                      {{ item.raw.originAddress }}
+                                    </div>
+                                  </template>
+                                  <span>{{ item.raw.originAddress }}</span>
+                                </v-tooltip>
+                              </div>
+                            </v-col>
+
+                            <!-- Columna 2: Destino -->
+                            <v-col cols="12" md="6" class="d-flex align-center pa-2">
+                              <v-avatar size="40">
+                                <v-img
+                                  :src="`${this.$axios.defaults.baseURL}images/${item.raw.destinationImage}`"
+                                />
+                              </v-avatar>
+                              <div class="ml-2 flex-grow-1">
+                                <div class="text-caption text-grey">
+                                  <v-icon small class="mr-1">mdi-map-marker-check</v-icon>
+                                  Destino
+                                </div>
+                                <v-tooltip location="top">
+                                  <template v-slot:activator="{ props: tooltipProps }">
+                                    <div v-bind="tooltipProps" class="text-truncate">
+                                      {{ item.raw.destinationAddress }}
+                                    </div>
+                                  </template>
+                                  <span>{{ item.raw.destinationAddress }}</span>
+                                </v-tooltip>
+                              </div>
+                            </v-col>
+                          </v-row>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-card>
+                  </template>
+                </v-autocomplete>
+              </v-col>
+              <v-col cols="12" md="12">
+                <v-text-field
+                  v-model="editedItem.price"
+                  label="Precio"
+                  type="number"
+                  variant="underlined"
+                  density="compact"
+                  prepend-icon="mdi-cash"
+                  :rules="[(v) => v > 0 || 'Debe ser un precio válido']"
+                  placeholder="Ingrese el precio del pasaje"
+                  min="0"
+                  step="1.00"
+                >
                 </v-text-field>
-                <v-data-table :headers="headers" :search="search" :items="branchroutes" class="elevation-1"
-                    style="max-height: 65vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
-                    no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
-                    <template v-slot:item.actions="{ item }">
-                        <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)"
-                            :color="paleteColors.primary" variant="tonal" elevation="1" title="Editar Ruta"></v-btn>
-                        <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)"
-                            :color="paleteColors.error" variant="tonal" elevation="1" title="Eliminar Ruta"></v-btn>
-                    </template>
-                    <template v-slot:item.originName="{ item }">
-                        <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
-                            <v-img :src="`${this.$axios.defaults.baseURL}images/${item.originImage
-                                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
-                        {{ item.originName }}
-                    </template>
-                    <template v-slot:item.destinationName="{ item }">
-                        <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
-                            <v-img :src="`${this.$axios.defaults.baseURL}images/${item.destinationImage
-                                }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
-                        {{ item.destinationName }}
-                    </template>
-                    <template v-slot:item.price="{ item }">
-                        {{ formatNumber(Number(item.price)) }}
-                    </template>
-                </v-data-table>
-            </v-card-text>
-        </v-card>
-    </v-container>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn :color="paleteColors.gris" variant="flat" @click="close">Cancelar</v-btn>
+          <v-btn
+            :color="paleteColors.primary"
+            variant="flat"
+            @click="save"
+            :disabled="!valid"
+            :loading="loading"
+            >Aceptar</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-form>
+  </v-dialog>
+  <v-dialog v-model="dialogDelete" max-width="500px">
+    <v-card>
+      <v-toolbar :color="paleteColors.error">
+        <span class="text-subtitle-2 ml-4"> Eliminar Ruta</span>
+      </v-toolbar>
 
-    <v-dialog v-model="dialog" max-width="450px">
-        <v-form ref="form" v-model="valid" enctype="multipart/form-data">
-            <v-card>
-                <v-toolbar :color="paleteColors.primary">
-                    <span class="text-subtitle-2 ml-4">{{ formTitle }}</span>
-                </v-toolbar>
-                <v-card-text>
-                    <v-container>
-                        <v-row>
-                            <v-col cols="12" md="12">
-                                <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.route_id"
-                                    :items="routes" label="Ruta" prepend-icon="mdi-road" item-title="name"
-                                    item-value="id" variant="underlined" :rules="selectRules" density="compact"
-                                    :disabled="this.editedIndex === 1">
-                                    <template v-slot:item="{ props, item }">
-                                        <v-list-item v-bind="props">
-                                            <v-list-item-content>
-                                                <!-- Subtítulo con los avatares e información de origen y destino -->
-                                                <v-list-item-subtitle>
-                                                    <v-row align="center" no-gutters>
-                                                        <!-- Origen -->
-                                                        <v-col cols="auto" class="d-flex align-center">
-                                                            <v-avatar>
-                                                                <v-img
-                                                                    :src="`${this.$axios.defaults.baseURL}images/${item.raw.originImage}`"
-                                                                    max-width="40" />
-                                                            </v-avatar>
-                                                            <div class="ml-2" style="
-                                      max-width: 150px;
-                                      white-space: nowrap;
-                                      overflow: hidden;
-                                      text-overflow: ellipsis;
-                                    ">
-                                                                {{ item.raw.originAddress }}
-                                                            </div>
-                                                        </v-col>
-
-                                                        <!-- Destino -->
-                                                        <v-col cols="auto" class="d-flex align-center">
-                                                            <v-avatar>
-                                                                <v-img
-                                                                    :src="`${this.$axios.defaults.baseURL}images/${item.raw.destinationImage}`"
-                                                                    max-width="40" />
-                                                            </v-avatar>
-                                                            <div class="ml-2" style="
-                                      max-width: 150px;
-                                      white-space: nowrap;
-                                      overflow: hidden;
-                                      text-overflow: ellipsis;
-                                    ">
-                                                                {{ item.raw.destinationAddress }}
-                                                            </div>
-                                                        </v-col>
-                                                    </v-row>
-                                                </v-list-item-subtitle>
-                                            </v-list-item-content>
-                                        </v-list-item>
-                                    </template>
-                                </v-autocomplete>
-                            </v-col>
-                            <v-col cols="12" md="12">
-                                <v-text-field v-model="editedItem.price" label="Precio" type="number"
-                                    variant="underlined" density="compact" prepend-icon="mdi-cash"
-                                    :rules="[(v) => v > 0 || 'Debe ser un precio válido']"
-                                    placeholder="Ingrese el precio del pasaje" min="0" step="1.00">
-                                </v-text-field>
-                            </v-col>
-                        </v-row>
-                    </v-container>
-                </v-card-text>
-                <v-divider></v-divider>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn :color="paleteColors.gris" variant="flat" @click="close">Cancelar</v-btn>
-                    <v-btn :color="paleteColors.primary" variant="flat" @click="save" :disabled="!valid"
-                        :loading="loading">Aceptar</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-form>
-    </v-dialog>
-    <v-dialog v-model="dialogDelete" max-width="500px">
-        <v-card>
-            <v-toolbar :color="paleteColors.error">
-                <span class="text-subtitle-2 ml-4"> Eliminar Ruta</span>
-            </v-toolbar>
-
-            <v-card-text class="mt-2 mb-2"> ¿Desea eliminar la ruta seleccionada?</v-card-text>
-            <v-divider></v-divider>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete"> Cancelar </v-btn>
-                <v-btn :color="paleteColors.error" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
+      <v-card-text class="mt-2 mb-2"> ¿Desea eliminar la ruta seleccionada?</v-card-text>
+      <v-divider></v-divider>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete">
+          Cancelar
+        </v-btn>
+        <v-btn :color="paleteColors.error" variant="flat" @click="deleteItemConfirm">
+          Aceptar
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
 import { paleteColors } from "@/assets/colors";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
 export default {
-    props: {
-        branch: {
-            type: Object,
-            required: true,
-            default: () => ({}), // Objeto vacío por defecto
-        },
+  props: {
+    branch: {
+      type: Object,
+      required: true,
+      default: () => ({}), // Objeto vacío por defecto
     },
-    data: () => ({
-        snackbar: false,
-        sb_type: "",
-        sb_message: "",
-        sb_timeout: 2000,
-        sb_title: "",
-        sb_icon: "",
-        paleteColors: paleteColors,
-        valid: true,
-        loading: false,
-        mostrar: false,
+  },
+  data: () => ({
+    snackbar: false,
+    sb_type: "",
+    sb_message: "",
+    sb_timeout: 2000,
+    sb_title: "",
+    sb_icon: "",
+    paleteColors: paleteColors,
+    valid: true,
+    loading: false,
+    mostrar: false,
 
-        dialog: false,
-        dialogDelete: false,
-        branchroutes: [],
-        routes: [],
-        branch_id: "",
-        data: {},
-        headers: [
-            { title: "Ruta", value: "name", width: "15%" },
-            { title: "Origen", value: "originName", width: "30%" },
-            { title: "Destino", value: "destinationName", width: "30%" },
-            { title: "Precio", value: "price", width: "10%" },
-            { title: "Acciones", value: "actions", sortable: false, width: "15%" },
-        ],
+    dialog: false,
+    dialogDelete: false,
+    branchroutes: [],
+    routes: [],
+    branch_id: "",
+    data: {},
+    headers: [
+      { title: "Ruta", value: "name", width: "15%" },
+      { title: "Origen", value: "originName", width: "30%" },
+      { title: "Destino", value: "destinationName", width: "30%" },
+      { title: "Precio", value: "price", width: "10%" },
+      { title: "Acciones", value: "actions", sortable: false, width: "15%" },
+    ],
 
-        editedItem: {
-            id: "",
-            branch_id: "",
-            route_id: "",
-            price: null,
-        },
-        originalItem: {
-            id: "",
-            branch_id: "",
-            route_id: "",
-            price: null,
-        },
-        defaultItem: {
-            id: "",
-            branch_id: "",
-            route_id: "",
-            price: null,
-        },
-        editedIndex: -1,
-        search: "",
-        selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
-    }),
-    computed: {
-        formTitle() {
-            return this.editedIndex === -1 ? "Agregar Ruta" : "Editar Ruta";
-        },
+    editedItem: {
+      id: "",
+      branch_id: "",
+      route_id: "",
+      price: null,
     },
-    mounted() {
-        this.branch_id = this.branch.id;
-        this.initialize();
+    originalItem: {
+      id: "",
+      branch_id: "",
+      route_id: "",
+      price: null,
     },
-    methods: {
-        formatNumber(value) {
-            // Si el valor es menor que 1000, devuelve el valor original con dos decimales
-            if (value < 1000) {
-                return (Math.round((value + Number.EPSILON) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            }
+    defaultItem: {
+      id: "",
+      branch_id: "",
+      route_id: "",
+      price: null,
+    },
+    editedIndex: -1,
+    search: "",
+    selectRules: [(v) => !!v || "Seleccionar al menos un elemento"],
+  }),
+  computed: {
+    formTitle() {
+      return this.editedIndex === -1 ? "Agregar Ruta" : "Editar Ruta";
+    },
+  },
+  mounted() {
+    this.branch_id = this.branch.id;
+    this.initialize();
+  },
+  methods: {
+    formatNumber(value) {
+      // Si el valor es menor que 1000, devuelve el valor original con dos decimales
+      if (value < 1000) {
+        return (Math.round((value + Number.EPSILON) * 100) / 100).toLocaleString(
+          "en-US",
+          { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+        );
+      }
 
-            // Primero, redondea el valor a dos decimales
-            value = Math.round((value + Number.EPSILON) * 100) / 100;
+      // Primero, redondea el valor a dos decimales
+      value = Math.round((value + Number.EPSILON) * 100) / 100;
 
-            // Convierte el valor a cadena con formato de número local (en-US)
-            let formattedValue = value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Convierte el valor a cadena con formato de número local (en-US)
+      let formattedValue = value.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
 
-            return formattedValue;
-        },
-        async showAdd() {
-            this.data = {};
-            try {
-                const result = await handleRequest({
-                    endpoint: 'route',
-                    method: 'GET'
-                });
+      return formattedValue;
+    },
+    async showAdd() {
+      this.data = {};
+      const firstBranchRoute = this.branchroutes[0];
+      const targetOriginId = firstBranchRoute?.origin_id;
+      try {
+        const result = await handleRequest({
+          endpoint: "route",
+          method: "GET",
+        });
 
-                if (result.success) {
-                    this.routes = result.data?.routes.filter((route) =>
-                        !this.branchroutes.some((branchroute) => branchroute.route_id === route.id)
-                    ) || [];
-                } else {
-                    // Si no hay datos, asignamos un array vacío
-                    this.routes = [];
-                }
-            } catch (error) {
-                this.showAlert('error', 'Ocurrió un error inesperado al cargar los datos.', 3000);
-            } finally {
-                this.dialog = true;
-            }
-        },
-        close() {
-            this.dialog = false;
-            this.$nextTick(() => {
-                this.editedItem = Object.assign({}, this.defaultItem);
-                this.originalItem = Object.assign({}, this.defaultItem);
+        if (result.success) {
+          // Obtenemos el origin_id de la primera ruta en branchroutes (si existe)
+          const firstBranchRoute = this.branchroutes[0];
+          const targetOriginId = firstBranchRoute?.origin_id;
+
+          // Filtramos las rutas
+          this.routes =
+            result.data?.routes.filter((route) => {
+              // 1. Filtramos rutas que no estén ya en branchroutes
+              const notInBranchRoutes = !this.branchroutes.some(
+                (branchroute) => branchroute.route_id === route.id
+              );
+
+              // 2. Si hay un targetOriginId, solo mostramos rutas con ese origin_id
+              //    Si no hay targetOriginId (no hay branchroutes), mostramos todas
+              const matchesOrigin = targetOriginId
+                ? route.origin_id === targetOriginId
+                : true;
+
+              return notInBranchRoutes && matchesOrigin;
+            }) || [];
+        } else {
+          this.routes = [];
+        }
+      } catch (error) {
+        this.showAlert("error", "Ocurrió un error inesperado al cargar los datos.", 3000);
+      } finally {
+        this.dialog = true;
+      }
+    },
+    close() {
+      this.dialog = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.originalItem = Object.assign({}, this.defaultItem);
+      });
+      this.editedIndex = -1;
+    },
+    async initialize() {
+      try {
+        this.loading = true;
+        this.data = {};
+        this.data.branch_id = this.branch_id;
+        const result = await handleRequest({
+          endpoint: "branch-routes",
+          method: "POST",
+          data: this.data,
+        });
+
+        if (result.success) {
+          // Si la solicitud es exitosa, asignamos las sucursales
+          this.branchroutes = result.data?.branchRoutes || [];
+          this.loading = false;
+        } else {
+          // Si no hay datos, asignamos un array vacío
+          this.branchroutes = [];
+          this.loading = false;
+        }
+      } catch (error) {
+        this.loading = false;
+        // Captura de errores no controlados
+        this.showAlert(
+          "error",
+          "Ocurrió un error inesperado al procesar la solicitud.",
+          3000
+        );
+      } finally {
+        this.loading = false;
+      }
+    },
+    async save() {
+      this.loading = true;
+      if (this.editedIndex === -1) {
+        this.valid = false;
+        this.data = {};
+        this.data.branch_id = this.branch_id;
+        this.data.route_id = this.editedItem.route_id;
+        this.data.price = this.editedItem.price;
+
+        try {
+          const result = await handleRequest({
+            endpoint: "branch-route",
+            method: "POST",
+            data: this.data,
+          });
+
+          // Manejo de la respuesta según el resultado
+          if (result.success) {
+            this.showAlert("success", result.message, 3000);
+            this.initialize();
+            this.loading = false;
+          } else {
+            this.showAlert("warning", result.message, 3000);
+            this.loading = false;
+          }
+        } catch (error) {
+          // Este bloque captura errores inesperados fuera del manejo estándar
+          this.showAlert(
+            "error",
+            "Ocurrió un error inesperado al procesar la solicitud.",
+            3000
+          );
+          this.loading = false;
+        }
+      } else {
+        this.valid = false;
+        const fieldsToUpdate = ["id", "branch_id", "route_id", "price"];
+        let updatedFields = Object.keys(this.editedItem)
+          .filter(
+            (key) =>
+              fieldsToUpdate.includes(key) &&
+              this.editedItem[key] !== this.originalItem[key]
+          )
+          .reduce((obj, key) => {
+            obj[key] = this.editedItem[key];
+            return obj;
+          }, {});
+        if (Object.keys(updatedFields).length > 0) {
+          updatedFields.id = this.editedItem.id;
+          try {
+            const result = await handleRequest({
+              endpoint: "branch-route",
+              method: "PUT",
+              data: updatedFields,
             });
-            this.editedIndex = -1;
-        },
-        async initialize() {
-            try {
-                this.loading = true;
-                this.data = {};
-                this.data.branch_id = this.branch_id;
-                const result = await handleRequest({
-                    endpoint: "branch-routes",
-                    method: "POST",
-                    data: this.data,
-                });
 
-                if (result.success) {
-                    // Si la solicitud es exitosa, asignamos las sucursales
-                    this.branchroutes = result.data?.branchRoutes || [];
-                    this.loading = false;
-                } else {
-                    // Si no hay datos, asignamos un array vacío
-                    this.branchroutes = [];
-                    this.loading = false;
-                }
-            } catch (error) {
-                this.loading = false;
-                // Captura de errores no controlados
-                this.showAlert(
-                    "error",
-                    "Ocurrió un error inesperado al procesar la solicitud.",
-                    3000
-                );
-            } finally {
-                this.loading = false;
-            }
-        },
-        async save() {
-            this.loading = true;
-            if (this.editedIndex === -1) {
-                this.valid = false;
-                this.data = {};
-                this.data.branch_id = this.branch_id;
-                this.data.route_id = this.editedItem.route_id;
-                this.data.price = this.editedItem.price;
-
-                try {
-                    const result = await handleRequest({
-                        endpoint: "branch-route",
-                        method: "POST",
-                        data: this.data,
-                    });
-
-                    // Manejo de la respuesta según el resultado
-                    if (result.success) {
-                        this.showAlert("success", result.message, 3000);
-                        this.initialize();
-                        this.loading = false;
-                    } else {
-                        this.showAlert("warning", result.message, 3000);
-                        this.loading = false;
-                    }
-                } catch (error) {
-                    // Este bloque captura errores inesperados fuera del manejo estándar
-                    this.showAlert(
-                        "error",
-                        "Ocurrió un error inesperado al procesar la solicitud.",
-                        3000
-                    );
-                    this.loading = false;
-                }
+            // Manejo de la respuesta según el resultado
+            if (result.success) {
+              this.showAlert("success", result.message, 3000);
+              this.initialize();
+              this.loading = false;
             } else {
-                this.valid = false;
-                const fieldsToUpdate = ["id", "branch_id", "route_id", "price"];
-                let updatedFields = Object.keys(this.editedItem)
-                    .filter(
-                        (key) =>
-                            fieldsToUpdate.includes(key) &&
-                            this.editedItem[key] !== this.originalItem[key]
-                    )
-                    .reduce((obj, key) => {
-                        obj[key] = this.editedItem[key];
-                        return obj;
-                    }, {});
-                if (Object.keys(updatedFields).length > 0) {
-                    updatedFields.id = this.editedItem.id;
-                    try {
-                        const result = await handleRequest({
-                            endpoint: "branch-route",
-                            method: "PUT",
-                            data: updatedFields,
-                        });
-
-                        // Manejo de la respuesta según el resultado
-                        if (result.success) {
-                            this.showAlert("success", result.message, 3000);
-                            this.initialize();
-                            this.loading = false;
-                        } else {
-                            this.showAlert("warning", result.message, 3000);
-                            this.loading = false;
-                        }
-                    } catch (error) {
-                        // Este bloque captura errores inesperados fuera del manejo estándar
-                        this.showAlert(
-                            "error",
-                            "Ocurrió un error inesperado al procesar la solicitud.",
-                            3000
-                        );
-                        this.loading = false;
-                    }
-                } else {
-                    this.showAlert("success", "No se realizaron cambios.", 3000);
-                    this.loading = false;
-                }
+              this.showAlert("warning", result.message, 3000);
+              this.loading = false;
             }
-            this.close();
-        },
-        async editItem(item) {
-            this.editedIndex = 1;
-            this.originalItem = Object.assign({}, item);
-            this.editedItem = Object.assign({}, item);
-            try {
-                const result = await handleRequest({
-                    endpoint: 'route',
-                    method: 'GET'
-                });
-
-                if (result.success) {
-                    this.routes = result.data?.routes.filter((route) =>
-                        !this.branchroutes.some((branchroute) => branchroute.route_id === route.id) ||
-                        route.id === this.editedItem.route_id
-                    ) || [];
-                } else {
-                    // Si no hay datos, asignamos un array vacío
-                    this.routes = [];
-                }
-            } catch (error) {
-                this.showAlert('error', "Ocurrió un error inesperado al procesar la solicitud.", 3000);
-            } finally {
-                this.dialog = true;
-            }
-        },
-        deleteItem(item) {
-            this.editedIndex = 1;
-            this.editedItem.id = item.id;
-            this.dialogDelete = true;
-        },
-        closeDelete() {
-            this.dialogDelete = false;
-            this.$nextTick(() => {
-                this.editedItem = Object.assign({}, this.defaultItem);
-            });
-        },
-        async deleteItemConfirm() {
-            try {
-                let request = {
-                    id: this.editedItem.id,
-                };
-                const result = await handleRequest({
-                    endpoint: "branch-route-destroy",
-                    method: "POST",
-                    data: request,
-                });
-
-                // Manejo de la respuesta según el resultado
-                if (result.success) {
-                    this.showAlert("success", result.message, 3000);
-                    this.initialize();
-                } else {
-                    this.showAlert("warning", result.message, 3000);
-                }
-            } catch (error) {
-                // Este bloque captura errores inesperados fuera del manejo estándar
-                this.showAlert(
-                    "error",
-                    "Ocurrió un error inesperado al procesar la solicitud.",
-                    3000
-                );
-            } finally {
-                this.closeDelete();
-            }
-        },
-        showAlert(sb_type, sb_message, sb_timeout) {
-            this.sb_type = sb_type;
-
-            if (sb_type == "success") {
-                this.sb_title = "Éxito";
-                this.sb_icon = "mdi-check-circle";
-            }
-
-            if (sb_type == "error") {
-                this.sb_title = "Error";
-                this.sb_icon = "mdi-check-circle";
-            }
-
-            if (sb_type == "warning") {
-                this.sb_title = "Advertencia";
-                this.sb_icon = "mdi-alert-circle";
-            }
-            this.sb_message = sb_message;
-            this.sb_timeout = sb_timeout;
-            this.snackbar = true;
-        },
+          } catch (error) {
+            // Este bloque captura errores inesperados fuera del manejo estándar
+            this.showAlert(
+              "error",
+              "Ocurrió un error inesperado al procesar la solicitud.",
+              3000
+            );
+            this.loading = false;
+          }
+        } else {
+          this.showAlert("success", "No se realizaron cambios.", 3000);
+          this.loading = false;
+        }
+      }
+      this.close();
     },
+    async editItem(item) {
+      this.editedIndex = 1;
+      this.originalItem = Object.assign({}, item);
+      this.editedItem = Object.assign({}, item);
+      try {
+        const result = await handleRequest({
+          endpoint: "route",
+          method: "GET",
+        });
+
+        if (result.success) {
+          this.routes =
+            result.data?.routes.filter(
+              (route) =>
+                !this.branchroutes.some(
+                  (branchroute) => branchroute.route_id === route.id
+                ) || route.id === this.editedItem.route_id
+            ) || [];
+        } else {
+          // Si no hay datos, asignamos un array vacío
+          this.routes = [];
+        }
+      } catch (error) {
+        this.showAlert(
+          "error",
+          "Ocurrió un error inesperado al procesar la solicitud.",
+          3000
+        );
+      } finally {
+        this.dialog = true;
+      }
+    },
+    deleteItem(item) {
+      this.editedIndex = 1;
+      this.editedItem.id = item.id;
+      this.dialogDelete = true;
+    },
+    closeDelete() {
+      this.dialogDelete = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+      });
+    },
+    async deleteItemConfirm() {
+      try {
+        let request = {
+          id: this.editedItem.id,
+        };
+        const result = await handleRequest({
+          endpoint: "branch-route-destroy",
+          method: "POST",
+          data: request,
+        });
+
+        // Manejo de la respuesta según el resultado
+        if (result.success) {
+          this.showAlert("success", result.message, 3000);
+          this.initialize();
+        } else {
+          this.showAlert("warning", result.message, 3000);
+        }
+      } catch (error) {
+        // Este bloque captura errores inesperados fuera del manejo estándar
+        this.showAlert(
+          "error",
+          "Ocurrió un error inesperado al procesar la solicitud.",
+          3000
+        );
+      } finally {
+        this.closeDelete();
+      }
+    },
+    showAlert(sb_type, sb_message, sb_timeout) {
+      this.sb_type = sb_type;
+
+      if (sb_type == "success") {
+        this.sb_title = "Éxito";
+        this.sb_icon = "mdi-check-circle";
+      }
+
+      if (sb_type == "error") {
+        this.sb_title = "Error";
+        this.sb_icon = "mdi-check-circle";
+      }
+
+      if (sb_type == "warning") {
+        this.sb_title = "Advertencia";
+        this.sb_icon = "mdi-alert-circle";
+      }
+      this.sb_message = sb_message;
+      this.sb_timeout = sb_timeout;
+      this.snackbar = true;
+    },
+  },
 };
 </script>

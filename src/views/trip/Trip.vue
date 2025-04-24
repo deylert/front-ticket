@@ -11,7 +11,7 @@
       </v-col>
     </v-row>
   </v-snackbar>
-  <v-container style="min-width: 100%;">
+  <v-container style="min-width: 100%">
     <v-card elevation="6" class="mx-2">
       <v-toolbar :color="paleteColors.primary">
         <v-row align="center">
@@ -29,7 +29,7 @@
       <v-card-text>
         <v-row>
           <v-container fluid>
-            <v-cols cols="12" md="12">
+            <v-col cols="12" md="12">
               <v-row v-if="mostrarFila" dense>
                 <v-col cols="12" md="3">
                   <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="branch_id" :items="branches"
@@ -39,15 +39,14 @@
                       <v-list-item v-bind="props"
                         :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.image}`">
                       </v-list-item>
-                    </template>
-                  </v-autocomplete><!-- @update:model-value="initialize()">-->
+                    </template> </v-autocomplete><!-- @update:model-value="initialize()">-->
                 </v-col>
                 <v-col cols="12" md="2">
                   <v-btn icon @click="initialize" :color="paleteColors.primary" density="comfortable">
                     <v-icon>mdi-magnify</v-icon></v-btn>
                 </v-col>
               </v-row>
-            </v-cols>
+            </v-col>
           </v-container>
         </v-row>
         <v-row dense>
@@ -66,31 +65,33 @@
               </template>
               <template v-slot:item.origin="{ item }">
                 <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
-                  <v-img :src="`${this.$axios.defaults.baseURL}images/${item.originImage
+                  <v-img :src="`${this.$axios.defaults.baseURL}images/${
+                      item.originImage
                     }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
                 {{ item.origin }}
               </template>
               <template v-slot:item.destination="{ item }">
                 <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
-                  <v-img :src="`${this.$axios.defaults.baseURL}images/${item.destinationImage
+                  <v-img :src="`${this.$axios.defaults.baseURL}images/${
+                      item.destinationImage
                     }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
                 {{ item.destination }}
               </template>
               <template v-slot:item.vehicleName="{ item }">
                 <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="small">
-                  <v-img :src="`${this.$axios.defaults.baseURL}images/${item.vehicleImage
+                  <v-img :src="`${this.$axios.defaults.baseURL}images/${
+                      item.vehicleImage
                     }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
                 {{ item.vehicleName }}
               </template>
             </v-data-table>
           </v-col>
         </v-row>
-
       </v-card-text>
     </v-card>
   </v-container>
 
-  <v-dialog v-model="dialog" max-width="700px">
+  <!--<v-dialog v-model="dialog" max-width="700px">
     <v-form ref="form" v-model="valid" enctype="multipart/form-data">
       <v-card>
         <v-toolbar :color="paleteColors.primary">
@@ -99,12 +100,10 @@
         <v-card-text>
           <v-container>
             <v-tabs v-model="tab" vertical>
-              <!-- Pestañas -->
               <v-tab value="general" :class="tab === 'general' ? 'selected-tab' : ''">Generales</v-tab>
               <v-tab value="worker" :class="tab === 'worker' ? 'selected-tab' : ''"
                 v-if="editedItem.vehicle_id">Trabajadores</v-tab>
             </v-tabs>
-            <!-- Contenido de las pestañas -->
             <v-window v-model="tab">
               <v-window-item value="general">
                 <v-row style="margin-top: 5px">
@@ -115,10 +114,8 @@
                       <template v-slot:item="{ props, item }">
                         <v-list-item v-bind="props">
                           <v-list-item-content>
-                            <!-- Subtítulo con los avatares e información de origen y destino -->
                             <v-list-item-subtitle>
                               <v-row align="center" no-gutters>
-                                <!-- Origen -->
                                 <v-col cols="auto" class="d-flex align-center">
                                   <v-avatar>
                                     <v-img :src="`${this.$axios.defaults.baseURL}images/${item.raw.originImage}`"
@@ -134,7 +131,6 @@
                                   </div>
                                 </v-col>
 
-                                <!-- Destino -->
                                 <v-col cols="auto" class="d-flex align-center">
                                   <v-avatar>
                                     <v-img :src="`${this.$axios.defaults.baseURL}images/${item.raw.destinationImage}`"
@@ -231,7 +227,7 @@
                       <template v-slot:item.name="{ item }">
                         <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
                           <v-img :src="`${this.$axios.defaults.baseURL}images/${item.image
-                            }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
+                            }?t=${Date.now()}`" alt="image"></v-img> </v-avatar>
                         {{ item.name }}
                       </template>
                     </v-data-table>
@@ -250,6 +246,215 @@
         </v-card-actions>
       </v-card>
     </v-form>
+  </v-dialog>-->
+
+  <v-dialog v-model="dialog" fullscreen transition="dialog-bottom-transition" :no-click-animation="true">
+    <v-card style="display: flex; flex-direction: column; min-height: 100vh;">
+    <v-card-text style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+      <v-form v-model="valid" enctype="multipart/form-data" style="flex: 1; display: flex; flex-direction: column;">
+          <v-stepper elevation="6" bg-color="" v-model="step" :items="items" hide-actions style="max-height: 100vh; min-height: 95vh; overflow-y: auto">
+            <template v-slot:item.1>
+              <div style="flex: 1; overflow-y: auto; padding: 16px;">
+              <v-row style="margin-top: 5px">
+                <v-col cols="12" md="12">
+                  <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.route_id"
+                    :items="routes" label="Ruta" prepend-icon="mdi-road" item-title="name" item-value="id"
+                    variant="underlined" :rules="selectRules" density="compact" @update:model-value="updateStimated">
+                    <template v-slot:item="{ props, item }">
+                      <v-card class="mx-1 my-2" elevation="2">
+                        <v-list-item v-bind="props">
+                          <v-list-item-content>
+                            <v-row align="center" no-gutters>
+                              <!-- Columna 1: Origen -->
+                              <v-col cols="12" md="4" class="d-flex align-center">
+                                <v-avatar>
+                                  <v-img :src="`${this.$axios.defaults.baseURL}images/${item.raw.originImage}`"
+                                    max-width="40" />
+                                </v-avatar>
+                                <div class="ml-2">
+                                  <div class="text-caption text-grey">
+                                    <v-icon small class="mr-1">mdi-map-marker</v-icon>
+                                    Origen
+                                  </div>
+                                  <v-tooltip location="top">
+                                    <template v-slot:activator="{ props: tooltipProps }">
+                                      <div v-bind="tooltipProps" class="text-truncate" style="max-width: 100%">
+                                        {{ item.raw.originAddress }}
+                                      </div>
+                                    </template>
+                                    <span>{{ item.raw.originAddress }}</span>
+                                    <!-- Texto completo en el tooltip -->
+                                  </v-tooltip>
+                                </div>
+                              </v-col>
+
+                              <!-- Columna 2: Destino -->
+                              <v-col cols="12" md="4" class="d-flex align-center">
+                                <v-avatar>
+                                  <v-img :src="`${this.$axios.defaults.baseURL}images/${item.raw.destinationImage}`"
+                                    max-width="40" />
+                                </v-avatar>
+                                <div class="ml-2">
+                                  <div class="text-caption text-grey">
+                                    <v-icon small class="mr-1">mdi-map-marker-check</v-icon>
+                                    Destino
+                                  </div>
+                                  <v-tooltip location="top">
+                                    <template v-slot:activator="{ props: tooltipProps }">
+                                      <div v-bind="tooltipProps" class="text-truncate" style="max-width: 100%">
+                                        {{ item.raw.destinationAddress }}
+                                      </div>
+                                    </template>
+                                    <span>{{ item.raw.destinationAddress }}</span>
+                                    <!-- Texto completo en el tooltip -->
+                                  </v-tooltip>
+                                </div>
+                              </v-col>
+                            </v-row>
+                          </v-list-item-content>
+                        </v-list-item>
+                      </v-card>
+                    </template>
+                  </v-autocomplete>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.vehicle_id"
+                    :items="vehicles" label="Vehículo" prepend-icon="mdi-car-side" item-title="vehicleName"
+                    item-value="id" variant="underlined" :rules="selectRules" density="compact"
+                    @update:model-value="filterWorkers">
+                    <template v-slot:item="{ props, item }">
+                      <v-list-item v-bind="props"
+                        :prepend-avatar="`${this.$axios.defaults.baseURL}images/${item.raw.vehicleImage}`"
+                        :title="item.raw.vehicleName">
+                        <v-list-item-subtitle class="d-flex flex-column">
+                          <div>Marca: {{ item.raw.brand }}</div>
+                          <div>Asientos: {{ item.raw.seats }}</div>
+                        </v-list-item-subtitle>
+                      </v-list-item>
+                    </template>
+                  </v-autocomplete>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40" transition="scale-transition"
+                    offset-y min-width="290px">
+                    <template v-slot:activator="{ props }">
+                      <v-text-field v-bind="props" :modelValue="dateFormatted" variant="underlined"
+                        prepend-icon="mdi-calendar" label="Fecha" density="compact"></v-text-field>
+                    </template>
+                    <v-locale-provider locale="es">
+                      <v-date-picker header="Calendario" title="Seleccione la fecha" :color="paleteColors.primary"
+                        :modelValue="input" @update:model-value="updateDate" format="yyyy-MM-dd"
+                        :min="new Date().toISOString().split('T')[0]"></v-date-picker>
+                    </v-locale-provider>
+                  </v-menu>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" md="4">
+                  <v-select 
+                  v-model="editedItem.schedule" 
+                  :items="filteredTimeSlots"
+                  label="Hora de salida"
+                  variant="underlined"
+                  density="compact"
+                  prepend-icon="mdi-calendar-clock"
+                  @update:modelValue="updateArrival"
+                  :disabled="!editedItem.route_id"
+                  :rules="selectRules"
+                  :key="'timeslot-' + (editedItem.date || '') + (editedItem.schedule || '')"
+                ></v-select>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-text-field v-model="editedItem.arrival" label="Hora de llegada" disabled="true"
+                    variant="underlined" density="compact" prepend-icon="mdi-calendar-clock"></v-text-field>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-text-field v-model="editedItem.price" label="Precio" prepend-icon="mdi-currency-usd"
+                    variant="underlined" :rules="priceRules" type="number" density="compact" min="0"></v-text-field>
+                </v-col>
+              </v-row>
+              </div>
+              <v-divider></v-divider>
+              <div style="padding: 16px; border-top: 1px solid #eee;">
+                <!-- BOTONES -->
+                <v-row class="mt-1">
+                  <v-btn color="#E7E9E9" variant="flat" @click="close()">Salir</v-btn>
+                  <v-spacer></v-spacer>
+                  <v-btn color="#E7E9E9" variant="flat" @click="nextStep" :disabled="
+                      !editedItem.vehicle_id ||
+                      !editedItem.route_id ||
+                      !editedItem.schedule ||
+                      !editedItem.price
+                    ">
+                    Siguiente
+                  </v-btn>
+                </v-row>
+              </div>
+            </template>
+            <template v-slot:item.2>
+              <div style="flex: 1; overflow-y: auto; padding: 16px;">
+              <v-sheet border>
+                <v-toolbar :color="paleteColors.primary">
+                  <v-row align="center">
+                    <v-col cols="12" md="7" class="grow ml-4">
+                      <span class="text-subtitle-1"><strong>Relación de Trabajadores</strong></span>
+                    </v-col>
+                    <v-col cols="12" md="4" class="text-right">
+                      <v-btn class="text-subtitle-1" :color="paleteColors.white" variant="tonal" elevation="2"
+                        prepend-icon="mdi-plus-circle" @click="showAssiegnedWorker">
+                        Asignar Trabajador
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </v-toolbar>
+
+                <v-card-text>
+                  <v-data-table :headers="headersWorkers" :items="filteredWorkers" class="elevation-1"
+                    style="max-height: 68vh; overflow-y: auto" :items-per-page-text="'Elementos por páginas'"
+                    no-data-text="No hay datos disponibles" :loading="loading" loading-text="Cargando datos...">
+                    <!--<template v-slot:item.actions="{ item }">
+                      <v-btn density="comfortable" icon="mdi-delete" @click="deleteItemWorker(item)"
+                        :color="paleteColors.error" variant="tonal" elevation="1" title="Eliminar Relación"></v-btn>
+                    </template>-->
+                    <template v-slot:item.workerName="{ item }">
+                      <v-avatar class="mr-1" elevation="3" color="grey-lighten-4" size="large">
+                        <v-img :src="`${this.$axios.defaults.baseURL}images/${
+                            item.workerImage
+                          }?t=${Date.now()}`" alt="image"></v-img> </v-avatar><!--+'?$'+Date.now()-->
+                      {{ item.workerName }}
+                    </template>
+                    <template v-slot:item.actions="{ item }">
+                    <v-btn 
+                      density="comfortable" 
+                      :icon="isWorkerAssociated(item) ? 'mdi-delete' : 'mdi-plus'" 
+                      @click="isWorkerAssociated(item) ? deleteItemWorker(item) : saveAssignedWorker(item)"
+                      :color="isWorkerAssociated(item) ? paleteColors.error : paleteColors.success" 
+                      variant="tonal" 
+                      elevation="1" 
+                      :title="isWorkerAssociated(item) ? 'Eliminar Relación' : 'Agregar Relación'"
+                    ></v-btn>
+                  </template>
+                  </v-data-table>
+                </v-card-text>
+              </v-sheet>
+              </div>
+              <v-divider></v-divider>
+              <div style="padding: 16px; border-top: 1px solid #eee;">
+                <!-- BOTONES -->
+                <v-row class="mt-1">
+                  <v-btn color="#E7E9E9" variant="flat" @click="prevStep">Volver</v-btn>
+                  <v-spacer></v-spacer>
+                  <!--<v-btn color="#E7E9E9" :disabled="hasInvalidState" variant="flat"
+                    @click="dialogDeleteDiario = true">Siguiente</v-btn>-->
+                  <v-btn :color="paleteColors.primary" variant="flat" @click="save()"
+                    :disabled="!valid || !editedItem.workers.length" :loading="loading">Aceptar</v-btn>
+                </v-row>
+              </div>
+            </template>
+          </v-stepper>
+        </v-form>
+      </v-card-text>
+    </v-card>
   </v-dialog>
   <v-dialog v-model="dialogDelete" max-width="500px">
     <v-card>
@@ -261,8 +466,12 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete"> Cancelar </v-btn>
-        <v-btn :color="paleteColors.error" variant="flat" @click="deleteItemConfirm"> Aceptar </v-btn>
+        <v-btn :color="paleteColors.gris" variant="flat" @click="closeDelete">
+          Cancelar
+        </v-btn>
+        <v-btn :color="paleteColors.error" variant="flat" @click="deleteItemConfirm">
+          Aceptar
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -310,7 +519,7 @@
 import { paleteColors } from "@/assets/colors";
 import LocalStorageService from "@/LocalStorageService";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
-import _ from 'lodash';
+import _ from "lodash";
 export default {
   data: () => ({
     snackbar: false,
@@ -324,6 +533,8 @@ export default {
     loading: false,
     mostrar: false,
     dialog: false,
+    timeSlots: [], // Array para almacenar los slots ordenados
+    currentTimeSlots: [], // Array para los slots filtrados según fecha
     dialogDelete: false,
     estimated: 0,
     timeSlotsKey: 0,
@@ -336,8 +547,10 @@ export default {
     filteredWorkers: [],
     data: {},
     selectedWorker: "",
-    route: '',
-    branch_id: '',
+    route: "",
+    branch_id: "",
+    step: 1,
+    items: ["Datos Generales", "Asignar Trabajadores"],
     dialogAssignedWorkers: false,
     headers: [
       { title: "Ruta", value: "name", width: "15%" },
@@ -353,7 +566,7 @@ export default {
     ],
 
     headersWorkers: [
-      { title: "Nombre", value: "name", width: "60%" },
+      { title: "Nombre", value: "workerName", width: "60%" },
       { title: "Rol", value: "roleName", width: "20%" },
       { title: "Acciones", value: "actions", sortable: false, width: "20%" },
     ],
@@ -433,32 +646,78 @@ export default {
       return this.input ? new Date(this.input) : new Date();
     },
     filteredTimeSlots() {
-      return this.generateTimeSlots();
-    }
+    return this.generateTimeSlots();
+  },
   },
   mounted() {
-    this.role = JSON.parse(LocalStorageService.getItem('role'));
-    if (this.role === 'Administrador') {
+    this.role = JSON.parse(LocalStorageService.getItem("role"));
+    if (this.role === "Administrador") {
       this.showBranches();
     } else {
-      this.branch_id = LocalStorageService.getItem('branch_id');
+      this.branch_id = LocalStorageService.getItem("branch_id");
     }
   },
   watch: {
     // Observar cambios en la fecha para resetear selección
     'editedItem.date'(newDate) {
-      this.editedItem.schedule = null; // Limpiar selección
-      this.editedItem.arrival = null; // Limpiar selección
-
-      this.timeSlotsKey += 1; // Forzar recreación del v-select
-    }
+    this.generateTimeSlots();
+  },
   },
   methods: {
+    generateTimeSlots() {
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const isToday = this.today(this.editedItem.date || new Date().toISOString().split("T")[0]);
+  const slots = [];
+
+  // Generar todos los slots posibles
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute = 0; minute < 60; minute += 5) {
+      const slotMinutes = hour * 60 + minute;
+      const timeStr = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+      
+      slots.push({
+        time: timeStr,
+        minutes: slotMinutes
+      });
+    }
+  }
+
+  // Si estamos editando, incluir el slot actual aunque esté en el pasado
+  if (this.editedIndex !== -1 && this.editedItem.schedule) {
+    const currentSlot = slots.find(s => s.time === this.editedItem.schedule);
+    if (currentSlot && isToday && currentSlot.minutes <= currentMinutes) {
+      return [this.editedItem.schedule, ...slots
+        .filter(s => s.minutes > currentMinutes)
+        .map(s => s.time)];
+    }
+  }
+
+  // Para creación o slots futuros
+  return isToday 
+    ? slots.filter(s => s.minutes > currentMinutes).map(s => s.time)
+    : slots.map(s => s.time);
+},
+    // Método para verificar si un trabajador ya está asociado al viaje
+  isWorkerAssociated(worker) {
+    return this.editedItem.workers?.some(w => w.id === worker.id);
+  },
+    async nextStep() {
+      if (this.step < this.items.length) {
+        this.step++;
+      }
+    },
+
+    prevStep() {
+      if (this.step > 1) {
+        this.step--;
+      }
+    },
     async showBranches() {
       try {
         const result = await handleRequest({
-          endpoint: 'branch',
-          method: 'GET',
+          endpoint: "branch",
+          method: "GET",
         });
 
         if (result.success) {
@@ -474,7 +733,11 @@ export default {
       } catch (error) {
         this.mostrarFila = false;
         // Captura de errores no controlados
-        this.showAlert('error', 'Ocurrió un error inesperado al procesar la solicitud.', 3000);
+        this.showAlert(
+          "error",
+          "Ocurrió un error inesperado al procesar la solicitud.",
+          3000
+        );
       } finally {
         this.mostrarFila = true;
         this.loading = false;
@@ -483,23 +746,34 @@ export default {
     },
     // Filtramos los trabajadores según el vehículo seleccionado
     filterWorkers() {
-      const selectedVehicleId = this.editedItem.vehicle_id;
+      const selectedVehicleId = Number(this.editedItem.vehicle_id);
+      console.log('this.editedItem.vehicle_id');
+      console.log(Number(this.editedItem.vehicle_id));
       // Filtramos los trabajadores que están relacionados con el vehículo seleccionado
       this.filteredWorkers = this.workers.filter((worker) =>
         worker.vehicles.some((vehicle) => vehicle.id === selectedVehicleId)
       );
     },
     updateStimated() {
+      this.editedItem.vehicle_id = "";
+      this.editedItem.workers = [];
       this.estimated = null;
-      const matchedRoute = this.routes.find((route) => route.id === this.editedItem.route_id);
+      const matchedRoute = this.routes.find(
+        (route) => route.id === this.editedItem.route_id
+      );
       // Si se encuentra el objeto, asignamos su propiedad 'estimated' a this.estimated
       this.estimated = matchedRoute ? matchedRoute.estimated : null;
       this.editedItem.arrival = null;
       this.editedItem.schedule = null;
     },
     updateArrival() {
-      console.log("Datos iniciales - schedule:", this.editedItem.schedule, "estimated:", this.estimated);
-      
+      console.log(
+        "Datos iniciales - schedule:",
+        this.editedItem.schedule,
+        "estimated:",
+        this.estimated
+      );
+
       // Validación básica
       if (!this.editedItem.schedule || !this.estimated) {
         this.editedItem.arrival = null;
@@ -508,78 +782,82 @@ export default {
 
       // Usar fecha del item o fecha actual si es null
       const baseDate = this.editedItem.date ? new Date(this.editedItem.date) : new Date();
-      
+
       // Extraer horas y minutos del schedule
       const [hours, minutes] = this.editedItem.schedule.split(":").map(Number);
-      
+
       // Configurar la hora en la fecha base
       baseDate.setHours(hours, minutes, 0, 0);
-      
+
       // Sumar los minutos estimados (convertidos a milisegundos)
       const arrivalDate = new Date(baseDate.getTime() + this.estimated * 60000);
-      
+
       // Formatear a YYYY-MM-DD HH:MM:SS
-      const formattedArrival = arrivalDate.toISOString()
-        .replace('T', ' ')
-        .replace(/\.\d{3}Z$/, '');
-      
+      const formattedArrival = arrivalDate
+        .toISOString()
+        .replace("T", " ")
+        .replace(/\.\d{3}Z$/, "");
+
       this.editedItem.arrival = formattedArrival;
       console.log("Hora de llegada calculada:", this.editedItem.arrival);
     },
-    generateTimeSlots() {
+    /*generateTimeSlots() {
       const slots = [];
       const now = new Date();
-      const selectedDate = this.editedItem.date ? 
-        this.editedItem.date : 
-        new Date().toISOString().split('T')[0];
-      
+      const selectedDate = this.editedItem.date
+        ? this.editedItem.date
+        : new Date().toISOString().split("T")[0];
+
       // Comparar solo día/mes/año
       const isToday = this.today(selectedDate);
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
-      console.log('isToday');
+      console.log("isToday");
       console.log(isToday);
       for (let hour = 0; hour < 24; hour++) {
         for (let minute = 0; minute < 60; minute += 5) {
           const slotMinutes = hour * 60 + minute;
-          
+
           // Si es hoy, saltar slots pasados
           if (isToday && slotMinutes <= currentMinutes) {
             continue;
           }
-          
-          slots.push(`${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
+
+          slots.push(
+            `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`
+          );
         }
       }
-      
+
       return slots;
-    },
+    },*/
 
     today(date) {
-    // Obtener la fecha actual
-    const hoy = new Date();
-    
-    // Formatear la fecha actual al mismo formato YYYY-MM-DD
-    const año = hoy.getFullYear();
-    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
-    const dia = String(hoy.getDate()).padStart(2, '0');
-    const hoyFormateado = `${año}-${mes}-${dia}`;
-    
-    // Comparar con la fecha proporcionada
-    return date === hoyFormateado;
-  },
+      // Obtener la fecha actual
+      const hoy = new Date();
+
+      // Formatear la fecha actual al mismo formato YYYY-MM-DD
+      const año = hoy.getFullYear();
+      const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+      const dia = String(hoy.getDate()).padStart(2, "0");
+      const hoyFormateado = `${año}-${mes}-${dia}`;
+
+      // Comparar con la fecha proporcionada
+      return date === hoyFormateado;
+    },
     updateDate(val) {
       this.input = val;
       this.editedItem.date = this.dateFormatted;
       this.menu = false;
     },
     async showAdd() {
-      this.tab = 1;
+      this.step = 1;
       this.data = {};
       this.filteredWorkers = [];
       this.data.branch_id = this.branch_id;
       this.editedIndex = -1;
       this.editedItem = Object.assign({}, this.defaultItem);
       this.originalItem = Object.assign({}, this.defaultItem);
+      this.timeSlotsKey = Date.now();
       try {
         const result = await handleRequest({
           endpoint: "get-routes-vehicle-workers",
@@ -599,7 +877,11 @@ export default {
           this.workers = [];
         }
       } catch (error) {
-        this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
+        this.showAlert(
+          "error",
+          "Ocurrió un error inesperado al procesar la solicitud.",
+          3000
+        );
       } finally {
         this.dialog = true;
       }
@@ -616,12 +898,14 @@ export default {
     },
     async showAssiegnedWorker() {
       // Clonar filteredWorkers para evitar referencias compartidas
-      const clonedFilteredWorkers = this.filteredWorkers.map(worker => ({ ...worker }));
+      const clonedFilteredWorkers = this.filteredWorkers.map((worker) => ({ ...worker }));
 
       // Ahora puedes filtrar el arreglo clonado sin afectar a los objetos originales
-      this.filteredWorkers = clonedFilteredWorkers.filter(worker => {
+      this.filteredWorkers = clonedFilteredWorkers.filter((worker) => {
         // Verificar si la persona no está en editedItem.workers
-        return !this.editedItem.workers.some(editedWorker => editedWorker.id === worker.id);
+        return !this.editedItem.workers.some(
+          (editedWorker) => editedWorker.id === worker.id
+        );
       });
       this.dialogAssignedWorkers = true;
     },
@@ -629,19 +913,20 @@ export default {
       this.dialogAssignedWorkers = false;
       this.selectedWorker = null;
     },
-    saveAssignedWorker() {
-      if (this.selectedWorker) {
-        const worker = this.workers.find((p) => p.id === this.selectedWorker);
+    saveAssignedWorker(worker) {
+      //if (this.selectedWorker) {
+        //const worker = this.workers.find((p) => p.id === this.selectedWorker);
         const newWorkers = {
           id: worker.id,
-          name: worker.workerName,
-          image: worker.workerImage,
+          workerName: worker.workerName,
+          workerImage: worker.workerImage,
           roleId: worker.roleId,
           roleName: worker.roleName,
         };
         // Verificar si la relación ya existe en editedItem.people
-        const existingPersonIndex = this.editedItem.workers.findIndex(p =>
-          p.id === newWorkers.id);
+        const existingPersonIndex = this.editedItem.workers.findIndex(
+          (p) => p.id === newWorkers.id
+        );
 
         if (existingPersonIndex === -1) {
           // No existe, por lo tanto, se agrega uno nuevo
@@ -650,10 +935,10 @@ export default {
           // Existe, por lo tanto se edita el existente
           this.editedItem.workers.splice(existingPersonIndex, 1, newWorkers); // Actualiza el elemento en el array
         }
-      }
+      //}
 
       // Reiniciar selección y cerrar diálogo
-      this.closeAssignedWorker();
+      this.filterWorkers();
     },
     deleteItemWorker(item) {
       const index = this.editedItem.workers.findIndex((p) => p.id === item.id);
@@ -673,23 +958,21 @@ export default {
       // Comparar cada objeto en los arrays
       return sortedOriginal.some((original, index) => {
         const edited = sortedEdited[index];
-        return Object.keys(original).some(
-          (key) => original[key] !== edited[key]
-        );
+        return Object.keys(original).some((key) => original[key] !== edited[key]);
       });
     },
     async initialize() {
       this.data = {};
       this.data.branch_id = this.branch_id;
       const today = new Date();
-      const formattedDate = today.toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+      const formattedDate = today.toISOString().split("T")[0]; // Formato: YYYY-MM-DD
       //this.data.date = formattedDate;
       try {
         this.loading = true;
         const result = await handleRequest({
           endpoint: "get-trip-branch-date",
           method: "POST",
-          data: this.data
+          data: this.data,
         });
 
         if (result.success) {
@@ -731,7 +1014,9 @@ export default {
         let updatedFields = Object.keys(this.editedItem)
           .filter(
             (key) =>
-              fieldsToUpdate.includes(key) && (this.originalItem[key], this.editedItem[key]))
+              fieldsToUpdate.includes(key) &&
+              (this.originalItem[key], this.editedItem[key])
+          )
           .reduce((obj, key) => {
             if (key === "workers") {
               // Transformar el campo `people`
@@ -842,7 +1127,9 @@ export default {
       this.close();
     },
     async editItem(item) {
+      this.timeSlotsKey = Date.now();
       this.editedIndex = 1;
+      this.step = 1;
       this.originalItem = _.cloneDeep(item);
       this.editedItem = _.cloneDeep(item);
       this.data = {};
@@ -866,9 +1153,13 @@ export default {
           this.workers = [];
         }
       } catch (error) {
-        this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
+        this.showAlert(
+          "error",
+          "Ocurrió un error inesperado al procesar la solicitud.",
+          3000
+        );
       } finally {
-        this.updateStimated();
+        //this.updateStimated();
         this.filterWorkers();
         this.dialog = true;
       }
@@ -940,7 +1231,7 @@ export default {
 </script>
 <style scoped>
 .selected-tab {
-  background-color: #1976D2;
+  background-color: #1976d2;
   /* Fondo del tab seleccionado */
   color: white;
   /* Texto blanco */
