@@ -37,6 +37,8 @@
         <template v-slot:item.actions="{ item }">
           <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)" :color="paleteColors.primary" variant="tonal"
             elevation="1" title="Editar Trabajador"></v-btn>
+            <v-btn density="comfortable" icon="mdi-lock-reset" @click="changePass(item)" :color="paleteColors.teal" variant="tonal"
+                elevation="1" class="mr-1 ml-1" title="Modificar contraseña"></v-btn>
           <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)" :color="paleteColors.error" variant="tonal"
             elevation="1" title="Eliminar Trabajador"></v-btn>
         </template>
@@ -143,9 +145,51 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <v-dialog v-model="dialogChangePass" max-width="400px">
+    <v-form ref="form" v-model="valid" enctype="multipart/form-data">
+      <v-card>
+        <v-toolbar color="#1976D2">
+          <span class="text-subtitle-2 ml-4">Actualizar Contraseña</span>
+        </v-toolbar>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <!--<v-col cols="12" md="12">
+                <v-text-field :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" :type="visible ? 'text' : 'password'"
+                density="compact" placeholder="Contraseña actual" prepend-inner-icon="mdi-lock-outline" variant="underlined"
+                @click:append-inner="visible = !visible" v-model="editedPass.currentPassword"></v-text-field>
+              </v-col>-->
+              <v-col cols="12" md="12">
+                <v-text-field :append-inner-icon="visible1 ? 'mdi-eye-off' : 'mdi-eye'" :type="visible1 ? 'text' : 'password'"
+                density="compact" placeholder="Contraseña nueva" prepend-inner-icon="mdi-lock-outline" variant="underlined"
+                @click:append-inner="visible1 = !visible1" v-model="editedPass.newPassword" :rules="[passwordRule]"></v-text-field>
+              </v-col>
+              <v-col cols="12" md="12">
+                <v-text-field :append-inner-icon="visible2 ? 'mdi-eye-off' : 'mdi-eye'" :type="visible2 ? 'text' : 'password'"
+                density="compact" placeholder="Contraseña nueva" prepend-inner-icon="mdi-lock-outline" variant="underlined"
+                @click:append-inner="visible2 = !visible2" v-model="editedPass.newPassword1"></v-text-field>
+              </v-col>
+              <!-- Alerta de error si las contraseñas no coinciden -->
+              <v-alert v-if="editedPass.newPassword !== editedPass.newPassword1 && editedPass.newPassword1 !== ''" type="error" dense>
+                Las contraseñas no coinciden.
+              </v-alert>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="#DA7171" variant="flat" @click="closePass">Cancelar</v-btn>
+          <v-btn color="#1976D2" variant="flat" :loading="loading" @click="savePass" :disabled="editedPass.newPassword !== editedPass.newPassword1 || editedItem.newPassword === ''">Aceptar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-form>
+  </v-dialog>
 </template>
 
 <script>
+import LocalStorageService from "@/LocalStorageService";
 import { paleteColors } from "@/assets/colors";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
 export default {
@@ -156,6 +200,9 @@ export default {
     sb_timeout: 2000,
     sb_title: '',
     sb_icon: '',
+    visible: false,
+    visible1: false,
+    visible2: false,
     paleteColors: paleteColors,
     valid: true,
     loading: false,
@@ -165,20 +212,21 @@ export default {
     dialog: false,
     dialogDelete: false,
     showPassword: false,
+    dialogChangePass: false,
     workers: [],
     branches: [],
     roles: [],
     data: {},
     headers: [
       //{ title: 'Sucursal', value: 'branchName', width: '20%' },
-      { title: 'Nombre', value: 'name', width: '25%' },
-      { title: 'Usuario', value: 'user', width: '10%' },
-      { title: 'Correo', value: 'email', width: '15%' },
-      { title: 'Teléfono', value: 'phone', width: '5%' },
-      { title: 'Rut', value: 'rut', width: '5%' },
-      { title: 'Rol', value: 'role', width: '5%' },
-      { title: 'Dirección', value: 'address', width: '25%' },
-      { title: 'Acciones', value: 'actions', sortable: false, width: '10%' },
+      { title: 'Nombre', value: 'name', },
+      { title: 'Usuario', value: 'user', },
+      { title: 'Correo', value: 'email', },
+      { title: 'Teléfono', value: 'phone', },
+      { title: 'Rut', value: 'rut', },
+      { title: 'Rol', value: 'role', },
+      { title: 'Dirección', value: 'address', },
+      { title: 'Acciones', value: 'actions', sortable: false, width: '13%' },
     ],
     editedItem: {
       id: '',
@@ -219,8 +267,19 @@ export default {
       role_id: '',
       user_id: ''
     },
+    editedPass: {
+      currentPassword: '',
+      newPassword: '',
+      newPassword1: ''
+    },
+    defaultPass: {
+      currentPassword: '',
+      newPassword: '',
+      newPassword1: ''
+    },
     editedIndex: -1,
     search: '',
+    user_id: '',
     nameRules: [
       (v) => !!v || "El campo es requerido",
       (v) => (v && v.length <= 50) ||
@@ -241,6 +300,7 @@ export default {
       (v) => !!v || "El Correo Electrónico es requerido",
       (v) => /.+@.+\..+/.test(v) || "El Correo Electrónico no es válido",
     ],
+    passwordRule: (value) => value && value.length >= 5 || 'La contraseña debe tener al menos 5 caracteres',
   }),
   computed: {
     formTitle() {
@@ -251,6 +311,7 @@ export default {
     },
   },
   mounted() {
+    //this.user_id = JSON.parse(LocalStorageService.getItem('user_id'));
     this.initialize();
   },
   methods: {
@@ -513,6 +574,48 @@ export default {
         this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
       } finally {
         this.closeDelete();
+      }
+    },
+    changePass(item){
+      this.editedPass = Object.assign({}, this.defaultPass);
+      this.user_id = item.user_id;
+      this.dialogChangePass = true;
+    },
+    closePass(){
+      this.editedPass = Object.assign({}, this.defaultPass);
+      this.dialogChangePass = false;
+    },
+
+    async savePass(){
+      this.loading = true; // Iniciar loader
+      try {
+        // Preparar el payload
+        this.data.id = this.user_id;
+        this.data.currentPassword = this.editedPass.currentPassword;
+        this.data.newPassword = this.editedPass.newPassword;
+
+        // Petición al servidor utilizando handleRequest
+        const result = await handleRequest({
+          endpoint: 'update-password',
+          method: 'POST',
+          data: this.data
+        });
+
+        if (result.success) {
+          // Manejo en caso de éxito
+          this.showAlert('success', 'Contraseña actualizada correctamente', 3000);
+          // Reiniciar el formulario
+          this.editedPass = Object.assign({}, this.defaultPass);
+        } else {
+          // Manejo de errores definidos por la API
+          this.showAlert('warning', result.details || 'Error inesperado', 3000);
+        }
+      } catch (error) {
+        // Manejo de errores no controlados
+        this.showAlert('error', 'Ocurrió un error inesperado al iniciar sesión.', 3000);
+      } finally {
+        this.loading = false; // Detener el loader
+        this.dialogChangePass = false;
       }
     },
     showAlert(sb_type, sb_message, sb_timeout) {

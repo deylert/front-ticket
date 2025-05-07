@@ -553,15 +553,15 @@ export default {
     items: ["Datos Generales", "Asignar Trabajadores"],
     dialogAssignedWorkers: false,
     headers: [
-      { title: "Ruta", value: "name", width: "15%" },
-      { title: "Origen", value: "origin", width: "20%" },
-      { title: "Destino", value: "destination", width: "20%" },
-      { title: "Vehículo", value: "vehicleName", width: "15%" },
-      { title: "Fecha", value: "date", width: "4%" },
-      { title: "Horario", value: "schedule", width: "4%" },
-      { title: "Precio", value: "price", width: "4%" },
-      { title: "Salida", value: "start", width: "4%" },
-      { title: "Llegada", value: "end", width: "4%" },
+      { title: "Ruta", value: "name" },
+      { title: "Origen", value: "origin" },
+      { title: "Destino", value: "destination" },
+      { title: "Vehículo", value: "vehicleName"},
+      { title: "Fecha", value: "date" },
+      { title: "Horario", value: "schedule" },
+      { title: "Precio", value: "price" },
+      { title: "Salida", value: "start" },
+      { title: "Llegada", value: "end" },
       { title: "Acciones", value: "actions", sortable: false, width: "10%" },
     ],
 
@@ -655,6 +655,7 @@ export default {
       this.showBranches();
     } else {
       this.branch_id = LocalStorageService.getItem("branch_id");
+      this.initialize();
     }
   },
   watch: {
@@ -767,12 +768,10 @@ export default {
       this.editedItem.schedule = null;
     },
     updateArrival() {
-      console.log(
-        "Datos iniciales - schedule:",
-        this.editedItem.schedule,
-        "estimated:",
-        this.estimated
-      );
+      console.log("updateArrival triggered");
+      console.log("schedule:", this.editedItem.schedule);
+      console.log("estimated:", this.estimated);
+      console.log("current arrival:", this.editedItem.arrival);
 
       // Validación básica
       if (!this.editedItem.schedule || !this.estimated) {
@@ -1096,8 +1095,8 @@ export default {
           updatedFields.id = this.editedItem.id;
           try {
             const result = await handleRequest({
-              endpoint: "trip",
-              method: "PUT",
+              endpoint: "trip-update",
+              method: "POST",
               data: updatedFields,
             });
 
@@ -1146,6 +1145,9 @@ export default {
           this.routes = result.data?.triproutes || [];
           this.vehicles = result.data?.tripvehicles || [];
           this.workers = result.data.tripworkers || [];
+
+          const matchedRoute = this.routes.find(route => route.id === this.editedItem.route_id);
+          this.estimated = matchedRoute ? matchedRoute.estimated : null;
         } else {
           // Si no hay datos, asignamos un array vacío
           this.routes = [];

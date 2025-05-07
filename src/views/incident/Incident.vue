@@ -194,71 +194,71 @@
                 </div>
               </template>
               <!-- Columna de expansión -->
-    <template v-slot:expander="{ item, isExpanded, expand }">
-      <v-btn
-        size="small"
-        variant="text"
-        :color="getDetailsButtonColor(item)"
-        @click.stop="expand(!isExpanded)"
-      >
-        <v-icon>{{ isExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
-        {{ isExpanded ? 'Ocultar' : 'Ver' }} detalles
-      </v-btn>
-    </template>
+              <template v-slot:expander="{ item, isExpanded, expand }">
+                <v-btn
+                  size="small"
+                  variant="text"
+                  :color="getDetailsButtonColor(item)"
+                  @click.stop="expand(!isExpanded)"
+                >
+                  <v-icon>{{ isExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+                  {{ isExpanded ? 'Ocultar' : 'Ver' }} detalles
+                </v-btn>
+              </template>
 
-    <!-- Contenido expandido -->
-    <template v-slot:expanded-row="{ columns, item }">
-      <tr>
-        <td :colspan="columns.length">
-          <div class="pa-4 bg-grey-lighten-4">
-            <h4 class="text-subtitle-1 mb-2">Detalles completos:</h4>
-            
-            <!-- Icono según tipo -->
-            <div class="d-flex align-center mb-3">
-              <v-icon
-                v-if="item.title.includes('Retraso')"
-                color="warning"
-                class="mr-2"
-              >
-                mdi-clock-alert
-              </v-icon>
-              <v-icon
-                v-else-if="item.title.includes('Escaneo')"
-                color="success"
-                class="mr-2"
-              >
-                mdi-qrcode-scan
-              </v-icon>
-              <v-icon
-                v-else-if="item.title.includes('Reimpresión')"
-                color="info"
-                class="mr-2"
-              >
-                mdi-printer
-              </v-icon>
-              <strong>{{ item.title }}</strong>
-            </div>
+              <!-- Contenido expandido -->
+              <template v-slot:expanded-row="{ columns, item }">
+                <tr>
+                  <td :colspan="columns.length">
+                    <div class="pa-4 bg-grey-lighten-4">
+                      <h4 class="text-subtitle-1 mb-2">Detalles completos:</h4>
+                      
+                      <!-- Icono según tipo -->
+                      <div class="d-flex align-center mb-3">
+                        <v-icon
+                          v-if="item.title.includes('Retraso')"
+                          color="warning"
+                          class="mr-2"
+                        >
+                          mdi-clock-alert
+                        </v-icon>
+                        <v-icon
+                          v-else-if="item.title.includes('Escaneo')"
+                          color="success"
+                          class="mr-2"
+                        >
+                          mdi-qrcode-scan
+                        </v-icon>
+                        <v-icon
+                          v-else-if="item.title.includes('Reimpresión')"
+                          color="info"
+                          class="mr-2"
+                        >
+                          mdi-printer
+                        </v-icon>
+                        <strong>{{ item.title }}</strong>
+                      </div>
 
-            <!-- Tabla de detalles con QR -->
-            <v-simple-table density="comfortable">
-              <tbody>
-                <tr v-for="(value, key) in item.details" :key="key">
-                  <td class="font-weight-bold" width="200">{{ formatDetailKey(key) }}:</td>
-                  <td>
-                    <div v-if="key === 'qr'" :id="'qr-container-'+item.id" class="qr-container">
-                      <!-- QR se generará aquí cuando se expanda -->
+                      <!-- Tabla de detalles con QR -->
+                      <v-simple-table density="comfortable">
+                        <tbody>
+                          <tr v-for="(value, key) in JSON.parse(item.details)" :key="key">
+                            <td class="font-weight-bold" width="200">{{ formatDetailKey(key) }}:</td>
+                            <td>
+                              <div v-if="key === 'qr'" :id="'qr-container-'+item.id" class="qr-container">
+                                <!-- QR se generará aquí cuando se expanda -->
+                              </div>
+                              <template v-else>
+                                {{ formatDetailValue(key, value) }}
+                              </template>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </v-simple-table>
                     </div>
-                    <template v-else>
-                      {{ formatDetailValue(key, value) }}
-                    </template>
                   </td>
                 </tr>
-              </tbody>
-            </v-simple-table>
-          </div>
-        </td>
-      </tr>
-    </template>
+              </template>
             </v-data-table>
           </v-col>
         </v-row>
@@ -358,6 +358,7 @@ import QRCode from 'qrcode';
         this.showBranches();
       } else {
         this.branch_id = LocalStorageService.getItem("branch_id");
+        this.initialize();
       }
     },
 

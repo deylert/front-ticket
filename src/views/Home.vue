@@ -104,23 +104,23 @@
                 <span style="font-weight: bold;">{{ this.formatNumber(item.dineroGenerado) }}</span>
               </template>
               <template v-slot:item.horario="{ item }">
-  <v-tooltip location="top">
-    <template v-slot:activator="{ props }">
-      <div v-bind="props" class="d-flex flex-column time-cell">
-        <div class="d-flex flex-column time-cell">
-          <v-icon small color="primary" class="mr-1">mdi-clock-outline</v-icon>
-          <span class="font-weight-medium">
-            {{ formatTimeRange(item.horario) }}
-          </span>
-        </div>
-        <span class="text-caption text-grey">
-          {{ item.estimated }} minutos
-        </span>
-      </div>
-    </template>
-    <span>Horario completo:<br>{{ item.horario }}</span>
-  </v-tooltip>
-</template>
+                <v-tooltip location="top">
+                  <template v-slot:activator="{ props }">
+                    <div v-bind="props" class="d-flex flex-column time-cell">
+                      <div class="d-flex flex-column time-cell">
+                        <v-icon small color="primary" class="mr-1">mdi-clock-outline</v-icon>
+                        <span class="font-weight-medium">
+                          {{ formatTimeRange(item.horario) }}
+                        </span>
+                      </div>
+                      <span class="text-caption text-grey">
+                        {{ item.estimated }} minutos
+                      </span>
+                    </div>
+                  </template>
+                  <span>Horario completo:<br>{{ item.horario }}</span>
+                </v-tooltip>
+              </template>
               <!--<template v-slot:item.horario="{ item }">
       <div class="d-flex flex-column time-cell">
         <div class="d-flex align-center">

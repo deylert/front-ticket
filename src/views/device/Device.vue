@@ -336,6 +336,7 @@ export default {
     this.showBranches();
     }else{
       this.branch_id = LocalStorageService.getItem('branch_id');
+      this.initialize();
     }
   },
   methods: {

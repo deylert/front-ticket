@@ -13,5 +13,6 @@ export const paleteColors = {
     info: '#2196F3', // Azul info
     active: 'green', // Rosa
     green: '#4CAF50',
-    inactive: '#FF5252' // Morado
+    inactive: '#FF5252', // Morado
+    teal: 'teal'
   };

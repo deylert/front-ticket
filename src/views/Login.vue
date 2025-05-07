@@ -54,7 +54,16 @@
       </v-card>
     </v-form>
   </div>-->
-
+    <v-row justify="center">
+      <v-col
+        cols="11"
+        sm="6"
+        md="5"
+        lg="4"
+        xl="2"
+      >
+      </v-col>
+      </v-row>
   <div class="d-flex align-center justify-center" style="height: 100vh; background-color: #B0BEC5;">
     <v-form ref="form" v-model="valid" enctype="multipart/form-data">
       <v-card class="mx-auto" elevation="8" max-width="600px" :min-width="$vuetify.display.smAndDown ? '90%' : '400px'"

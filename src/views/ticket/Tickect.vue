@@ -64,6 +64,9 @@
                                 <v-btn density="comfortable" icon="mdi-pencil" @click="editItem(item)"
                                     :color="paleteColors.primary" variant="tonal" elevation="1"
                                     title="Editar Ticket"></v-btn>
+                                <v-btn density="comfortable" icon="mdi-printer" @click="printerItem(item)"
+                                    :color="paleteColors.green" variant="tonal" elevation="1"
+                                    title="Reimprimir Ticket"></v-btn>
                                 <v-btn density="comfortable" icon="mdi-delete" @click="deleteItem(item)"
                                     :color="paleteColors.error" variant="tonal" elevation="1"
                                     title="Eliminar Ticket"></v-btn>
@@ -512,6 +515,132 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
+
+    <v-dialog v-model="showTicketDialog" max-width="500" persistent>
+      <v-card>
+        <v-card-title style="position: relative;">
+        <!-- Contenedor principal centrado -->
+        <div class="d-flex flex-column align-center" style="width: 100%;">
+            <!-- Logo de la sucursal -->
+            <v-avatar v-if="selectedBranch?.image" size="80" class="mb-3">
+            <img 
+                :src="`${this.$axios.defaults.baseURL}images/${selectedBranch.image}`" 
+                :alt="selectedBranch.name"
+                style="object-fit: contain;"
+            >
+            </v-avatar>
+            
+            <!-- Información de la sucursal -->
+            <div class="text-center">
+            <div class="text-h6 font-weight-bold">{{ selectedBranch?.name || 'Nombre Sucursal' }}</div>
+            <div class="text-body-2" v-if="selectedBranch?.rut">RUT: {{ selectedBranch.rut }}</div>
+            <div class="text-body-2" v-if="selectedBranch?.address">Dirección: {{ selectedBranch.address }}</div>
+            <div class="text-body-2" v-if="selectedBranch?.phone">Teléfono: {{ selectedBranch.phone }}</div>
+            <div class="text-body-2" v-if="selectedBranch?.id">Folio N° {{ currentTicket.id }}</div>
+            </div>
+        </div>
+        
+        <!-- Botón de impresión -->
+        <v-btn 
+            icon 
+            @click="printTicket"
+            style="position: absolute; right: 16px; top: 16px;"
+        >
+            <v-icon>mdi-printer</v-icon>
+        </v-btn>
+        </v-card-title>
+        
+        <v-card-text>
+        <div class="ticket-container">
+            <!-- Ticket original -->
+                       
+            <div class="d-flex justify-space-between align-center mb-3">
+            <div class="font-weight-medium">Fecha: {{ currentTicket.date }}</div>
+            <div class="font-weight-medium">Hora: {{ currentTicket.schedule || '--:--' }}</div>
+            </div>
+            
+            <div class="mb-3">
+            <div class="font-weight-bold mb-1">Recorrido:</div>
+            <div>
+                <span class="font-weight-medium mr-1">Origen:</span>
+                <span>{{ currentTicket.tripOrigin || 'No especificado' }}</span>
+            </div>
+            <div>
+                <span class="font-weight-medium mr-1">Destino:</span>
+                <span>{{ currentTicket.tripDestination || 'No especificado' }}</span>
+            </div>
+            </div>
+            
+            <div class="ticket-details">
+            <div class="d-flex align-center mb-1">
+                <span class="font-weight-medium mr-1">Precio:</span>
+                <span>${{ formatNumber(currentTicket.total) }}</span>
+            </div>
+            <div class="d-flex align-center mb-1">
+                <span class="font-weight-medium mr-1">Medio de pago:</span>
+                <span>{{ currentTicket.method }}</span>
+            </div>
+            </div>
+            <br>
+            <div class="text-center">
+            <canvas ref="qrCanvasOriginal" style="width: 150px; height: 150px;"></canvas>
+            </div>
+            <br>
+            <!-- Línea divisoria que ocupa todo el ancho -->
+            <div class="dashed-divider my-3"></div>
+            
+            <!-- Copia de control -->
+            <div class="text-center caption mb-3">
+            -Copia de control-
+            <div class="text-body-2" v-if="currentTicket?.id">Folio N° {{ currentTicket.id }}</div>
+            </div>
+            
+            <div class="d-flex justify-space-between align-center mb-3">
+            <div class="font-weight-medium">Fecha: {{ currentTicket.date }}</div>
+            <div class="font-weight-medium">Hora: {{ currentTicket.schedule || '--:--' }}</div>
+            </div>
+            
+            <div class="mb-3">
+            <div class="font-weight-bold mb-1">Recorrido:</div>
+            <div>
+                <span class="font-weight-medium mr-1">Origen:</span>
+                <span>{{ currentTicket.tripOrigin || 'No especificado' }}</span>
+            </div>
+            <div>
+                <span class="font-weight-medium mr-1">Destino:</span>
+                <span>{{ currentTicket.tripDestination || 'No especificado' }}</span>
+            </div>
+            </div>
+            
+            <div class="ticket-details">
+            <div class="d-flex align-center mb-1">
+                <span class="font-weight-medium mr-1">Precio:</span>
+                <span>${{ formatNumber(currentTicket.total) }}</span>
+            </div>
+            <div class="d-flex align-center mb-1">
+                <span class="font-weight-medium mr-1">Medio de pago:</span>
+                <span>{{ currentTicket.method }}</span>
+            </div>
+            </div>
+            <br>
+            <div class="text-center">
+            <canvas ref="qrCanvasControl" style="width: 150px; height: 150px;"></canvas>
+            </div>
+            <br>
+            <!-- Nota de impresión -->
+            <v-divider class="my-2"></v-divider>
+            <div v-if="currentTicket.print >= 1" class="text-center caption mt-2 uppercase-text">
+            (COPIA REIMPRESA POR EL OPERADOR {{ nameUser }})
+            </div>
+        </div>
+        </v-card-text>
+        
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="showTicketDialog = false">Cerrar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 </template>
 
 <script>
@@ -519,6 +648,7 @@ import LocalStorageService from "@/LocalStorageService";
 import { handleRequest } from "@/utils/api"; // Ruta al archivo
 import _ from 'lodash';
 import { paleteColors } from "@/assets/colors";
+import QRCode from 'qrcode';
 export default {
     data: () => ({
         snackbar: false,
@@ -541,6 +671,11 @@ export default {
         workers: [],
         tickets: [],
         promotions: [],
+        currentTicket: {},
+        nameBranch: '',
+        imageBranch: '',
+        nameUser: '',
+        selectedBranch: {},
         data: {},
         hasStartedSelecting: false,
         seats: 0, // Ejemplo de asientos disponibles
@@ -550,6 +685,7 @@ export default {
         aviable: '',
         branches: [],
         showSeatsMenu: false,
+        showTicketDialog: false,
         headers: [
             { title: "Ruta", value: "tripName", },
             { title: "Origen", value: "tripOrigin", },
@@ -563,7 +699,7 @@ export default {
             { title: "Asientos", value: "seats", },
             { title: "Precio", value: "price", },
             { title: "Total", value: "total", },
-            { title: "Acciones", value: "actions", sortable: false, width: "10%" },
+            { title: "Acciones", value: "actions", sortable: false, width: "15%" },
         ],
 
         editedItem: {
@@ -720,13 +856,29 @@ export default {
     },
     mounted() {
         this.role = JSON.parse(LocalStorageService.getItem('role'));
+        this.nameUser = JSON.parse(LocalStorageService.getItem('name'));
         if (this.role === 'Administrador') {
             this.showBranches();
         } else {
             this.branch_id = LocalStorageService.getItem('branch_id');
+            this.initialize();
         }
     },
     methods: {
+        formatNumber(value) {
+            // Si el valor es menor que 1000, devuelve el valor original con dos decimales
+            if (value < 1000) {
+                return (Math.round((value + Number.EPSILON) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            // Primero, redondea el valor a dos decimales
+            value = Math.round((value + Number.EPSILON) * 100) / 100;
+
+            // Convierte el valor a cadena con formato de número local (en-US)
+            let formattedValue = value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            return formattedValue;
+        },
         applyPromotionAdults(promotionId) {
             // Buscar la promoción seleccionada
             const selectedPromotion = this.promotions.find((promo) => promo.id === promotionId);
@@ -1323,6 +1475,27 @@ export default {
 
                         // Manejo de la respuesta según el resultado
                         if (result.success) {
+                            // Aquí llamamos a la función de impresión con los datos del ticket
+                            if (result.data && result.data.ticket) {
+                                console.log("Ticket generado:", result.data.ticket);
+                                this.currentTicket = {};
+                                this.currentTicket = result.data.ticket;
+                                this.showTicketDialog = true;
+                                
+                                const branchIdBuscado = this.currentTicket.branch_id; // o el ID que necesitas comparar
+            
+                                // Encuentra la branch que coincide
+                                const branchEncontrada = this.branches.find(branch => 
+                                        branch.id === branchIdBuscado
+                                    );
+
+                                // Si necesitas la branch en this para usarla en el template
+                                this.selectedBranch = branchEncontrada || null;   
+                                // Genera el QR después de que el componente se haya renderizado
+                                await this.$nextTick();
+                                await this.generateQRCode();
+                            //this.printTicket(result.data.ticket);
+                            }
                             this.showAlert("success", result.message, 3000);
                             this.initialize();
                             this.loading = false;
@@ -1411,6 +1584,337 @@ export default {
                 }
             }
             this.close();
+        },
+
+        async generateQRCode() {
+            try {
+                const qrData = this.currentTicket.qr
+                
+                if (!qrData) return;
+                
+                // Opciones comunes para ambos QR
+                const qrOptions = {
+                width: 150,
+                margin: 1,
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff'
+                }
+                };
+                
+                // Generar QR original
+                if (this.$refs.qrCanvasOriginal) {
+                await QRCode.toCanvas(this.$refs.qrCanvasOriginal, qrData, qrOptions);
+                }
+                
+                // Generar QR para copia de control
+                if (this.$refs.qrCanvasControl) {
+                await QRCode.toCanvas(this.$refs.qrCanvasControl, qrData, qrOptions);
+                }
+                
+            } catch (error) {
+                console.error('Error generando QR codes:', error);
+                this.showError('Error al generar códigos QR');
+            }
+        },
+        formatDate(dateString) {
+        if (!dateString) return '';
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-ES', options);
+        },
+        async printerItem(item){
+            this.currentTicket = {};
+
+            this.data = {};
+            this.data.id = Number(item.id);
+            //this.data.date = formattedDate;
+            try {
+                const result = await handleRequest({
+                    endpoint: "ticket-show",
+                    method: "POST",
+                    data: this.data,
+                });
+
+                if (result.success) {
+                    // Si la solicitud es exitosa, asignamos las sucursales
+                    this.currentTicket = result.data?.ticket || {};
+                } else {
+                    // Si no hay datos, asignamos un array vacío
+                    this.currentTicket = {};
+                }
+            } catch (error) {
+                this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
+            } finally {                
+            this.showTicketDialog = true;
+            const branchIdBuscado = this.currentTicket.branch_id; // o el ID que necesitas comparar
+            
+            // Encuentra la branch que coincide
+            const branchEncontrada = this.branches.find(branch => 
+                    branch.id === branchIdBuscado
+                );
+
+            // Si necesitas la branch en this para usarla en el template
+            this.selectedBranch = branchEncontrada || null;        
+           // Genera el QR después de que el componente se haya renderizado
+            await this.$nextTick();
+            await this.generateQRCode();
+            }
+
+        },
+        async printTicket() {
+        try {
+            const printWindow = window.open('', '_blank');
+            
+            // Generar ambos códigos QR
+            let qrImageOriginal = '';
+            let qrImageControl = '';
+            const qrData = this.currentTicket.qr || this.currentTicket.id;
+            
+            if (qrData) {
+            qrImageOriginal = await QRCode.toDataURL(qrData, {
+                width: 150,
+                margin: 1,
+                color: {
+                dark: '#000000',
+                light: '#ffffff'
+                }
+            });
+            qrImageControl = qrImageOriginal; // Usamos el mismo QR para ambas secciones
+            }
+
+            const printContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Ticket de Viaje</title>
+                <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 10px;
+                    font-size: 14px;
+                }
+                .ticket-container {
+                    max-width: 100%;
+                    margin: 0 auto;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 15px;
+                }
+                .branch-logo {
+                    width: 80px;
+                    height: 80px;
+                    margin: 0 auto 10px;
+                    display: block;
+                    object-fit: contain;
+                }
+                .branch-name {
+                    font-size: 1.25rem;
+                    font-weight: bold;
+                    margin-bottom: 5px;
+                }
+                .branch-info {
+                    font-size: 0.875rem;
+                    margin-bottom: 3px;
+                }
+                .dashed-divider {
+                    border-top: 1px dashed #000;
+                    width: 100%;
+                    margin: 15px 0;
+                }
+                .detail-row {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 8px;
+                }
+                .font-weight-medium {
+                    font-weight: 500;
+                }
+                .font-weight-bold {
+                    font-weight: bold;
+                }
+                .mr-1 {
+                    margin-right: 4px;
+                }
+                .mb-1 {
+                    margin-bottom: 4px;
+                }
+                .mb-3 {
+                    margin-bottom: 12px;
+                }
+                .my-3 {
+                    margin-top: 12px;
+                    margin-bottom: 12px;
+                }
+                .text-center {
+                    text-align: center;
+                }
+                .caption {
+                    font-size: 0.75rem;
+                }
+                .uppercase-text {
+                    text-transform: uppercase;
+                }
+                .ticket-details {
+                    margin-bottom: 15px;
+                }
+                .control-copy-title {
+                    font-style: italic;
+                    margin-bottom: 8px;
+                }
+                @page {
+                    size: auto;
+                    margin: 0;
+                }
+                @media print {
+                    body {
+                    padding: 5px;
+                    }
+                }
+                </style>
+            </head>
+            <body>
+                <div class="ticket-container">
+                <!-- Encabezado con logo e información de sucursal -->
+                <div class="header">
+                    ${this.selectedBranch?.image ? `
+                    <img src="${this.$axios.defaults.baseURL}images/${this.selectedBranch.image}" 
+                        class="branch-logo" 
+                        alt="${this.selectedBranch.name}">
+                    ` : ''}
+                    
+                    <div class="branch-name">${this.selectedBranch?.name || 'Nombre Sucursal'}</div>
+                    
+                    ${this.selectedBranch?.rut ? `
+                    <div class="branch-info">RUT: ${this.selectedBranch.rut}</div>
+                    ` : ''}
+                    
+                    ${this.selectedBranch?.address ? `
+                    <div class="branch-info">Dirección: ${this.selectedBranch.address}</div>
+                    ` : ''}
+                    
+                    ${this.selectedBranch?.phone ? `
+                    <div class="branch-info">Teléfono: ${this.selectedBranch.phone}</div>
+                    ` : ''}
+                    
+                    <div class="branch-info">Folio N° ${this.currentTicket.id}</div>
+                </div>
+                
+                <!-- Ticket original -->
+                <div class="detail-row">
+                    <div class="font-weight-medium">Fecha: ${this.currentTicket.date}</div>
+                    <div class="font-weight-medium">Hora: ${this.currentTicket.schedule || '--:--'}</div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="font-weight-bold mb-1">Recorrido:</div>
+                    <div>
+                    <span class="font-weight-medium mr-1">Origen:</span>
+                    <span>${this.currentTicket.tripOrigin || 'No especificado'}</span>
+                    </div>
+                    <div>
+                    <span class="font-weight-medium mr-1">Destino:</span>
+                    <span>${this.currentTicket.tripDestination || 'No especificado'}</span>
+                    </div>
+                </div>
+                
+                <div class="ticket-details">
+                    <div class="d-flex align-center mb-1">
+                    <span class="font-weight-medium mr-1">Precio:</span>
+                    <span>$${this.formatNumber(this.currentTicket.total)}</span>
+                    </div>
+                    <div class="d-flex align-center mb-1">
+                    <span class="font-weight-medium mr-1">Medio de pago:</span>
+                    <span>${this.currentTicket.method}</span>
+                    </div>
+                </div>
+                
+                <br>
+                
+                ${qrImageOriginal ? `
+                    <div class="text-center">
+                    <img src="${qrImageOriginal}" style="width: 150px; height: 150px;">
+                    </div>
+                ` : ''}
+                
+                <br>
+                
+                <!-- Línea divisoria -->
+                <div class="dashed-divider"></div>
+                
+                <!-- Copia de control -->
+                <div class="text-center caption control-copy-title">
+                    -Copia de control-
+                    <div class="branch-info">Folio N° ${this.currentTicket.id}</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="font-weight-medium">Fecha: ${this.currentTicket.date}</div>
+                    <div class="font-weight-medium">Hora: ${this.currentTicket.schedule || '--:--'}</div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="font-weight-bold mb-1">Recorrido:</div>
+                    <div>
+                    <span class="font-weight-medium mr-1">Origen:</span>
+                    <span>${this.currentTicket.tripOrigin || 'No especificado'}</span>
+                    </div>
+                    <div>
+                    <span class="font-weight-medium mr-1">Destino:</span>
+                    <span>${this.currentTicket.tripDestination || 'No especificado'}</span>
+                    </div>
+                </div>
+                
+                <div class="ticket-details">
+                    <div class="d-flex align-center mb-1">
+                    <span class="font-weight-medium mr-1">Precio:</span>
+                    <span>$${this.formatNumber(this.currentTicket.total)}</span>
+                    </div>
+                    <div class="d-flex align-center mb-1">
+                    <span class="font-weight-medium mr-1">Medio de pago:</span>
+                    <span>${this.currentTicket.method}</span>
+                    </div>
+                </div>
+                
+                <br>
+                
+                ${qrImageControl ? `
+                    <div class="text-center">
+                    <img src="${qrImageControl}" style="width: 150px; height: 150px;">
+                    </div>
+                ` : ''}
+                
+                <br>
+                
+                <!-- Nota de impresión -->
+                
+                
+                ${this.currentTicket.print >= 1 ? `
+                    <div class="text-center caption mt-2 uppercase-text">
+                    (COPIA REIMPRESA POR EL OPERADOR ${this.nameUser})
+                    </div>
+                ` : ''}
+                </div>
+                
+                <script>
+                setTimeout(() => {
+                    window.print();
+                    window.close();
+                }, 300);
+                <\/script>
+            </body>
+            </html>
+            `;
+
+            printWindow.document.open();
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+        } catch (error) {
+            console.error('Error al imprimir:', error);
+            this.showAlert('error', 'Error al imprimir el ticket', 3000);
+        }
         },
         async editItem(item) {
             this.editedIndex = 1;
@@ -1580,4 +2084,14 @@ export default {
   font-weight: bold;
   color: black; /* Color del texto */
 }
+
+.dashed-divider {
+  border-top: 1px dashed #000;
+  width: 100%;
+  margin: 16px 0;
+}
+.uppercase-text {
+  text-transform: uppercase;
+}
+
 </style>

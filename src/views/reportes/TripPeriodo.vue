@@ -257,6 +257,7 @@ export default {
             }
         },
         async initialize() {
+            this.response = [];
             try {
                 this.loading = true;
                 this.data = {};
