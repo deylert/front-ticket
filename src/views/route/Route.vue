@@ -92,7 +92,7 @@
                 </v-autocomplete>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="editedItem.distance" clearable label="Distancia" prepend-icon="mdi-ruler"
+                <v-text-field v-model="editedItem.distance" clearable label="Distancia (Km)" prepend-icon="mdi-ruler"
                   variant="underlined" :rules="distanceRules"></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
@@ -152,8 +152,8 @@ export default {
       { title: "Nombre", value: "name", width: "15%" },
       { title: "Origen", value: "originAddress", width: "30%" },
       { title: "Destino", value: "destinationAddress", width: "30%" },
-      { title: "Distancia", value: "distance", width: "5%" },
-      { title: "Duración", value: "estimated", width: "5%" },
+      { title: "Distancia (Km)", value: "distance", width: "5%" },
+      { title: "Duración (Minutos)", value: "estimated", width: "5%" },
       { title: "Acciones", value: "actions", sortable: false, width: "15%" },
     ],
 

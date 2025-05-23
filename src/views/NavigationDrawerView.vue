@@ -90,6 +90,7 @@ export default {
     mainteiners: [
       { title: "Estructuras de asientos", icon: "mdi-bus-side", to: "structure", permission: "view_structures" },
       { title: "Promociones", icon: "mdi-tag-outline", to: "promotion", permission: "view_promotions" },
+      { title: "Tipos de Pasajes", icon: "mdi-ticket-confirmation-outline", to: "ticket-type", permission: "view_tickettype" },
     ],
     security: [
       { title: "Roles", icon: "mdi-account-cog-outline", to: "role", permission: "view_roles" },

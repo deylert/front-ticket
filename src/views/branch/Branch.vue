@@ -63,7 +63,7 @@
     </v-card>
   </v-container>
 
-  <v-dialog v-model="dialog" max-width="600px">
+  <v-dialog v-model="dialog" max-width="550px">
     <v-form ref="form" v-model="valid" enctype="multipart/form-data">
       <v-card>
         <v-toolbar :color="paleteColors.primary">
@@ -72,7 +72,7 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" md="6">
+              <v-col cols="12" md="12">
                 <v-autocomplete :no-data-text="'No hay datos disponibles'" v-model="editedItem.company_id"
                   :items="companies" label="Negocios" prepend-icon="mdi-store-outline" item-title="name" item-value="id"
                   variant="underlined" :rules="selectRules">
@@ -83,15 +83,15 @@
                   </template>
                 </v-autocomplete>
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col cols="12" md="12">
                 <v-text-field v-model="editedItem.name" clearable label="Nombre" prepend-icon="mdi-store"
                   variant="underlined" :rules="nameRules"></v-text-field>
               </v-col>
-              <v-col cols="12" md="6">
+              <!--<v-col cols="12" md="12">
                 <v-text-field v-model="editedItem.rut" clearable label="Rut" prepend-icon="mdi-identifier"
                   variant="underlined" :rules="rutRules"></v-text-field>
-              </v-col>
-              <v-col cols="12" md="6">
+              </v-col>-->
+              <v-col cols="12" md="12">
                 <v-text-field v-model="editedItem.phone" clearable label="Teléfono" placeholder="+56912345678"
                   prepend-icon="mdi-phone" variant="underlined" :rules="mobileRules"></v-text-field>
               </v-col>
@@ -220,11 +220,11 @@ export default {
     dialogBranchVehicle: null,
     dialogBranchRoute: null,
     headers: [
-      { title: "Negocio", value: "companyName", width: "20%" },
+      { title: "Negocio", value: "companyName", },
       { title: "Nombre", value: "name", width: "20%" },
-      { title: "Rut", value: "rut", width: "10%" },
-      { title: "Teléfono", value: "phone", width: "10%" },
-      { title: "Dirección", value: "address", width: "20%" },
+      //{ title: "Rut", value: "rut", width: "10%" },
+      { title: "Teléfono", value: "phone", },
+      { title: "Dirección", value: "address", },
       { title: "Acciones", value: "actions", sortable: false, width: "20%" },
     ],
 
@@ -295,7 +295,12 @@ export default {
         if (result.success) {
           // Si la solicitud es exitosa, asignamos las sucursales
           this.companies = result.data?.companies || [];
-        } else {
+          if (!this.editedItem.company_id || this.editedItem.company_id === 0 || this.editedItem.company_id === '') {
+          if (this.companies.length > 0) {
+            this.editedItem.company_id = this.companies[0].id;
+          } 
+        }
+                } else {
           // Si no hay datos, asignamos un array vacío
           this.companies = [];
         }

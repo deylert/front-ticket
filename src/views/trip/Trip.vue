@@ -773,6 +773,48 @@ export default {
       console.log("estimated:", this.estimated);
       console.log("current arrival:", this.editedItem.arrival);
 
+      // Validación mejorada
+      if (!this.editedItem.schedule || !this.estimated || 
+          !this.editedItem.schedule.match(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)) {
+        this.editedItem.arrival = null;
+        return;
+      }
+
+      try {
+        // Usar fecha del item o fecha actual si es null
+        const baseDate = this.editedItem.date ? 
+          new Date(this.editedItem.date + 'T00:00:00') : 
+          new Date();
+
+        // Extraer horas y minutos del schedule
+        const [hours, minutes] = this.editedItem.schedule.split(":").map(Number);
+
+        // Configurar la hora en la fecha base (en zona horaria local)
+        const departureDate = new Date(baseDate);
+        departureDate.setHours(hours, minutes, 0, 0);
+
+        // Sumar los minutos estimados
+        const arrivalDate = new Date(departureDate.getTime() + this.estimated * 60000);
+
+        // Formatear a YYYY-MM-DD HH:MM:SS en hora local
+        const pad = n => n.toString().padStart(2, '0');
+        const formattedArrival = 
+          `${arrivalDate.getFullYear()}-${pad(arrivalDate.getMonth() + 1)}-${pad(arrivalDate.getDate())} ` +
+          `${pad(arrivalDate.getHours())}:${pad(arrivalDate.getMinutes())}:00`;
+
+        this.editedItem.arrival = formattedArrival;
+        console.log("Hora de llegada calculada:", this.editedItem.arrival);
+      } catch (error) {
+        console.error("Error calculando hora de llegada:", error);
+        this.editedItem.arrival = null;
+      }
+    },
+    /*updateArrival() {
+      console.log("updateArrival triggered");
+      console.log("schedule:", this.editedItem.schedule);
+      console.log("estimated:", this.estimated);
+      console.log("current arrival:", this.editedItem.arrival);
+
       // Validación básica
       if (!this.editedItem.schedule || !this.estimated) {
         this.editedItem.arrival = null;
@@ -799,7 +841,7 @@ export default {
 
       this.editedItem.arrival = formattedArrival;
       console.log("Hora de llegada calculada:", this.editedItem.arrival);
-    },
+    },*/
     /*generateTimeSlots() {
       const slots = [];
       const now = new Date();
@@ -964,8 +1006,13 @@ export default {
       this.data = {};
       this.data.branch_id = this.branch_id;
       const today = new Date();
-      const formattedDate = today.toISOString().split("T")[0]; // Formato: YYYY-MM-DD
-      //this.data.date = formattedDate;
+      const formattedDate = today.toLocaleDateString('es-CL', {
+          timeZone: 'America/Santiago',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+      }).split('-').reverse().join('-'); // Convierte "DD-MM-YYYY" a "YYYY-MM-DD"
+      this.data.date = formattedDate;
       try {
         this.loading = true;
         const result = await handleRequest({

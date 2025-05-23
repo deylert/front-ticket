@@ -131,7 +131,13 @@ const routes = [
         name: "Incident",
         component: () =>
           import(/* webpackChunkName: "home" */ "@/views/incident/Incident.vue"),
-      }
+      },
+      {
+        path: "/ticket-type",
+        name: "Tipo Pasaje",
+        component: () =>
+          import(/* webpackChunkName: "home" */ "@/views/tickettype/TicketType.vue"),
+      },
     ],
   },
 ];

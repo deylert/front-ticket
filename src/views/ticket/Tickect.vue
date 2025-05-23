@@ -252,168 +252,92 @@
                     </v-row>
                     <!-- Pasajeros adultos y menores -->
                     <v-row>
-                        <v-col cols="12" md="6">
-                            <!-- Pasajeros estándar -->
-                            <v-card class="pa-4 mb-4">
-                                <v-row>
-                                    <!-- Campo para pasajeros estándar -->
-                                    <v-col cols="12" md="6">
-                                        <v-text-field v-model="normal" label="Pasajeros Estandar" type="number"
-                                            variant="underlined" density="compact" prepend-icon="mdi-account"
-                                            placeholder="Ingrese la cantidad de adultos" min="0"
-                                            @update:model-value="onNormalsChange"
-                                            :rules="quantityAndPassengerRules" :disabled="isDisabledNormal"></v-text-field>
-                                    </v-col>
-
-                                    <!-- Botón para aplicar promoción o autocomplete para seleccionar promoción -->
-                                    <v-col cols="12" md="6">
-                                        <!-- Mostrar botón "Aplicar Promoción" solo si `normal` tiene valor y no hay promoción seleccionada -->
-                                        <v-btn v-if="!showPromotion" @click="showPromotion = showPromotionField" variant="outlined"
-                                            prepend-icon="mdi-tag" color="primary" :disabled="isDisabledNormal">
-                                            Aplicar Promoción
-                                        </v-btn>
-
-                                        <!-- Mostrar autocomplete y botón "Eliminar Promoción" si `showPromotionField` es true -->
-                                        <div v-if="this.showPromotion">
-                                            <v-autocomplete :no-data-text="'No hay datos disponibles'"
-                                                v-model="selectedPromotion" :items="promotions"
-                                                label="Seleccionar promoción" item-title="name" item-value="id"
-                                                variant="underlined" density="compact" prepend-icon="mdi-tag"
-                                                @update:model-value="applyPromotionNormal">
-                                                <template v-slot:item="{ props, item }">
-                                                    <v-list-item v-bind="props">
-                                                        <v-list-item-subtitle>
-                                                            <strong>Descuento:</strong> {{ item.raw.percentage }}%
-                                                        </v-list-item-subtitle>
-                                                        <v-list-item-subtitle>
-                                                            <v-tooltip bottom>
-                                                                <template v-slot:activator="{ props }">
-                                                                    <div class="truncate" v-bind="props"
-                                                                        style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                                        <strong>Descripción:</strong> {{
-                                                                            item.raw.description }}
-                                                                    </div>
-                                                                </template>
-                                                                <span>{{ item.raw.description }}</span>
-                                                            </v-tooltip>
-                                                        </v-list-item-subtitle>
-                                                    </v-list-item>
-                                                </template>
-                                            </v-autocomplete>
-                                            <!-- Botón para eliminar promoción -->
-                                            <v-btn v-if="selectedPromotion" @click="removePromotionNormal" variant="text"
-                                                color="error" prepend-icon="mdi-close">
-                                                Eliminar Promoción
-                                            </v-btn>
-                                        </div>
-                                    </v-col>
-                                </v-row>
-                            </v-card>
-
-                            <!-- Pasajeros adultos mayores -->
-                            <v-card class="pa-4 mb-4">
-                                <v-row>
-                                    <v-col cols="12" md="6">
-                                        <v-text-field v-model="editedItem.adults" label="Pasajeros adultos mayor"
-                                            type="number" variant="underlined" density="compact"
-                                            prepend-icon="mdi-account-supervisor"
-                                            placeholder="Ingrese la cantidad de adultos" min="0"
-                                            @update:model-value="onAdultsChange"
-                                            :rules="quantityAndPassengerRules"
-                                            :disabled="isDisabledAdult"></v-text-field>
-                                    </v-col>
-                                    <v-col cols="12" md="6">
-                                        <v-btn v-if="!showPromotionAdults" @click="showPromotionAdults = showPromotionFieldAdults"
-                                            variant="outlined" prepend-icon="mdi-tag" color="primary" :disabled="isDisabledAdult">
-                                            Aplicar Promoción
-                                        </v-btn>
-                                        <div v-if="this.showPromotionAdults">
-                                            <v-autocomplete :no-data-text="'No hay datos disponibles'"
-                                                v-model="selectedPromotionAdults" :items="promotions"
-                                                label="Seleccionar promoción" item-title="name" item-value="id"
-                                                variant="underlined" density="compact" prepend-icon="mdi-tag"
-                                                @update:model-value="applyPromotionAdults">
-                                                <template v-slot:item="{ props, item }">
-                                                    <v-list-item v-bind="props">
-                                                        <v-list-item-subtitle>
-                                                            <strong>Descuento:</strong> {{ item.raw.percentage }}%
-                                                        </v-list-item-subtitle>
-                                                        <v-list-item-subtitle>
-                                                            <v-tooltip bottom>
-                                                                <template v-slot:activator="{ props }">
-                                                                    <div class="truncate" v-bind="props"
-                                                                        style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                                        <strong>Descripción:</strong> {{
-                                                                            item.raw.description }}
-                                                                    </div>
-                                                                </template>
-                                                                <span>{{ item.raw.description }}</span>
-                                                            </v-tooltip>
-                                                        </v-list-item-subtitle>
-                                                    </v-list-item>
-                                                </template>
-                                            </v-autocomplete>
-                                            <v-btn v-if="selectedPromotionAdults" @click="removePromotionAdult" variant="text" color="error"
-                                                prepend-icon="mdi-close">
-                                                Eliminar Promoción
-                                            </v-btn>
-                                        </div>
-                                    </v-col>
-                                </v-row>
-                            </v-card>
-
-                            <!-- Pasajeros menores de edad -->
-                            <v-card class="pa-4 mb-4">
-                                <v-row>
-                                    <v-col cols="12" md="6">
-                                        <v-text-field v-model="editedItem.minors" label="Pasajeros menores de edad"
-                                            type="number" variant="underlined" density="compact"
-                                            prepend-icon="mdi-account-child"
-                                            placeholder="Ingrese la cantidad de menores" min="0"
-                                            @update:model-value="onMinorsChange"
-                                            :rules="quantityAndPassengerRules" :disabled="isDisabledMinor"></v-text-field>
-                                    </v-col>
-                                    <v-col cols="12" md="6">
-                                        <v-btn v-if="!showPromotionMinors" @click="showPromotionMinors = showPromotionFieldMinors"
-                                            variant="outlined" prepend-icon="mdi-tag" color="primary" :disabled="isDisabledMinor">
-                                            Aplicar Promoción
-                                        </v-btn>
-                                        <div v-if="this.showPromotionMinors">
-                                            <v-autocomplete :no-data-text="'No hay datos disponibles'"
-                                                v-model="selectedPromotionMinors" :items="promotions"
-                                                label="Seleccionar promoción" item-title="name" item-value="id"
-                                                variant="underlined" density="compact" prepend-icon="mdi-tag"
-                                                @update:model-value="applyPromotionMinors">
-                                                <template v-slot:item="{ props, item }">
-                                                    <v-list-item v-bind="props">
-                                                        <v-list-item-subtitle>
-                                                            <strong>Descuento:</strong> {{ item.raw.percentage }}%
-                                                        </v-list-item-subtitle>
-                                                        <v-list-item-subtitle>
-                                                            <v-tooltip bottom>
-                                                                <template v-slot:activator="{ props }">
-                                                                    <div class="truncate" v-bind="props"
-                                                                        style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                                        <strong>Descripción:</strong> {{
-                                                                            item.raw.description }}
-                                                                    </div>
-                                                                </template>
-                                                                <span>{{ item.raw.description }}</span>
-                                                            </v-tooltip>
-                                                        </v-list-item-subtitle>
-                                                    </v-list-item>
-                                                </template>
-                                            </v-autocomplete>
-                                            <v-btn v-if="selectedPromotionMinors" @click="removePromotionMinor" variant="text" color="error"
-                                                prepend-icon="mdi-close">
-                                                Eliminar Promoción
-                                            </v-btn>
-                                        </div>
-                                    </v-col>
-                                </v-row>
-                            </v-card>
-
-                            <!-- Total a pagar -->
+                    <v-col cols="12" md="6">
+                    <v-card>
+                            <v-card-title class="bg-primary">Tipos de Pasaje</v-card-title>
+                            <v-card-text class="bg-white pt-4" style="min-height: 44vh; overflow-y: auto;">
+                                <div v-if="mergedTicketTypes.length > 0">
+                                    <div v-for="ticket in mergedTicketTypes" :key="ticket.id" class="mb-2">
+                                        <v-row align="center">
+                                            <v-col cols="12" md="6">
+                                                <v-text-field
+                                                    :model-value="ticket.cant"
+                                                    @update:modelValue="(val) => handleQuantityChange(ticket, val)"
+                                                    @blur="validateQuantity(ticket)"
+                                                    :label="ticket.name"
+                                                    variant="underlined"
+                                                    density="compact"
+                                                    type="number"
+                                                    min="0"
+                                                    :max="getMaxQuantity(ticket)"
+                                                    :error-messages="quantityErrors[ticket.id]"
+                                                    hide-details="auto"
+                                                    @keypress="onlyNumbers"
+                                                ></v-text-field>
+                                            </v-col>
+                                            <v-col cols="12" md="6" class="d-flex align-center">
+                                                <!-- Mostrar autocomplete cuando se está agregando promoción -->
+                                                <div v-if="ticket.showPromotionSelect" class="flex-grow-1">
+                                                    <v-autocomplete 
+                                                        v-model="ticket.selectedPromotion"
+                                                        :items="promotions"
+                                                        label="Seleccionar promoción"
+                                                        item-title="name"
+                                                        item-value="id"
+                                                        variant="underlined"
+                                                        density="compact"
+                                                        :no-data-text="'No hay promociones disponibles'"
+                                                        @update:model-value="(val) => applyPromotion(ticket, val)"
+                                                        @blur="ticket.showPromotionSelect = false"
+                                                        autofocus
+                                                    >
+                                                        <template v-slot:item="{ props, item }">
+                                                            <v-list-item v-bind="props">
+                                                                <v-list-item-subtitle>
+                                                                    <strong>Descuento:</strong> {{ item.raw.percentage }}%
+                                                                </v-list-item-subtitle>
+                                                            </v-list-item>
+                                                        </template>
+                                                    </v-autocomplete>
+                                                </div>
+                                                
+                                                <!-- Mostrar chip de promoción cuando está aplicada -->
+                                                <div v-else-if="ticket.promotion_id" class="d-flex align-center" style="gap: 8px;">
+                                                    <v-chip variant="outlined" color="primary" prepend-icon="mdi-tag">
+                                                        {{ ticket.namePromotion }} ({{ ticket.percentage }}%)
+                                                    </v-chip>
+                                                    <v-btn 
+                                                        @click="removePromotion(ticket)" 
+                                                        variant="flat" 
+                                                        color="error"
+                                                        icon="mdi-tag"
+                                                        size="small"
+                                                    ></v-btn>
+                                                </div>
+                                                
+                                                <!-- Mostrar botón para agregar promoción cuando no hay -->
+                                                <v-btn 
+                                                    v-else
+                                                    @click="showPromotionSelect(ticket)"
+                                                    variant="flat" 
+                                                    color="primary"
+                                                    icon="mdi-tag"
+                                                    size="small"
+                                                    elevation="1"
+                                                    :disabled="ticket.cant === 0"
+                                                ></v-btn>
+                                            </v-col>
+                                        </v-row>
+                                        <v-divider class="my-2"></v-divider>
+                                    </div>
+                                </div>
+                                <div v-else class="text-center py-8">
+                                    <v-icon size="large">mdi-ticket-confirmation-outline</v-icon>
+                                    <p class="text-body-1 mt-2">No hay tipos de pasaje disponibles</p>
+                                </div>
+                            </v-card-text>
+                        </v-card>
+                           <!-- Total a pagar -->
                             <v-card class="pa-4">
                                 <v-row>
                                     <v-col cols="12" md="6">
@@ -448,28 +372,47 @@
                                                                 <v-icon>mdi-arrow-down</v-icon> P
                                                             </span>
                                                             {{ seat.type === 'seat' ? seat.label : '' }}
-                                                        </v-btn>-->
+                                                        </v-btn>
                                                         <div v-if="seat.type" 
                                                             :class="['seat-icon-preview', 'ma-1', { 'disabled': !isSeatAvailable(seat) }]" 
                                                             :style="{ color: getSeatColor(seat) }" 
                                                             @click="toggleSeat(seat)" 
                                                             style="cursor: pointer; font-weight: bold; position: relative;">
                                                             
-                                                            <!-- Mostrar ícono de asiento -->
+                                       
                                                             <v-icon v-if="seat.type === 'seat'" size="x-large" class="seat-icon">
                                                             mdi-seat
                                                             </v-icon>
                                                             
-                                                            <!-- Mostrar ícono de pasillo -->
+                                 
                                                             <v-icon v-if="seat.type === 'aisle'" size="x-large" class="aisle-icon">
                                                             mdi-arrow-split-vertical
                                                             </v-icon>
 
-                                                            <!-- Superponer el número del asiento -->
+                               
                                                             <span v-if="seat.type === 'seat'" class="seat-label">{{ seat.label }}</span>
 
-                                                            <!-- Superponer la "P" del pasillo -->
                                                             <span v-if="seat.type === 'aisle'" class="aisle-label">P</span>
+                                                        </div>-->
+                                                        <div v-if="seat.type" 
+                                                            :class="['seat-container', 'ma-1', 
+                                                                    {'seat-available': isSeatAvailable(seat),
+                                                                    'seat-selected': selectedSeats.includes(Number(seat.label)),
+                                                                    'seat-reserved': isSeatReserved(seat.label),
+                                                                    'seat-aisle': seat.type === 'aisle'}]" 
+                                                            @click="toggleSeat(seat)">
+                                                            
+                                                            <!-- Icono de asiento con tamaño aumentado -->
+                                                            <v-icon v-if="seat.type === 'seat'" class="seat-icon" size="30">mdi-seat</v-icon>
+                                                            
+                                                            <!-- Icono de pasillo con tamaño aumentado -->
+                                                            <v-icon v-if="seat.type === 'aisle'" class="aisle-icon" size="30">mdi-arrow-split-vertical</v-icon>
+                                                            
+                                                            <!-- Número de asiento más grande -->
+                                                            <span v-if="seat.type === 'seat'" class="seat-number">{{ seat.label }}</span>
+                                                            
+                                                            <!-- Indicador de pasillo más grande -->
+                                                            <span v-if="seat.type === 'aisle'" class="aisle-indicator">P</span>
                                                         </div>
                                                     </template>
                                                 </div>
@@ -629,7 +572,7 @@
             <br>
             <!-- Nota de impresión -->
             <v-divider class="my-2"></v-divider>
-            <div v-if="currentTicket.print >= 1" class="text-center caption mt-2 uppercase-text">
+            <div v-if="currentTicket.print > 1" class="text-center caption mt-2 uppercase-text">
             (COPIA REIMPRESA POR EL OPERADOR {{ nameUser }})
             </div>
         </div>
@@ -671,6 +614,7 @@ export default {
         workers: [],
         tickets: [],
         promotions: [],
+        tickettypes: [],
         currentTicket: {},
         nameBranch: '',
         imageBranch: '',
@@ -717,6 +661,7 @@ export default {
             minors: "",
             seats: [],
             promotions: [],
+            tickettypes: []
         },
         originalItem: {
             id: "",
@@ -733,6 +678,7 @@ export default {
             adults: "",
             minors: "",
             promotions: [],
+            tickettypes: []
         },
         defaultItem: {
             id: "",
@@ -749,6 +695,7 @@ export default {
             adults: "",
             minors: "",
             promotions: [],
+            tickettypes: []
         },
         paymentMethods: [
             { text: "Efectivo", value: "Efectivo", icon: "mdi-cash" },
@@ -781,7 +728,7 @@ export default {
         //prueba borrar  
         currentPage: 1, // Página actual
         itemsPerPage: 6, // Elementos por página
-
+        quantityErrors: {}
     }),
     computed: {
         formTitle() {
@@ -816,10 +763,10 @@ export default {
                         return `La cantidad de pasajes no puede ser mayor a los asientos disponibles (${availableSeats}).`;
                     }
 
-                    if (this.validateQuantity()) {
+                    /*if (this.validateQuantity()) {
                         return true;
-                    }
-                    return "La suma de pasajeros, adultos y menores no puede ser mayor que la cantidad de pasajes.";
+                    }*/
+                    return true;
                 },
             ];
         },
@@ -841,30 +788,52 @@ export default {
         isDisabledMinor() {
             return (Number(this.normal) + Number(this.editedItem.adults)) >= Number(this.editedItem.quantity);
         },
-    },
-    watch: {
-        selectedSeats(newValue) {
-            if (typeof newValue === 'string') {
-                this.selectedSeats = JSON.parse(newValue);
+         mergedTicketTypes() {
+            const editedTickets = this.editedItem.tickettypes || [];
+            const result = this.tickettypes.map(ticket => {
+                const editedTicket = editedTickets.find(t => t.id === ticket.id) || {};
+                return {
+                ...ticket,
+                cant: editedTicket.cant ?? 0,
+                promotion_id: editedTicket.promotion_id ?? null,
+                namePromotion: editedTicket.namePromotion ?? '',
+                percentage: editedTicket.percentage ?? 0,
+                discount: editedTicket.discount ?? 0,
+                showPromotionSelect: editedTicket.showPromotionSelect ?? false
+                };
+            });
+            
+            console.log('mergedTicketTypes result:', JSON.parse(JSON.stringify(result)));
+            return result;
+        },
+        totalSelected() {
+        return this.editedItem.tickettypes.reduce((sum, t) => sum + t.cant, 0);
+        }
+        },
+        watch: {
+            selectedSeats(newValue) {
+                if (typeof newValue === 'string') {
+                    this.selectedSeats = JSON.parse(newValue);
+                }
+            },
+            'editedItem.quantity'(newValue) {
+                this.editedItem.adults = Math.min(this.editedItem.adults, newValue);
+                this.editedItem.minors = Math.min(this.editedItem.minors, newValue);
+                this.normal = Math.min(this.normal, newValue);
+            },
+        },
+        mounted() {
+            this.role = JSON.parse(LocalStorageService.getItem('role'));
+            this.nameUser = JSON.parse(LocalStorageService.getItem('name'));
+            if (this.role === 'Administrador') {
+                this.showBranches();
+            } else {
+                this.branch_id = LocalStorageService.getItem('branch_id');
+                this.initialize();
             }
         },
-        'editedItem.quantity'(newValue) {
-            this.editedItem.adults = Math.min(this.editedItem.adults, newValue);
-            this.editedItem.minors = Math.min(this.editedItem.minors, newValue);
-            this.normal = Math.min(this.normal, newValue);
-        },
-    },
-    mounted() {
-        this.role = JSON.parse(LocalStorageService.getItem('role'));
-        this.nameUser = JSON.parse(LocalStorageService.getItem('name'));
-        if (this.role === 'Administrador') {
-            this.showBranches();
-        } else {
-            this.branch_id = LocalStorageService.getItem('branch_id');
-            this.initialize();
-        }
-    },
-    methods: {
+        methods: {
+
         formatNumber(value) {
             // Si el valor es menor que 1000, devuelve el valor original con dos decimales
             if (value < 1000) {
@@ -1239,7 +1208,7 @@ export default {
                 this.initialize();
             }
         },
-        getSeatColor(seat) {
+        /*getSeatColor(seat) {
             if (this.isSeatReserved(seat.label)) {
                 return this.paleteColors.error; // Asiento reservado
             } else if (this.selectedSeats.includes(Number(seat.label))) {
@@ -1250,16 +1219,38 @@ export default {
             else {
                 return this.paleteColors.green; // Asiento disponible
             }
-        },
-        isSeatAvailable(seat) {
+        },*/
+        getSeatColor(seat) {
+            if (!seat.label) return this.paleteColors.gris; // Para elementos sin label
+            
+            const seatNumber = Number(seat.label);
+            
+            if (this.isSeatReserved(seatNumber)) {
+                return this.paleteColors.error; // Asiento reservado (rojo)
+            } 
+            if (this.selectedSeats.includes(seatNumber)) {
+                return this.paleteColors.primary; // Asiento seleccionado (azul)
+            }
+            if (seat.type === 'aisle') {
+                return this.paleteColors.gris; // Pasillo (gris)
+            }
+            return this.paleteColors.green; // Asiento disponible (verde)
+            },
+        /*isSeatAvailable(seat) {
             return seat.label && !this.isSeatReserved(seat.label);
+        },*/
+        isSeatAvailable(seat) {
+        // Verificar que sea un asiento válido, no reservado y no sea pasillo
+        return seat.type === 'seat' && 
+                seat.label && 
+                !this.isSeatReserved(Number(seat.label));
         },
-        updateSeats(tripId) {
+        /*updateSeats(tripId) {
             this.seats = 0;
                 this.availableSeats = [];
                 this.reservedSeats = [];
                 this.aviable = 0;
-                this.editedItem.quantity = '';
+                //this.editedItem.quantity = '';
             this.selectedSeats = [];
             const selectedTrip = this.trips.find((trip) => trip.id === tripId);
 
@@ -1281,8 +1272,31 @@ export default {
                 this.reservedSeats = [];
                 this.aviable = 0;
             }
+        },*/
+        updateSeats(tripId) {
+        this.availableSeats = [];
+        this.reservedSeats = [];
+        this.aviable = 0;
+        this.selectedSeats = [];
+        
+        const selectedTrip = this.trips.find(trip => trip.id === tripId);
+        
+        if (selectedTrip) {
+            this.seats = selectedTrip.seats;
+            this.editedItem.price = selectedTrip.price;
+            this.reservedSeats = selectedTrip.reservedSeats.map(Number); // Asegurar que sean números
+            this.seatMap = selectedTrip.seatMap;
+            
+            this.availableSeats = this.generateAvailableSeats(this.seatMap, this.reservedSeats);
+            this.aviable = this.availableSeats.length;
+            
+            // Si estamos editando, restaurar los asientos seleccionados
+            if (this.editedIndex > -1 && this.editedItem.seats) {
+            this.selectedSeats = this.editedItem.seats.map(Number);
+            }
+        }
         },
-        generateAvailableSeats(seatMap, reservedSeats) {
+        /*generateAvailableSeats(seatMap, reservedSeats) {
 
             const availableSeats = [];
             seatMap.forEach((row) => {
@@ -1294,11 +1308,31 @@ export default {
             });
 
             return availableSeats;
-        },
-        isSeatReserved(seat) {
+        },*/
+        /*isSeatReserved(seat) {
             return this.reservedSeats.includes(Number(seat));
+        },*/
+        generateAvailableSeats(seatMap, reservedSeats) {
+        const availableSeats = [];
+        const reservedNumbers = reservedSeats.map(Number); // Convertir a números
+        
+        seatMap.forEach(row => {
+            row.forEach(seat => {
+            if (seat.type === 'seat' && seat.label) {
+                const seatNumber = Number(seat.label);
+                if (!reservedNumbers.includes(seatNumber)) {
+                availableSeats.push(seatNumber);
+                }
+            }
+            });
+        });
+        
+        return availableSeats;
         },
-        toggleSeat(seat) {
+        isSeatReserved(seatNumber) {
+        return this.reservedSeats.includes(Number(seatNumber));
+        },
+        /*toggleSeat(seat) {
             if (this.isSeatAvailable(seat)) {
                 const seatLabel = Number(seat.label);
                 const index = this.selectedSeats.indexOf(seatLabel);
@@ -1312,9 +1346,32 @@ export default {
                 // Forzar la validación del campo después de cambiar selectedSeats
                 //this.$refs.seatsField.validate();
             }
+        },*/
+        toggleSeat(seat) {
+        // Validación adicional de seguridad
+        if (!this.isSeatAvailable(seat)) return;
+        
+        const seatNumber = Number(seat.label);
+        const index = this.selectedSeats.indexOf(seatNumber);
+        
+        // Limitar la selección al quantity definido
+        if (index === -1) {
+            if (this.selectedSeats.length >= this.editedItem.quantity) {
+            this.showAlert("warning", `Solo puede seleccionar ${this.editedItem.quantity} asientos`, 2000);
+            return;
+            }
+            this.selectedSeats.push(seatNumber);
+        } else {
+            this.selectedSeats.splice(index, 1);
+        }
+        
+        // Forzar actualización si es necesario
+        this.$forceUpdate();
         },
         calculateTotal() {
-            this.editedItem.adults = 0;
+             this.editedItem.tickettypes = this.originalItem.tickettypes;
+             this.editedItem.total = this.editedItem.price * this.editedItem.quantity;
+            /*this.editedItem.adults = 0;
             this.editedItem.minors = 0;
             this.normal = 0;
             this.selectedPromotionAdults= null;
@@ -1336,15 +1393,15 @@ export default {
                 // Si hay adultos o menores, calcular el total considerando el 50%
                 const discountedTickets = adults + minors;
                 this.editedItem.total = price * quantity - discountedTickets * (price * 0.5);
-            }
+            }*/
         },
-        validateQuantity() {
+        /*validateQuantity() {
             const adults = Number(this.editedItem.adults);
             const minors = Number(this.editedItem.minors);
             const normal = Number(this.normal);
             const quantity = Number(this.editedItem.quantity);
             return adults + minors + normal <= quantity;
-        },
+        },*/
         updateDate(val) {
             this.input = val;
             this.editedItem.date = this.dateFormatted;
@@ -1357,8 +1414,12 @@ export default {
             this.data = {};
             this.data.branch_id = Number(this.branch_id);
             const today = new Date();
-            const formattedDate = today.toISOString().split('T')[0]; // Formato: YYYY-MM-DD
-            //this.data.date = formattedDate;
+            const formattedDate = [
+                today.getFullYear(),
+                (today.getMonth() + 1).toString().padStart(2, '0'),
+                today.getDate().toString().padStart(2, '0')
+            ].join('-');
+            this.data.date = formattedDate;
             try {
                 const result = await handleRequest({
                     endpoint: "get-trip-date",
@@ -1370,10 +1431,12 @@ export default {
                     // Si la solicitud es exitosa, asignamos las sucursales
                     this.trips = result.data?.trips || [];
                     this.promotions = result.data?.promotions || [];
+                    this.tickettypes = result.data?.tickettypes || [];
                 } else {
                     // Si no hay datos, asignamos un array vacío
                     this.trips = [];
                     this.promotions = [];
+                    this.tickettypes = [];
                 }
             } catch (error) {
                 this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
@@ -1396,7 +1459,12 @@ export default {
                 this.loading = true;
                 this.data = {};
                 const today = new Date();
-                const formattedDate = today.toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+                const formattedDate = today.toLocaleDateString('es-CL', {
+                    timeZone: 'America/Santiago',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                }).split('-').reverse().join('-'); // Convierte "DD-MM-YYYY" a "YYYY-MM-DD"
                 this.data.date = formattedDate;
                 this.data.branch_id = Number(this.branch_id);
                 const result = await handleRequest({
@@ -1447,7 +1515,8 @@ export default {
                     "seats",
                     "adults",
                     "minors",
-                    "promotions"
+                    "promotions",
+                    "tickettypes"
                 ];
 
                 let updatedFields = Object.keys(this.editedItem)
@@ -1462,6 +1531,9 @@ export default {
                     }, {});
                 if (this.areSeatsDifferent(this.selectedSeats, this.originalItem.seats)) {
                     updatedFields.seats = this.selectedSeats;
+                }
+                if (this.areSeatsDifferent(this.editedItem.tickettypes, this.originalItem.seats)) {
+                    updatedFields.tickettypes = this.editedItem.tickettypes;
                 }
                 if (Object.keys(updatedFields).length > 0) {
                     updatedFields.date = this.editedItem.date ? this.editedItem.date : new Date();
@@ -1531,7 +1603,8 @@ export default {
                     "seats",
                     "adults",
                     "minors",
-                    "promotions"
+                    "promotions",
+                    "tickettypes"
                 ];
                 let updatedFields = Object.keys(this.editedItem)
                     .filter(
@@ -1546,6 +1619,9 @@ export default {
 
                 if (this.areSeatsDifferent(this.originalItem.seats, this.selectedSeats)) {
                     updatedFields.seats = _.cloneDeep(this.selectedSeats);
+                }
+                if (this.areSeatsDifferent(this.editedItem.tickettypes, this.originalItem.seats)) {
+                    updatedFields.tickettypes = this.editedItem.tickettypes;
                 }
                 if (Object.keys(updatedFields).length > 0) {
                     updatedFields.id = this.editedItem.id;
@@ -1930,25 +2006,14 @@ export default {
 
             // Inicializar las variables de promoción
             this.selectedPromotion = null;
-            this.selectedPromotionAdults = null;
-            this.selectedPromotionMinors = null;
-
-            // Buscar en el array de promociones
-            if (this.editedItem.promotions && this.editedItem.promotions.length > 0) {
-                this.editedItem.promotions.forEach((promotion) => {
-                    if (promotion.type === "normal") {
-                        this.selectedPromotion = promotion.id; // Asignar el ID de la promoción normal
-                        this.normal = item.quantity - item.adults - item.minors; // Asignar la cantidad (si existe)
-                    } else if (promotion.type === "adults") {
-                        this.selectedPromotionAdults = promotion.id; // Asignar el ID de la promoción para adultos
-                    } else if (promotion.type === "minors") {
-                        this.selectedPromotionMinors = promotion.id; // Asignar el ID de la promoción para menores
-                    }
-                });
-            }
+           
             const today = new Date();
-            const formattedDate = today.toISOString().split('T')[0]; // Formato: YYYY-MM-DD
-            //this.data.date = formattedDate;
+            const formattedDate = [
+                today.getFullYear(),
+                (today.getMonth() + 1).toString().padStart(2, '0'),
+                today.getDate().toString().padStart(2, '0')
+            ].join('-');
+            this.data.date = formattedDate;
             try {
                 const result = await handleRequest({
                     endpoint: "get-trip-date",
@@ -1960,10 +2025,12 @@ export default {
                     // Si la solicitud es exitosa, asignamos las sucursales
                     this.trips = result.data?.trips || [];
                     this.promotions = result.data?.promotions || [];
+                    this.tickettypes = result.data?.tickettypes || [];
                 } else {
                     // Si no hay datos, asignamos un array vacío
                     this.trips = [];
                     this.promotions = [];
+                    this.tickettypes = [];
                 }
             } catch (error) {
                 this.showAlert("error", "Ocurrió un error inesperado al procesar la solicitud.", 3000);
@@ -2036,62 +2103,405 @@ export default {
             this.sb_timeout = sb_timeout;
             this.snackbar = true;
         },
+
+        handleQuantityChange(ticket, newValue) {
+            // Convertir a número y validar
+            const numericValue = Number(newValue) || 0;
+            
+            // Crear copia del array de tickettypes
+            const updatedTickets = [...(this.editedItem.tickettypes || [])];
+            const existingIndex = updatedTickets.findIndex(t => t.id === ticket.id);
+            
+            // Obtener el ticket existente para calcular diferencias en descuentos
+            const existingTicket = existingIndex !== -1 ? updatedTickets[existingIndex] : null;
+            let previousDiscount = existingTicket?.discount || 0;
+            
+            // Preparar el objeto ticket con los datos básicos
+            const ticketData = {
+                id: ticket.id,
+                name: ticket.name,
+                cant: numericValue,
+                promotion_id: ticket.promotion_id || null,
+                namePromotion: ticket.namePromotion || '',
+                percentage: ticket.percentage || 0,
+                discount: 0, // Inicializamos en 0, lo calcularemos después
+                showPromotionSelect: ticket.showPromotionSelect || false,
+            };
+            
+            // Calcular descuento si tiene promoción
+            if (ticketData.promotion_id !== null && ticketData.percentage > 0) {
+                const discountPerTicket = this.editedItem.price * (ticketData.percentage / 100);
+                ticketData.discount = discountPerTicket * numericValue;
+            }
+            
+            // Ajustar el total general
+            if (this.editedItem.total === undefined) {
+                this.editedItem.total = 0;
+            }
+            
+            // 1. Sumamos el descuento anterior al total (para "eliminarlo")
+            this.editedItem.total += previousDiscount;
+            // 2. Restamos el nuevo descuento
+            this.editedItem.total -= ticketData.discount;
+            
+            // Actualizar o añadir el ticket
+            if (numericValue > 0) {
+                if (existingIndex !== -1) {
+                    updatedTickets[existingIndex] = ticketData;
+                } else {
+                    updatedTickets.push(ticketData);
+                }
+            } else if (existingIndex !== -1) {
+                updatedTickets.splice(existingIndex, 1);
+            }
+            
+            // Actualizar editedItem
+            this.editedItem.tickettypes = updatedTickets;
+            
+            // Si necesitas emitir el cambio
+            this.$emit('update:editedItem', {
+                ...this.editedItem,
+                tickettypes: updatedTickets
+            });
+            
+            // Validar la cantidad después del cambio
+            this.validateQuantity(ticket);
+        },
+        //logic de tios de pasajes
+         validateQuantity(ticket) {
+            // Resetear errores
+            this.quantityErrors = {
+                ...this.quantityErrors,
+                [ticket.id]: null
+            };
+            
+            // Validar que sea número válido
+            if (isNaN(ticket.cant)) {
+                ticket.cant = 0;
+            }
+            
+            // Asegurar que no sea negativo
+            ticket.cant = Math.max(0, ticket.cant);
+            
+            // Calcular la cantidad actual antes del cambio
+            const currentQty = this.getCurrentQuantity(ticket.id);
+            
+            // Calcular el nuevo total considerando:
+            // totalSelected - cantidad actual + nueva cantidad
+            const newTotal = this.totalSelected - currentQty + ticket.cant;
+            
+            // Validar que no exceda el total disponible
+            if (newTotal > this.editedItem.quantity) {
+                const available = this.editedItem.quantity - (this.totalSelected - currentQty);
+                
+                // Establecer error y ajustar cantidad
+                this.quantityErrors = {
+                    ...this.quantityErrors,
+                    [ticket.id]: `Máximo disponible: ${available}`
+                };
+                ticket.cant = available;
+            }
+            
+            // Actualizar los datos (incluyendo promociones)
+            this.updateTicketWithPromotion(ticket);
+        },
+
+        // Método actualizado para manejar promociones
+        updateTicketWithPromotion(ticket) {
+            const finalQty = Math.min(
+                ticket.cant,
+                this.editedItem.quantity - (this.totalSelected - this.getCurrentQuantity(ticket.id))
+            );
+            
+            const updatedTickets = [...(this.editedItem.tickettypes || [])];
+            const existingIndex = updatedTickets.findIndex(t => t.id === ticket.id);
+            
+            // Obtener el descuento anterior para actualizar el total
+            const previousDiscount = existingIndex !== -1 ? 
+                (updatedTickets[existingIndex].discount || 0) : 0;
+            
+            // Preparar datos del ticket
+            const ticketData = {
+                id: ticket.id,
+                name: ticket.name,
+                cant: finalQty,
+                // Mantener datos de promoción si existen
+                promotion_id: existingIndex !== -1 ? updatedTickets[existingIndex].promotion_id : null,
+                namePromotion: existingIndex !== -1 ? updatedTickets[existingIndex].namePromotion : '',
+                percentage: existingIndex !== -1 ? updatedTickets[existingIndex].percentage : 0,
+                discount: 0 // Lo calcularemos después
+            };
+            
+            // Recalcular descuento si tiene promoción
+            if (ticketData.promotion_id && ticketData.percentage > 0) {
+                const discountPerTicket = this.editedItem.price * (ticketData.percentage / 100);
+                ticketData.discount = discountPerTicket * finalQty;
+            }
+            
+            // Actualizar el total general
+            if (this.editedItem.total === undefined) {
+                this.editedItem.total = 0;
+            }
+            
+            // Ajustar el total: sumar descuento anterior y restar el nuevo
+            this.editedItem.total += previousDiscount;
+            this.editedItem.total -= ticketData.discount;
+            
+            // Actualizar o añadir el ticket
+            if (finalQty > 0) {
+                if (existingIndex !== -1) {
+                    updatedTickets[existingIndex] = ticketData;
+                } else {
+                    updatedTickets.push(ticketData);
+                }
+            } else if (existingIndex !== -1) {
+                updatedTickets.splice(existingIndex, 1);
+            }
+            
+            // Emitir el cambio
+            this.$emit('update:editedItem', {
+                ...this.editedItem,
+                tickettypes: updatedTickets
+            });
+        },
+
+        // Métodos auxiliares (se mantienen igual)
+        getMaxQuantity(ticket) {
+            return this.editedItem.quantity - (this.totalSelected - this.getCurrentQuantity(ticket.id));
+        },
+
+        getCurrentQuantity(ticketId) {
+            const ticket = this.editedItem.tickettypes?.find(t => t.id === ticketId);
+            return ticket ? ticket.cant : 0;
+        },
+
+
+        showPromotionSelect(ticket) {
+            // Encontrar el índice del ticket en editedItem.tickettypes
+            const updatedTickets = [...(this.editedItem.tickettypes || [])];
+            const existingIndex = updatedTickets.findIndex(t => t.id === ticket.id);
+            
+            if (existingIndex !== -1) {
+                // Actualizar el ticket existente
+                updatedTickets[existingIndex] = {
+                    ...updatedTickets[existingIndex],
+                    showPromotionSelect: true,
+                    selectedPromotion: null
+                };
+            } else {
+                // Crear un nuevo ticket si no existe
+                updatedTickets.push({
+                    id: ticket.id,
+                    name: ticket.name,
+                    cant: ticket.cant,
+                    showPromotionSelect: true,
+                    selectedPromotion: null
+                });
+            }
+            
+            // Actualizar editedItem
+            this.editedItem.tickettypes = updatedTickets;
+            
+            // Forzar la actualización de la vista
+            this.$forceUpdate();
+            
+            // Cargar promociones si no están cargadas
+            if (this.promotions.length === 0) {
+                this.loadPromotions();
+            }
+        },
+        applyPromotion(ticket, promotionId) {
+        const promotion = this.promotions.find(p => p.id === promotionId);
+        if (!promotion) return;
+        
+        // Calcular el descuento
+        const discountPerTicket = this.editedItem.price * (promotion.percentage / 100);
+        const totalDiscount = discountPerTicket * ticket.cant;
+        
+        // Obtener el descuento anterior
+        const previousDiscount = ticket.discount || 0;
+        
+        // Actualizar el ticket
+        const updatedTickets = [...(this.editedItem.tickettypes || [])];
+        const existingIndex = updatedTickets.findIndex(t => t.id === ticket.id);
+        
+        const updatedTicket = {
+            id: ticket.id,
+            name: ticket.name,
+            cant: ticket.cant,
+            promotion_id: promotion.id,
+            namePromotion: promotion.name,
+            percentage: promotion.percentage,
+            discount: totalDiscount,
+            showPromotionSelect: false,
+            selectedPromotion: null
+        };
+        
+        if (existingIndex !== -1) {
+            updatedTickets[existingIndex] = updatedTicket;
+        } else {
+            updatedTickets.push(updatedTicket);
+        }
+        
+        // Actualizar el total
+        if (this.editedItem.total === undefined) {
+            this.editedItem.total = 0;
+        }
+        
+        this.editedItem.total += previousDiscount; // Eliminar descuento anterior
+        this.editedItem.total -= totalDiscount;   // Aplicar nuevo descuento
+        
+        // Actualizar editedItem
+        this.editedItem.tickettypes = updatedTickets;
+        
+        // Emitir evento
+        this.$emit('update:editedItem', {
+            ...this.editedItem,
+            tickettypes: updatedTickets
+        });
+        },
+        
+        removePromotion(ticket) {
+            // Obtener el descuento anterior para este ticket
+            const previousDiscount = ticket.discount || 0;
+            
+            // Actualizar el ticket en editedItem
+            const updatedTickets = this.editedItem.tickettypes.map(t => {
+                if (t.id === ticket.id) {
+                    // Eliminar todos los datos de promoción
+                    const { promotion_id, namePromotion, percentage, discount, ...rest } = t;
+                    return rest;
+                }
+                return t;
+            });
+            
+            // Actualizar el total
+            if (this.editedItem.total === undefined) {
+                this.editedItem.total = 0;
+            }
+            
+            // Sumar el descuento anterior al total (para "eliminarlo")
+            this.editedItem.total += previousDiscount;
+            
+            // Actualizar la lista de tickets
+            this.editedItem.tickettypes = updatedTickets;
+            
+            // Emitir evento si es necesario
+            this.$emit('update:editedItem', {
+                ...this.editedItem,
+                tickettypes: updatedTickets
+            });
+        },
+
+    // Validar solo números
+        onlyNumbers(evt) {
+        const charCode = evt.which ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            evt.preventDefault();
+        }
+        },
     },
 };
 </script>
 <style scoped>
-.seat-icon-preview {
+.seat-container {
+  position: relative;
   display: inline-flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
   cursor: pointer;
-  position: relative; /* Necesario para posicionar los elementos hijos de forma absoluta */
+  margin: 6px;
+  transition: all 0.2s ease;
 }
 
-.disabled {
-  opacity: 0.7;
-  pointer-events: none;
+/* Tamaño moderado para iconos */
+.seat-icon, .aisle-icon {
+  font-size: 36px !important;
+  width: 100%;
+  height: 100%;
 }
 
-/* Estilos para el ícono de asiento */
-.seat-icon {
-  font-size: 3rem; /* Tamaño del ícono */
-}
-
-/* Estilos para el ícono de pasillo */
-.aisle-icon {
-  font-size: 3rem; /* Tamaño del ícono */
-}
-
-/* Estilos para el número del asiento */
-.seat-label {
+/* Número de asiento mejor posicionado y visible */
+.seat-number {
   position: absolute;
-  top: 30%;
+  top: 35%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 1rem; /* Tamaño del número */
+  font-size: 14px;
   font-weight: bold;
-  color: black; /* Color del texto */
+  color: #333; /* Color oscuro para mejor contraste */
+  text-shadow: 0 0 2px rgba(255,255,255,0.8);
 }
 
-/* Estilos para la "P" del pasillo */
-.aisle-label {
+/* Indicador de pasillo */
+.aisle-indicator {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 1rem; /* Tamaño de la "P" */
+  font-size: 14px;
   font-weight: bold;
-  color: black; /* Color del texto */
+  color: #333;
 }
 
-.dashed-divider {
-  border-top: 1px dashed #000;
-  width: 100%;
-  margin: 16px 0;
-}
-.uppercase-text {
-  text-transform: uppercase;
+/* Colores para diferentes estados */
+.seat-available {
+  color: #4CAF50; /* Verde para disponibles */
 }
 
+.seat-selected {
+  color: #2196F3; /* Azul para seleccionados */
+}
+
+.seat-reserved {
+  color: #F44336; /* Rojo para reservados */
+  cursor: not-allowed;
+}
+
+.seat-aisle {
+  color: #9E9E9E; /* Gris para pasillos */
+  cursor: default;
+}
+
+/* Efecto hover para asientos disponibles */
+.seat-available:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+}
+
+/* Números más oscuros en asientos claros */
+.seat-available .seat-number,
+.seat-available .aisle-indicator,
+.seat-aisle .aisle-indicator {
+  color: #333;
+}
+
+/* Números claros en asientos oscuros */
+.seat-selected .seat-number,
+.seat-reserved .seat-number {
+  color: #333;
+  font-weight: bold;
+}
+@media (max-width: 768px) {
+  .seat-container {
+    width: 40px;
+    height: 40px;
+    margin: 4px;
+  }
+  
+  .seat-icon, .aisle-icon {
+    font-size: 32px !important;
+  }
+  
+  .seat-number, .aisle-indicator {
+    font-size: 12px;
+  }
+  
+  /* Ajuste fino para móviles */
+  .seat-number {
+    top: 28%; /* Puedes ajustar este valor según necesidad */
+  }
+}
 </style>

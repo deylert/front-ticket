@@ -93,24 +93,24 @@
                 </v-autocomplete>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="editedItem.brand" clearable label="Marca" prepend-icon="mdi-car"
+                <v-text-field v-model="editedItem.brand" label="Marca" prepend-icon="mdi-car"
                   variant="underlined"></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="editedItem.model" clearable label="Modelo" prepend-icon="mdi-car-info"
+                <v-text-field v-model="editedItem.model" label="Modelo" prepend-icon="mdi-car-info"
                   variant="underlined"></v-text-field>
               </v-col>
-              <v-col cols="12" md="6">
-                <v-text-field v-model="editedItem.plate" clearable label="Placa" prepend-icon="mdi-license"
+              <v-col cols="12" md="4">
+                <v-text-field v-model="editedItem.plate" label="Placa" prepend-icon="mdi-license"
                   variant="underlined" :rules="[v => !!v || 'La placa es requerida']"></v-text-field>
               </v-col>
-              <v-col cols="12" md="6">
-                <v-text-field v-model="editedItem.rut" clearable label="RUT" prepend-icon="mdi-identifier"
+              <!--<v-col cols="12" md="6">
+                <v-text-field v-model="editedItem.rut" label="RUT" prepend-icon="mdi-identifier"
                   variant="underlined" :rules="rutRules">
                 </v-text-field>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-text-field v-model="editedItem.seats" clearable label="Asientos" prepend-icon="mdi-seat"
+              </v-col>-->
+              <v-col cols="12" md="4">
+                <v-text-field v-model="editedItem.seats" label="Asientos" prepend-icon="mdi-seat"
                   variant="underlined" :rules="[v => !!v || 'El número de asientos es requerido',
                   v => !isNaN(v) || 'Debe ser un número'
                   ]" disabled="true"></v-text-field>
@@ -122,7 +122,7 @@
             </v-row>
             <v-row>
               <v-col cols="12" md="6">
-                <v-file-input clearable v-model="file" ref="fileInput" label="Imagen del Vehículo" variant="underlined"
+                <v-file-input v-model="file" ref="fileInput" label="Imagen del Vehículo" variant="underlined"
                   density="compact" name="file" accept=".png, .jpg, .jpeg" @change="onFileSelected">
                 </v-file-input>
               </v-col>
@@ -214,12 +214,12 @@ export default {
     dialogVehicleWorker: null,
     headers: [
       //{ title: 'Sucursal', value: 'branchName', width: '20%' },
-      { title: 'Placa', value: 'plate', width: '25%' },
-      { title: 'Marca', value: 'brand', width: '10%' },
-      { title: 'Modelo', value: 'model', width: '10%' },
-      { title: 'Rut', value: 'rut', width: '15%' },
-      { title: 'Asientos', value: 'seats', width: '10%' },
-      { title: 'Estado', value: 'state', width: '10%' },
+      { title: 'Placa', value: 'plate', },
+      { title: 'Marca', value: 'brand', },
+      { title: 'Modelo', value: 'model', },
+      //{ title: 'Rut', value: 'rut', width: '15%' },
+      { title: 'Asientos', value: 'seats', },
+      { title: 'Estado', value: 'state', },
       { title: 'Acciones', value: 'actions', sortable: false, width: '20%' },
     ],
     statusOptions: [

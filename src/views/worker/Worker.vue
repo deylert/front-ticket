@@ -434,7 +434,6 @@ export default {
               this.initialize();
               this.loading = false;
             } else {
-              this.loading = false;
               this.showAlert("warning", result.message, 3000);
               this.loading = false;
             }

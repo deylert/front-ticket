@@ -80,53 +80,109 @@
                             <v-icon>mdi-magnify</v-icon></v-btn>
                     </v-col>
                 </v-row>
-                <v-row class="mx-auto" max-width="400">
-                    <!-- Contenido del reporte -->
-                    <v-card ref="reportContent" class="mx-auto" max-width="500"
-                        style="max-height: 68vh; overflow-y: auto;">
-                        <v-card-text>
-                            <v-col cols="12" class="pa-0"> <!-- Elimina el padding en la columna principal -->
-                                <v-row class="ma-0"> <!-- Elimina el margin en la fila -->
-                                    <v-col cols="12" class="text-h6 text-center pa-1"> <!-- Ajusta el padding -->
+                <v-row class="mx-auto">
+   
+                            <v-col cols="12" class="pa-0"> 
+                                <v-row class="ma-0"> 
+                                    <v-col cols="12" class="text-h6 text-center pa-1">
                                         {{ response.nombre }}
                                     </v-col>
+                                    
+                                    <!-- Fecha -->
                                     <v-col cols="12" class="text-center pa-1">
-                                        FECHA: {{ this.response.fecha }}
+                                        FECHA: {{ response.fecha }}
                                     </v-col>
+                                    
+                                    <!-- Sección RESUMEN -->
                                     <v-col cols="12" class="pa-1">
                                         <strong>RESUMEN:</strong>
                                     </v-col>
-                                    <v-col cols="12" class="pa-1">
-                                        <strong>EMISIÓN DE PASAJES:</strong>
+                                    
+                                    <!-- Cards informativas -->
+                                    <v-col cols="12" md="4" class="pa-1">
+                                        <v-card class="h-100" title="Pasajes emitidos" :subtitle="response.pasajesEmitidos">
+                                        <template v-slot:prepend>
+                                            <v-avatar color="blue-lighten-1">
+                                            <v-icon>mdi-ticket-confirmation</v-icon>
+                                            </v-avatar>
+                                        </template>
+                                        <template v-slot:append>
+                                            <v-avatar color="blue-lighten-4" size="32">
+                                            <v-icon color="blue-darken-2" size="20">mdi-plus</v-icon>
+                                            </v-avatar>
+                                        </template>
+                                        </v-card>
                                     </v-col>
-                                    <v-col cols="12" class="pa-1">
-                                        <strong>Pasajes emitidos:</strong> {{ this.response.pasajesEmitidos }}
+                                    
+                                    <v-col cols="12" md="4" class="pa-1">
+                                        <v-card class="h-100" title="Reimpresiones" :subtitle="response.reimpresiones">
+                                        <template v-slot:prepend>
+                                            <v-avatar color="orange-lighten-1">
+                                            <v-icon>mdi-printer</v-icon>
+                                            </v-avatar>
+                                        </template>
+                                        <template v-slot:append>
+                                            <v-avatar color="orange-lighten-4" size="32">
+                                            <v-icon color="orange-darken-2" size="20">mdi-refresh</v-icon>
+                                            </v-avatar>
+                                        </template>
+                                        </v-card>
                                     </v-col>
-                                    <v-col cols="12" class="pa-1">
-                                        <strong>Reimpresiones:</strong> {{ this.response.reimpresiones }}
+                                    <v-col cols="12" md="4" class="pa-1">
+                                    <v-card class="h-100" title="TOTAL GENERAL" :subtitle="'$' + formatNumber(Number(response.totales))">
+                                        <template v-slot:prepend>
+                                        <v-avatar color="blue-grey-lighten-1">
+                                            <v-icon>mdi-scale-balance</v-icon>
+                                        </v-avatar>
+                                        </template>
+                                    </v-card>
                                     </v-col>
-                                    <v-col cols="12" v-for="(total, index) in this.response.totalesPorMetodo"
-                                        :key="index" class="pa-1">
-                                        {{ total.metodo }}: {{ (Number(total.cantidad)) }}
-                                    </v-col>
-                                    <v-col cols="12" class="pa-1">
-                                        <strong>TOTALES:</strong>
-                                    </v-col>
-                                    <v-col cols="12" v-for="(total, index) in this.response.totalesPorMetodo"
-                                        :key="index" class="pa-1">
-                                        <strong>{{ total.metodo }}:</strong> ${{
-                                            this.formatNumber(Number(total.total)) }}
-                                    </v-col>
-                                    <v-col cols="12" class="font-weight-bold pa-1">
-                                        TOTAL: ${{ this.formatNumber(Number(this.response.totales)) }}
-                                    </v-col>
+                                   <br>
+                                   <v-col cols="12" md="12" class="pa-1">
+                                    <v-card class="mt-4" elevation="2">
+                                <v-card-title class="bg-blue-grey-lighten-5">
+                                    <v-icon start>mdi-credit-card-multiple</v-icon>
+                                    Totales por Método de Pago
+                                </v-card-title>
+                                <v-data-table
+                                    :headers="headersMetodos"
+                                    :items="response.totalesPorMetodo || []"
+                                    :items-per-page="5"
+                                    class="elevation-0"
+                                    density="comfortable"
+                                    no-data-text="No se encontraron registros de pagos"
+                                >
+                                    <template v-slot:item.metodo="{ item }">
+                <v-chip :color="getMethodColor(item.metodo)" size="small" label>
+                  {{ item.metodo }}
+                </v-chip>
+              </template>
+              <template v-slot:item.cantidad="{ item }">
+                <v-chip variant="outlined" size="small" :color="getMethodColor(item.metodo)">
+                  {{ item.cantidad }}
+                </v-chip>
+              </template>
+              <template v-slot:item.total="{ item }">
+                <span class="font-weight-bold" :class="'text-' + getMethodColor(item.metodo) + '-darken-3'">
+                  ${{ formatNumber(Number(item.total)) }}
+                </span>
+              </template>
+                                    <template v-slot:bottom>
+                                    <div class="text-right pa-2">
+                                        <span class="text-subtitle-1">Total general: </span>
+                                        <span class="text-h6 text-success">
+                                        ${{ formatNumber(Number(response.totales)) }}
+                                        </span>
+                                    </div>
+                                    </template>
+                                </v-data-table>
+                                </v-card>
+                                </v-col>
                                 </v-row>
                             </v-col>
+                            </v-row>
                         </v-card-text>
                     </v-card>
-                </v-row>
-            </v-card-text>
-        </v-card>
     </v-container>
 </template>
 
@@ -150,6 +206,16 @@ export default {
             ],
             totales: 10000
         },
+        headersResumen: [
+    { title: 'RESUMEN', key: 'title', align: 'start', class: 'font-weight-bold' },
+    { title: 'Pasajes emitidos', key: 'pasajesEmitidos', align: 'end' },
+    { title: 'Reimpresiones', key: 'reimpresiones', align: 'end' },
+  ],
+  headersMetodos: [
+    { title: 'MÉTODO DE PAGO', key: 'metodo', align: 'start' },
+    { title: 'CANTIDAD', key: 'cantidad', align: 'end' },
+    { title: 'TOTAL', key: 'total', align: 'end', class: 'font-weight-bold' },
+  ],
         snackbar: false,
         sb_type: "",
         sb_message: "",
@@ -216,6 +282,28 @@ export default {
 
     },
     methods: {
+        getMethodColor(metodo) {
+    if (!metodo) return 'grey'; // Manejo de valores nulos/undefined
+    
+    // Normalización del texto
+    const normalized = metodo.toString()
+        .toLowerCase() // Convertir a minúsculas
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Eliminar tildes
+        .trim(); // Eliminar espacios extras
+    
+    const methodColors = {
+        'efectivo': 'green',
+        'debito': 'blue',
+        'credito': 'orange',
+        // Puedes agregar más variantes si es necesario
+        'tarjeta debito': 'blue',
+        'tarjeta credito': 'orange',
+        'cash': 'green',
+        'contado': 'green'
+    };
+    
+    return methodColors[normalized] || 'grey';
+    },
         formatNumber(value) {
             // Si el valor es menor que 1000, devuelve el valor original con dos decimales
             if (value < 1000) {
@@ -393,5 +481,38 @@ export default {
 .primary--text {
     color: #1976d2;
     /* Color primario de Vuetify */
+}
+.tramos-card {
+  max-height: 600px; /* Altura máxima ajustable */
+  display: flex;
+  flex-direction: column;
+}
+
+.tramos-container {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.metodo-pago-table {
+  max-height: 200px;
+}
+
+/* Scrollbar personalizada */
+.tramos-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tramos-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.tramos-container::-webkit-scrollbar-thumb {
+  background: #b0bec5;
+  border-radius: 3px;
+}
+
+.tramos-container::-webkit-scrollbar-thumb:hover {
+  background: #78909c;
 }
 </style>
