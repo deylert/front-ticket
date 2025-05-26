@@ -666,39 +666,39 @@ export default {
   },
   methods: {
     generateTimeSlots() {
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const isToday = this.today(this.editedItem.date || new Date().toISOString().split("T")[0]);
-  const slots = [];
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const isToday = this.today(this.editedItem.date || new Date().toISOString().split("T")[0]);
+      const slots = [];
 
-  // Generar todos los slots posibles
-  for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute += 5) {
-      const slotMinutes = hour * 60 + minute;
-      const timeStr = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
-      
-      slots.push({
-        time: timeStr,
-        minutes: slotMinutes
-      });
-    }
-  }
+      // Generar todos los slots posibles
+      for (let hour = 0; hour < 24; hour++) {
+        for (let minute = 0; minute < 60; minute += 5) {
+          const slotMinutes = hour * 60 + minute;
+          const timeStr = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+          
+          slots.push({
+            time: timeStr,
+            minutes: slotMinutes
+          });
+        }
+      }
 
-  // Si estamos editando, incluir el slot actual aunque esté en el pasado
-  if (this.editedIndex !== -1 && this.editedItem.schedule) {
-    const currentSlot = slots.find(s => s.time === this.editedItem.schedule);
-    if (currentSlot && isToday && currentSlot.minutes <= currentMinutes) {
-      return [this.editedItem.schedule, ...slots
-        .filter(s => s.minutes > currentMinutes)
-        .map(s => s.time)];
-    }
-  }
+      // Si estamos editando, incluir el slot actual aunque esté en el pasado
+      if (this.editedIndex !== -1 && this.editedItem.schedule) {
+        const currentSlot = slots.find(s => s.time === this.editedItem.schedule);
+        if (currentSlot && isToday && currentSlot.minutes <= currentMinutes) {
+          return [this.editedItem.schedule, ...slots
+            .filter(s => s.minutes > currentMinutes)
+            .map(s => s.time)];
+        }
+      }
 
-  // Para creación o slots futuros
-  return isToday 
-    ? slots.filter(s => s.minutes > currentMinutes).map(s => s.time)
-    : slots.map(s => s.time);
-},
+      // Para creación o slots futuros
+      return isToday 
+        ? slots.filter(s => s.minutes > currentMinutes).map(s => s.time)
+        : slots.map(s => s.time);
+    },
     // Método para verificar si un trabajador ya está asociado al viaje
   isWorkerAssociated(worker) {
     return this.editedItem.workers?.some(w => w.id === worker.id);

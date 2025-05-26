@@ -638,8 +638,8 @@ export default {
             { title: "Horario", value: "schedule", },
             { title: "Metodo", value: "method", },
             { title: "Pasajes", value: "quantity", },
-            { title: "Adultos", value: "adults", },
-            { title: "Menores", value: "minors", },
+            //{ title: "Adultos", value: "adults", },
+            //{ title: "Menores", value: "minors", },
             { title: "Asientos", value: "seats", },
             { title: "Precio", value: "price", },
             { title: "Total", value: "total", },
@@ -1429,7 +1429,8 @@ export default {
 
                 if (result.success) {
                     // Si la solicitud es exitosa, asignamos las sucursales
-                    this.trips = result.data?.trips || [];
+                    //this.trips = result.data?.trips || [];
+                    this.trips = (result.data?.trips || []).filter(trip => trip.start == null || trip.start === "");
                     this.promotions = result.data?.promotions || [];
                     this.tickettypes = result.data?.tickettypes || [];
                 } else {
@@ -2023,7 +2024,8 @@ export default {
 
                 if (result.success) {
                     // Si la solicitud es exitosa, asignamos las sucursales
-                    this.trips = result.data?.trips || [];
+                    //this.trips = result.data?.trips || [];
+                    this.trips = (result.data?.trips || []).filter(trip => trip.start == null || trip.start === "");
                     this.promotions = result.data?.promotions || [];
                     this.tickettypes = result.data?.tickettypes || [];
                 } else {
